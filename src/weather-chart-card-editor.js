@@ -657,6 +657,11 @@ class WeatherChartCardEditor extends LitElement {
 	   <ha-list-item .value=${'uk'}>Ukrainian</ha-list-item>
     	   <ha-list-item .value=${'ko'}>한국어</ha-list-item>
         </ha-select>
+        <ha-textfield
+          label="Timezone (e.g., America/New_York, Europe/London)"
+          .value="${this._config.timezone || ''}"
+          @change="${(e) => this._valueChanged(e, 'timezone')}"
+        ></ha-textfield>
         </div>
       </div>
 
@@ -758,6 +763,18 @@ class WeatherChartCardEditor extends LitElement {
         <!-- Units Page -->
         <div class="page-container ${this.currentPage === 'units' ? 'active' : ''}">
           <div class="textfield-container">
+            <ha-select
+              naturalMenuWidth
+              fixedMenuPosition
+              label="Convert temperature to"
+              .configValue=${'units.temperature'}
+              .value=${unitsConfig.temperature}
+              @change=${(e) => this._valueChanged(e, 'units.temperature')}
+              @closed=${(ev) => ev.stopPropagation()}
+            >
+              <ha-list-item .value=${'°C'}>Celsius (°C)</ha-list-item>
+              <ha-list-item .value=${'°F'}>Fahrenheit (°F)</ha-list-item>
+            </ha-select>
             <ha-select
               naturalMenuWidth
               fixedMenuPosition

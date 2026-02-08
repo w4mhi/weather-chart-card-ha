@@ -1,10 +1,7 @@
-<h1 align="center">Weather Chart Card</h1>
+<h1 align="center">Enhanced Weather Chart Card</h1>
 
-# No Longer Maintained
-This repository is no longer maintained. Feel free to fork it if you find it useful.
-
-[![Buy me a coffee](https://www.buymeacoffee.com/assets/img/custom_images/orange_img.png)](https://www.buymeacoffee.com/mlamberts7I)
-[![PayPal](https://img.shields.io/badge/Donate-PayPal-blue?logo=paypal)](https://www.paypal.com/donate/?hosted_button_id=HZUUW64FRM2J2)
+## Maintained Fork
+This is an actively maintained fork of the original weather-chart-card project. We've added several improvements including timezone support, temperature unit conversion, and enhanced clock functionality. This version continues to receive updates and bug fixes to ensure compatibility with the latest Home Assistant releases.
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/integration)
 [![GitHub release (latest by date)](https://img.shields.io/github/v/release/mlamberts78/weather-chart-card?style=flat-square)](https://github.com/mlamberts78/weather-chart-card/releases/latest)
@@ -19,7 +16,7 @@ This repository is no longer maintained. Feel free to fork it if you find it use
 
 ### HACS
 
-This card is available in HACS (Home Assistant Community Store).
+This enhanced card is not available in HACS (Home Assistant Community Store).
 HACS is a third party community store and is not included in Home Assistant out of the box.
 
 #### Configuration variables:
@@ -62,6 +59,7 @@ HACS is a third party community store and is not included in Home Assistant out 
 | show_description      | boolean | false                    | Show or hide the weather description on the card.                                                  |
 | show_last_changed     | boolean | false                    | Show or hide when last data changed on the card.                                                   |
 | use_12hour_format     | boolean | false                    | Display time in 12-hour format (AM/PM) instead of 24-hour format.                                  |
+| timezone              | string  | none                     | Set a specific timezone (e.g., 'America/New_York'). Defaults to system timezone if not specified.  |
 | icons                 | string  | none                     | Path to the location of custom icons in svg format, for example `/local/weather-icons/`.           |
 | animated_icons        | boolean | false                    | Enable the use of animated icons                                                                   |
 | icon_style            | string  | 'style1'                 | Options are 'style1' and'style2' for different set of animated icons.                              |
@@ -102,6 +100,7 @@ HACS is a third party community store and is not included in Home Assistant out 
 | -------------------- | ------- | -------------------------|--------------------------------------------------------------------------------------------------- |
 | pressure             | string  | none                     | Convert to 'hPa' or 'mmHg' or 'inHg'                                                               |
 | speed                | string  | none                     | Convert to 'km/h' or 'm/s' or 'Bft' or 'mph'                                                       |
+| temperature          | string  | none                     | Convert to '°C' or '°F'. Applies to current temp, feels like, and forecast temperatures.           |
 
 ###### What custom icons can I use?
 Icons should be in svg format. Icons should have names as shown [here](https://github.com/mlamberts78/weather-chart-card/blob/master/src/const.js#L24). Example:
@@ -148,6 +147,17 @@ entity: weather.my_home
 units:
   pressure: mmHg
   speed: m/s
+  temperature: °F
+```
+
+###### Custom timezone
+```yaml
+type: custom:weather-chart-card
+entity: weather.my_home
+show_time: true
+show_day: true
+show_date: true
+timezone: America/New_York
 ```
 
 ###### Supported languages:

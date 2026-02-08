@@ -40,6 +40,7 @@ static getStubConfig(hass, unusedEntities, allEntities) {
     show_wind_speed: true,
     show_sun: true,
     show_feels_like: false,
+    timezone: '',
     show_dew_point: false,
     show_wind_gust_speed: false,
     show_visibility: false,
@@ -141,6 +142,7 @@ set hass(hass) {
   this.unitSpeed = this.config.units.speed ? this.config.units.speed : this.weather && this.weather.attributes.wind_speed_unit;
   this.unitPressure = this.config.units.pressure ? this.config.units.pressure : this.weather && this.weather.attributes.pressure_unit;
   this.unitVisibility = this.config.units.visibility ? this.config.units.visibility : this.weather && this.weather.attributes.visibility_unit;
+  this.unitTemperature = this.config.units.temperature ? this.config.units.temperature : this.weather && this.weather.attributes.temperature_unit;
   this.weather = this.config.entity in hass.states
     ? hass.states[this.config.entity]
     : null;
@@ -223,6 +225,10 @@ subscribeForecastEvents() {
     if (this.forecastSubscriber) {
       this.forecastSubscriber.then((unsub) => unsub());
     }
+    if (this.clockInterval) {
+      clearInterval(this.clockInterval);
+      this.clockInterval = null;
+    }
   }
 
   attachResizeObserver() {
@@ -263,6 +269,10 @@ ll(str) {
   }
 
   return locale[selectedLocale][str];
+}
+
+getTimezone() {
+  return this.config.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
 }
 
   getCardSize() {
@@ -375,6 +385,18 @@ calculateBeaufortScale(windSpeed) {
   else return 12;
 }
 
+convertTemperature(temp, fromUnit, toUnit) {
+  if (!toUnit || fromUnit === toUnit) return temp;
+  
+  if (toUnit === '°C' && fromUnit === '°F') {
+    return (temp - 32) * 5/9;
+  } else if (toUnit === '°F' && fromUnit === '°C') {
+    return (temp * 9/5) + 32;
+  }
+  
+  return temp;
+}
+
 async firstUpdated(changedProperties) {
   super.firstUpdated(changedProperties);
   this.measureCard();
@@ -467,7 +489,7 @@ drawChart({ config, language, weather, forecastItems } = this) {
   if (this.forecastChart) {
     this.forecastChart.destroy();
   }
-  var tempUnit = this._hass.config.unit_system.temperature;
+  var tempUnit = this.unitTemperature || this._hass.config.unit_system.temperature;
   var lengthUnit = this._hass.config.unit_system.length;
   if (config.forecast.precipitation_type === 'probability') {
     var precipUnit = '%';
@@ -639,27 +661,35 @@ drawChart({ config, language, weather, forecastItems } = this) {
               callback: function (value, index, values) {
                   var datetime = this.getLabelForValue(value);
                   var dateObj = new Date(datetime);
+                  var timezone = config.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+                  var locale = config.locale || undefined;
         
                   var timeFormatOptions = {
                       hour12: config.use_12hour_format,
                       hour: 'numeric',
                       ...(config.use_12hour_format ? {} : { minute: 'numeric' }),
+                      timeZone: timezone,
                   };
 
-                  var time = dateObj.toLocaleTimeString(language, timeFormatOptions);
+                  var time = dateObj.toLocaleTimeString(locale, timeFormatOptions);
 
-                  if (dateObj.getHours() === 0 && dateObj.getMinutes() === 0 && config.forecast.type === 'hourly') {
+                  // Get hours in the target timezone
+                  var tzHours = parseInt(new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: false, timeZone: timezone }).format(dateObj));
+                  var tzMinutes = parseInt(new Intl.DateTimeFormat('en-US', { minute: 'numeric', timeZone: timezone }).format(dateObj));
+
+                  if (tzHours === 0 && tzMinutes === 0 && config.forecast.type === 'hourly') {
                       var dateFormatOptions = {
                           day: 'numeric',
                           month: 'short',
+                          timeZone: timezone,
                       };
-                      var date = dateObj.toLocaleDateString(language, dateFormatOptions);
+                      var date = dateObj.toLocaleDateString(locale, dateFormatOptions);
                       time = time.replace('a.m.', 'AM').replace('p.m.', 'PM');
                       return [date, time];
                   }
 
                   if (config.forecast.type !== 'hourly') {
-                      var weekday = dateObj.toLocaleString(language, { weekday: 'short' }).toUpperCase();
+                      var weekday = dateObj.toLocaleString(locale, { weekday: 'short', timeZone: timezone }).toUpperCase();
                       return weekday;
                   }
 
@@ -719,13 +749,16 @@ drawChart({ config, language, weather, forecastItems } = this) {
           callbacks: {
             title: function (TooltipItem) {
               var datetime = TooltipItem[0].label;
-              return new Date(datetime).toLocaleDateString(language, {
+              var timezone = config.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+              var locale = config.locale || undefined;
+              return new Date(datetime).toLocaleDateString(locale, {
                 month: 'short',
                 day: 'numeric',
                 weekday: 'short',
                 hour: 'numeric',
                 minute: 'numeric',
                 hour12: config.use_12hour_format,
+                timeZone: timezone,
               });
             },
     label: function (context) {
@@ -764,17 +797,29 @@ computeForecastData({ config, forecastItems } = this) {
       }
     }
     dateTime.push(d.datetime);
-    tempHigh.push(d.temperature);
-    if (typeof d.templow !== 'undefined') {
-      tempLow.push(d.templow);
-    }
-
-    if (roundTemp) {
-      tempHigh[i] = Math.round(tempHigh[i]);
-      if (typeof d.templow !== 'undefined') {
-        tempLow[i] = Math.round(tempLow[i]);
+    
+    let highTemp = d.temperature;
+    let lowTemp = d.templow;
+    
+    // Convert temperatures if needed
+    if (this.unitTemperature && this.unitTemperature !== this.weather.attributes.temperature_unit) {
+      highTemp = this.convertTemperature(highTemp, this.weather.attributes.temperature_unit, this.unitTemperature);
+      if (typeof lowTemp !== 'undefined') {
+        lowTemp = this.convertTemperature(lowTemp, this.weather.attributes.temperature_unit, this.unitTemperature);
       }
     }
+    
+    // ALWAYS round temperatures for chart display (whether roundTemp is on or not)
+    highTemp = roundTemp ? Math.round(highTemp) : Math.round(highTemp * 10) / 10;
+    if (typeof lowTemp !== 'undefined') {
+      lowTemp = roundTemp ? Math.round(lowTemp) : Math.round(lowTemp * 10) / 10;
+    }
+    
+    tempHigh.push(highTemp);
+    if (typeof lowTemp !== 'undefined') {
+      tempLow.push(lowTemp);
+    }
+
     if (config.forecast.precipitation_type === 'probability') {
       precip.push(d.precipitation_probability);
     } else {
@@ -993,11 +1038,31 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
   const showSeconds = config.show_time_seconds === true;
 
   let roundedTemperature = parseFloat(temperature);
+  
+  // Temperature conversion
+  if (this.unitTemperature && this.unitTemperature !== this.weather.attributes.temperature_unit) {
+    roundedTemperature = this.convertTemperature(
+      roundedTemperature, 
+      this.weather.attributes.temperature_unit, 
+      this.unitTemperature
+    );
+  }
+  
   if (!isNaN(roundedTemperature) && roundedTemperature % 1 !== 0) {
     roundedTemperature = Math.round(roundedTemperature * 10) / 10;
   }
 
   let roundedFeelsLike = parseFloat(feels_like);
+  
+  // Feels like conversion
+  if (this.unitTemperature && this.unitTemperature !== this.weather.attributes.temperature_unit) {
+    roundedFeelsLike = this.convertTemperature(
+      roundedFeelsLike, 
+      this.weather.attributes.temperature_unit, 
+      this.unitTemperature
+    );
+  }
+  
   if (!isNaN(roundedFeelsLike) && roundedFeelsLike % 1 !== 0) {
     roundedFeelsLike = Math.round(roundedFeelsLike * 10) / 10;
   }
@@ -1006,43 +1071,14 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
     ? html`<img src="${this.getWeatherIcon(weather.state, sun.state)}" alt="">`
     : html`<ha-icon icon="${this.getWeatherIcon(weather.state, sun.state)}"></ha-icon>`;
 
-  const updateClock = () => {
-    const currentDate = new Date();
-    const timeOptions = {
-      hour12: use12HourFormat,
-      hour: 'numeric',
-      minute: 'numeric',
-      second: showSeconds ? 'numeric' : undefined
-    };
-    const currentTime = currentDate.toLocaleTimeString(this.language, timeOptions);
-    const currentDayOfWeek = currentDate.toLocaleString(this.language, { weekday: 'long' }).toUpperCase();
-    const currentDateFormatted = currentDate.toLocaleDateString(this.language, { month: 'long', day: 'numeric' });
-
-    const mainDiv = this.shadowRoot.querySelector('.main');
-    if (mainDiv) {
-      const clockElement = mainDiv.querySelector('#digital-clock');
-      if (clockElement) {
-        clockElement.textContent = currentTime;
-      }
-      if (showDay) {
-        const dayElement = mainDiv.querySelector('.date-text.day');
-        if (dayElement) {
-          dayElement.textContent = currentDayOfWeek;
-        }
-      }
-      if (showDate) {
-        const dateElement = mainDiv.querySelector('.date-text.date');
-        if (dateElement) {
-          dateElement.textContent = currentDateFormatted;
-        }
-      }
-    }
-  };
-
-  updateClock();
-
-  if (showTime) {
-    setInterval(updateClock, 1000);
+  // Clock update logic - moved outside render
+  if (showTime && !this.clockInterval) {
+    this.clockInterval = setInterval(() => this.updateClock(), 1000);
+    // Initial update
+    setTimeout(() => this.updateClock(), 0);
+  } else if (!showTime && this.clockInterval) {
+    clearInterval(this.clockInterval);
+    this.clockInterval = null;
   }
 
   return html`
@@ -1050,11 +1086,11 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
       ${iconHtml}
       <div>
         <div>
-          ${showTemperature ? html`${roundedTemperature}<span>${this.getUnit('temperature')}</span>` : ''}
+          ${showTemperature ? html`${roundedTemperature}<span>${this.unitTemperature || this.getUnit('temperature')}</span>` : ''}
           ${showFeelsLike && roundedFeelsLike ? html`
             <div class="feels-like">
               ${this.ll('feelsLike')}
-              ${roundedFeelsLike}${this.getUnit('temperature')}
+              ${roundedFeelsLike}${this.unitTemperature || this.getUnit('temperature')}
             </div>
           ` : ''}
           ${showCurrentCondition ? html`
@@ -1079,6 +1115,59 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
       </div>
     </div>
   `;
+}
+
+updateClock() {
+  const timezone = this.getTimezone();
+  const use12HourFormat = this.config.use_12hour_format;
+  const showSeconds = this.config.show_time_seconds === true;
+  const showDay = this.config.show_day;
+  const showDate = this.config.show_date;
+  const currentDate = new Date();
+  
+  // Force timezone conversion using explicit formatters
+  const timeFormatter = new Intl.DateTimeFormat(this.config.locale || 'en-US', {
+    hour: '2-digit',
+    minute: '2-digit',
+    second: showSeconds ? '2-digit' : undefined,
+    hour12: use12HourFormat,
+    timeZone: timezone
+  });
+  
+  const dayFormatter = new Intl.DateTimeFormat(this.config.locale || 'en-US', {
+    weekday: 'long',
+    timeZone: timezone
+  });
+  
+  const dateFormatter = new Intl.DateTimeFormat(this.config.locale || 'en-US', {
+    month: 'long',
+    day: 'numeric',
+    timeZone: timezone
+  });
+  
+  const currentTime = timeFormatter.format(currentDate);
+  const currentDayOfWeek = dayFormatter.format(currentDate).toUpperCase();
+  const currentDateFormatted = dateFormatter.format(currentDate);
+
+  const mainDiv = this.shadowRoot.querySelector('.main');
+  if (mainDiv) {
+    const clockElement = mainDiv.querySelector('#digital-clock');
+    if (clockElement) {
+      clockElement.textContent = currentTime;
+    }
+    if (showDay) {
+      const dayElement = mainDiv.querySelector('.date-text.day');
+      if (dayElement) {
+        dayElement.textContent = currentDayOfWeek;
+      }
+    }
+    if (showDate) {
+      const dateElement = mainDiv.querySelector('.date-text.date');
+      if (dateElement) {
+        dateElement.textContent = currentDateFormatted;
+      }
+    }
+  }
 }
 
 renderAttributes({ config, humidity, pressure, windSpeed, windDirection, sun, language, uv_index, dew_point, wind_gust_speed, visibility } = this) {
@@ -1206,18 +1295,22 @@ renderSun({ sun, language, config } = this) {
     return html``;
   }
 
-const use12HourFormat = this.config.use_12hour_format;
-const timeOptions = {
+  const use12HourFormat = this.config.use_12hour_format;
+  const timezone = this.getTimezone();
+  const locale = this.config.locale || undefined;
+  
+  const timeOptions = {
     hour12: use12HourFormat,
     hour: 'numeric',
-    minute: 'numeric'
-};
+    minute: 'numeric',
+    timeZone: timezone
+  };
 
   return html`
     <ha-icon icon="mdi:weather-sunset-up"></ha-icon>
-      ${new Date(sun.attributes.next_rising).toLocaleTimeString(language, timeOptions)}<br>
+      ${new Date(sun.attributes.next_rising).toLocaleTimeString(locale, timeOptions)}<br>
     <ha-icon icon="mdi:weather-sunset-down"></ha-icon>
-      ${new Date(sun.attributes.next_setting).toLocaleTimeString(language, timeOptions)}
+      ${new Date(sun.attributes.next_setting).toLocaleTimeString(locale, timeOptions)}
   `;
 }
 
