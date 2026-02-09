@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Weather Chart Card Test</title>
+  <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet">
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: sans-serif;
+      background: var(--primary-background-color, #fafafa);
+      color: var(--primary-text-color, #212121);
+      transition: background 0.3s, color 0.3s;
+    }
+    
+    body.dark-mode {
+      --primary-background-color: #111111;
+      --card-background-color: #1c1c1c;
+      --primary-text-color: #e1e1e1;
+      --secondary-text-color: #e1e1e1;
+      --divider-color: rgba(255, 255, 255, 0.12);
+      background: #111111;
+      color: #e1e1e1;
+    }
+    
+    body.light-mode {
+      --primary-background-color: #fafafa;
+      --card-background-color: #ffffff;
+      --primary-text-color: #212121;
+      --secondary-text-color: #727272;
+      --divider-color: rgba(0, 0, 0, 0.12);
+      background: #fafafa;
+      color: #212121;
+    }
+    
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    
+    .controls {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      background: var(--card-background-color, #fff);
+      color: var(--primary-text-color, #212121);
+      border: 1px solid var(--divider-color, #ccc);
+      border-radius: 4px;
+    }
+    
+    button:hover {
+      opacity: 0.8;
+    }
+    
+    ha-card {
+      display: block;
+      background: var(--card-background-color, #fff);
+      border-radius: 4px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+  </style>
+</head>
+<body class="light-mode">
+  <div class="container">
+    <div class="controls">
+      <button onclick="toggleTheme()">Toggle Theme</button>
+    </div>
+    
+    <weather-chart-card></weather-chart-card>
+  </div>
+
+  <script type="module">
+    // Polyfill for ha-card
+    if (!customElements.get('ha-card')) {
+      class HaCard extends HTMLElement {
+        constructor() {
+          super();
+          this.attachShadow({ mode: 'open' });
+        }
+        
+        connectedCallback() {
+          const header = this.getAttribute('header');
+          this.shadowRoot.innerHTML = `
+            <style>
+              :host {
+                display: block;
+                background: var(--card-background-color, #fff);
+                border-radius: 4px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+              }
+              .header {
+                padding: 16px;
+                font-size: 20px;
+                font-weight: 500;
+                border-bottom: 1px solid var(--divider-color, #e0e0e0);
+              }
+            </style>
+            ${header ? `<div class="header">${header}</div>` : ''}
+            <slot></slot>
+          `;
+        }
+      }
+      customElements.define('ha-card', HaCard);
+    }
+    
+    // Polyfill for ha-icon
+    if (!customElements.get('ha-icon')) {
+      class HaIcon extends HTMLElement {
+        constructor() {
+          super();
+          this.attachShadow({ mode: 'open' });
+        }
+        
+        connectedCallback() {
+          const icon = this.getAttribute('icon');
+          const iconName = icon ? icon.replace('mdi:', '').replace('hass:', '') : 'help-circle';
+          this.shadowRoot.innerHTML = `
+            <style>
+              :host {
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                width: var(--mdc-icon-size, 24px);
+                height: var(--mdc-icon-size, 24px);
+                color: var(--paper-item-icon-color, currentColor);
+              }
+              i {
+                font-size: var(--mdc-icon-size, 24px);
+              }
+            </style>
+            <i class="mdi mdi-${iconName}"></i>
+          `;
+        }
+      }
+      customElements.define('ha-icon', HaIcon);
+    }
+  </script>
+
+  <script type="module" src="./weather-chart-card.js"></script>
+
+  <script>
+    function toggleTheme() {
+      const body = document.body;
+      if (body.classList.contains('light-mode')) {
+        body.classList.remove('light-mode');
+        body.classList.add('dark-mode');
+      } else {
+        body.classList.remove('dark-mode');
+        body.classList.add('light-mode');
+      }
+    }
+
+    // Mock Home Assistant object
+    const mockHass = {
+      language: 'en',
+      selectedLanguage: 'en',
+      config: {
+        unit_system: {
+          temperature: '°C',
+          length: 'km',
+          wind_speed: 'km/h',
+          pressure: 'hPa',
+        },
+      },
+      states: {
+        'sun.sun': {
+          state: 'above_horizon',
+          attributes: {
+            next_rising: new Date(Date.now() + 12 * 60 * 60 * 1000).toISOString(),
+            next_setting: new Date(Date.now() + 6 * 60 * 60 * 1000).toISOString(),
+          },
+        },
+        'weather.home': {
+          state: 'sunny',
+          attributes: {
+            temperature: 22,
+            humidity: 65,
+            pressure: 1013,
+            wind_speed: 15,
+            wind_bearing: 180,
+            visibility: 10,
+            temperature_unit: '°C',
+            pressure_unit: 'hPa',
+            wind_speed_unit: 'km/h',
+            visibility_unit: 'km',
+            supported_features: 3,
+          },
+          last_changed: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
+        },
+      },
+      connection: {
+        subscribeMessage: (callback, config) => {
+          // Generate mock forecast data
+          const forecasts = [];
+          const now = new Date();
+          
+          for (let i = 0; i < 10; i++) {
+            const date = new Date(now);
+            date.setDate(date.getDate() + i);
+            
+            const temp = 15 + Math.sin(i * 0.5) * 10 + Math.random() * 5;
+            
+            forecasts.push({
+              datetime: date.toISOString(),
+              temperature: Math.round(temp),
+              templow: Math.round(temp - 5 - Math.random() * 3),
+              condition: ['sunny', 'cloudy', 'rainy', 'partly-cloudy'][Math.floor(Math.random() * 4)],
+              precipitation: Math.random() * 10,
+              precipitation_probability: Math.random() * 100,
+              wind_speed: 10 + Math.random() * 20,
+              wind_bearing: Math.random() * 360,
+            });
+          }
+          
+          setTimeout(() => {
+            callback({ forecast: forecasts });
+          }, 100);
+          
+          return Promise.resolve(() => {});
+        },
+      },
+    };
+
+    // Wait for the custom element to be defined
+    customElements.whenDefined('weather-chart-card').then(() => {
+      const card = document.querySelector('weather-chart-card');
+      
+      // Set config
+      card.setConfig({
+        entity: 'weather.home',
+        title: 'Weather Chart Card Test',
+        show_main: true,
+        show_temperature: true,
+        show_current_condition: true,
+        show_attributes: true,
+        show_time: true,
+        show_time_seconds: false,
+        show_day: true,
+        show_date: true,
+        show_humidity: true,
+        show_pressure: true,
+        show_wind_direction: true,
+        show_wind_speed: true,
+        show_sun: true,
+        animated_icons: false,
+        forecast: {
+          precipitation_type: 'rainfall',
+          show_probability: false,
+          labels_font_size: '11',
+          precip_bar_size: '100',
+          style: 'style2',
+          show_wind_forecast: true,
+          condition_icons: true,
+          round_temp: false,
+          type: 'daily',
+          number_of_forecasts: '0',
+          disable_animation: false,
+          chart_height: 180,
+          show_date_labels: true,
+          use_color_thresholds: true,
+        },
+      });
+      
+      // Set hass
+      card.hass = mockHass;
+    });
+  </script>
+</body>
+</html>

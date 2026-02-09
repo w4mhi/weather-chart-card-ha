@@ -61,7 +61,9 @@ static getStubConfig(hass, unusedEntities, allEntities) {
       round_temp: false,
       type: 'daily',
       number_of_forecasts: '0', 
-      disable_animation: false, 
+      disable_animation: false,
+      show_date_labels: true,
+      use_color_thresholds: true,
     },
   };
 }
@@ -115,6 +117,8 @@ setConfig(config) {
       type: 'daily',
       number_of_forecasts: '0',
       '12hourformat': false,
+      show_date_labels: true,
+      use_color_thresholds: true,
       ...config.forecast,
     },
     units: {
@@ -475,6 +479,46 @@ cancelAutoscroll() {
   }
 }
 
+getTemperatureColor(temp, unit) {
+  // Convert to Celsius for consistent thresholds
+  let tempC = temp;
+  if (unit === '°F') {
+    tempC = (temp - 32) * 5/9;
+  }
+  
+  // 6-level color spectrum
+  if (tempC < 5) {
+    return 'rgba(30, 136, 229, 1.0)';   // Cold - Dark Blue
+  } else if (tempC < 15) {
+    return 'rgba(129, 212, 250, 1.0)';  // Cool - Light Blue
+  } else if (tempC < 22) {
+    return 'rgba(129, 199, 132, 1.0)';  // Comfortable - Green
+  } else if (tempC < 26) {
+    return 'rgba(255, 241, 118, 1.0)';  // Pleasant/Warm - Yellow
+  } else if (tempC < 32) {
+    return 'rgba(255, 167, 38, 1.0)';   // Hot - Orange
+  } else {
+    return 'rgba(244, 67, 54, 1.0)';    // Very Hot - Red
+  }
+}
+
+createTemperatureGradient(data, unit, ctx, chartArea) {
+  if (!chartArea) {
+    return null;
+  }
+  
+  const gradient = ctx.createLinearGradient(chartArea.left, 0, chartArea.right, 0);
+  const dataLength = data.length;
+  
+  for (let i = 0; i < dataLength; i++) {
+    const position = i / (dataLength - 1);
+    const color = this.getTemperatureColor(data[i], unit);
+    gradient.addColorStop(position, color);
+  }
+  
+  return gradient;
+}
+
 drawChart({ config, language, weather, forecastItems } = this) {
   if (!this.forecasts || !this.forecasts.length) {
     return [];
@@ -536,14 +580,37 @@ drawChart({ config, language, weather, forecastItems } = this) {
       type: 'line',
       data: data.tempHigh,
       yAxisID: 'TempAxis',
-      borderColor: config.forecast.temperature1_color,
-      backgroundColor: config.forecast.temperature1_color,
+      borderColor: config.forecast.use_color_thresholds 
+        ? (context) => {
+            if (context.chart.chartArea) {
+              return this.createTemperatureGradient(data.tempHigh, tempUnit, context.chart.ctx, context.chart.chartArea);
+            }
+            return config.forecast.temperature1_color;
+          }
+        : config.forecast.temperature1_color,
+      backgroundColor: config.forecast.use_color_thresholds
+        ? (context) => {
+            if (context.chart.chartArea) {
+              return this.createTemperatureGradient(data.tempHigh, tempUnit, context.chart.ctx, context.chart.chartArea);
+            }
+            return config.forecast.temperature1_color;
+          }
+        : config.forecast.temperature1_color,
+      segment: {
+        borderColor: config.forecast.use_color_thresholds
+          ? (ctx) => {
+              const temp = ctx.p1.parsed.y;
+              return this.getTemperatureColor(temp, tempUnit);
+            }
+          : undefined,
+      },
     },
     {
       label: this.ll('tempLo'),
       type: 'line',
       data: data.tempLow,
       yAxisID: 'TempAxis',
+      borderDash: [5, 5],
       borderColor: config.forecast.temperature2_color,
       backgroundColor: config.forecast.temperature2_color,
     },
@@ -604,7 +671,9 @@ drawChart({ config, language, weather, forecastItems } = this) {
       anchor: 'center',
       backgroundColor: 'transparent',
       borderColor: 'transparent',
-      color: chart_text_color || config.forecast.temperature1_color,
+      color: config.forecast.use_color_thresholds
+        ? (context) => this.getTemperatureColor(context.dataset.data[context.dataIndex], tempUnit)
+        : (chart_text_color || config.forecast.temperature1_color),
       font: {
         size: parseInt(config.forecast.labels_font_size) + 1,
         lineHeight: 0.7,
@@ -690,6 +759,13 @@ drawChart({ config, language, weather, forecastItems } = this) {
 
                   if (config.forecast.type !== 'hourly') {
                       var weekday = dateObj.toLocaleString(locale, { weekday: 'short', timeZone: timezone }).toUpperCase();
+                      
+                      // Add date number if show_date_labels is enabled
+                      if (config.forecast.show_date_labels) {
+                          var dayNumber = dateObj.toLocaleString(locale, { day: 'numeric', timeZone: timezone });
+                          return [weekday, dayNumber];  // Return as array for multi-line display
+                      }
+                      
                       return weekday;
                   }
 

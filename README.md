@@ -12,6 +12,19 @@ This is an actively maintained fork of the original weather-chart-card project. 
 ![weather-chart-card](https://github.com/mlamberts78/weather-chart-card/assets/93537082/bd5b9f6e-4125-4a19-9773-463e6d054bce)
 ![15-days](https://github.com/mlamberts78/weather-chart-card/assets/93537082/f4de6060-7005-4a6d-b1f3-3aa17c856c73)
 
+## Recent Updates
+
+### New Features
+- **Temperature Gradient Colors**: Automatic color-coded temperature lines based on comfort levels (6-level spectrum)
+  - High/day temperature line displays with gradient colors from cold (blue) to hot (red)
+  - Low/night temperature line displays as a dashed line in solid color for easy distinction
+- **Date Labels**: Display date numbers below weekday labels in daily forecast view
+- **Enhanced Visual Design**: 
+  - Gradient colors based on actual temperature comfort: < 5°C (Cold/Dark Blue), 5-15°C (Cool/Light Blue), 15-22°C (Comfortable/Green), 22-26°C (Pleasant/Yellow), 26-32°C (Hot/Orange), > 32°C (Very Hot/Red)
+  - Dashed border for night temperature line for better visual distinction
+  - Solid border for day temperature line with gradient colors
+- **Development Tools**: Local test server for easier development without Home Assistant installation
+
 ## Installation
 
 ### HACS
@@ -80,19 +93,22 @@ HACS is a third party community store and is not included in Home Assistant out 
 | show_probability     | boolean | false                    | Also show probability value when precipitation_type = rainfall. (Only when available)              |
 | labels_font_size     | number  | 11                       | Font size for temperature and precipitation labels.                                                |
 | precip_bar_size      | number  | 100                      | Adjusts the thickness of precipitation bars (1-100).                                               |
-| temperature1_color   | string  | rgba(255, 152, 0, 1.0)   | Temperature first line chart color.                                                                |
-| temperature2_color   | string  | rgba(68, 115, 158, 1.0)  | Temperature second line chart color.                                                               |
+| temperature1_color   | string  | rgba(255, 152, 0, 1.0)   | High/day temperature line color (used when use_color_thresholds is false).                         |
+| temperature2_color   | string  | rgba(68, 115, 158, 1.0)  | Low/night temperature line color.                                                                  |
 | precipitation_color  | string  | rgba(132, 209, 253, 1.0) | Precipitation bar chart color.                                                                     |
+| use_color_thresholds | boolean | true                     | Enable automatic temperature-based gradient colors for high temperature line (6 comfort levels).   |
 | chart_datetime_color | string  | primary-text-color       | Chart day or hour color                                                                            |
 | chart_text_color     | string  | none                     | Chart text color                                                                                   |
 | chart_height         | number  | 180                      | Adjust the forecast chart height                                                                   |
 | condition_icons      | boolean | true                     | Show or hide forecast condition icons.                                                             |
+| condition_icon_size_multiplier | number | 2.0             | Multiplier for condition icon size relative to icons_size.                                         |
 | show_wind_forecast   | boolean | true                     | Show or hide wind forecast on the card.                                                            |
 | round_temp           | boolean | false                    | Option for rounding the forecast temperatures                                                      |
 | style                | string  | style1                   | Change chart style, options: 'style1' or 'style2'                                                  |
 | type                 | string  | daily                    | Show daily or hourly forecast if available, options: 'daily' or 'hourly'                           |
 | number_of_forecasts  | number  | 0                        | Overrides the number of forecasts to display. Set to "0" for automatic mode.                       |
 | disable_animation    | boolean | false                    | Disable the chart animation.                                                                       |
+| show_date_labels     | boolean | true                     | Show date numbers below weekday labels in daily forecast view.                                     |
 
 ##### Units of measurement
 
@@ -159,6 +175,70 @@ show_day: true
 show_date: true
 timezone: America/New_York
 ```
+
+###### Temperature gradient colors (automatic comfort-based thresholds)
+The card automatically colors the high temperature line based on comfort levels with a 6-level spectrum:
+- **< 5°C**: Dark Blue (Cold)
+- **5-15°C**: Light Blue (Cool)  
+- **15-22°C**: Green (Comfortable - good weather range)
+- **22-26°C**: Yellow (Pleasant/Warm)
+- **26-32°C**: Orange (Hot)
+- **> 32°C**: Red (Very Hot)
+
+The night temperature line displays as a dashed line in solid color for easy distinction.
+
+Enabled by default. Example configuration:
+```yaml
+type: custom:weather-chart-card
+entity: weather.my_home
+forecast:
+  use_color_thresholds: true  # Enable gradient colors (default)
+  style: style2
+```
+
+To disable automatic gradients and use solid colors:
+```yaml
+type: custom:weather-chart-card
+entity: weather.my_home
+forecast:
+  use_color_thresholds: false
+  temperature1_color: rgba(255, 152, 0, 1.0)
+  temperature2_color: rgba(68, 115, 158, 1.0)
+```
+
+###### Date labels in daily forecast
+Show date numbers below weekday labels for better context:
+```yaml
+type: custom:weather-chart-card
+entity: weather.my_home
+forecast:
+  type: daily
+  show_date_labels: true  # Shows "MON" and "8" on separate lines
+```
+
+## Development
+
+### Local Testing Without Home Assistant
+For developers who want to test changes without installing the card in Home Assistant:
+
+1. Install dependencies:
+```bash
+npm install
+```
+
+2. Start the development server:
+```bash
+npm start
+```
+
+3. Open `test.html` in your browser at `http://localhost:5500/test.html`
+
+The development server includes:
+- Automatic rebuilding on file changes
+- Source maps for debugging
+- Mock weather data for testing
+- Theme toggle (light/dark mode)
+- All card features enabled
 
 ###### Supported languages:
 | Language         | Locale  |

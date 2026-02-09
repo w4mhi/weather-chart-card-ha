@@ -1,6 +1,6 @@
 {
   "name": "weather-chart-card",
-  "version": "1.2.0",
+  "version": "1.2.5",
   "description": "Weather card with charts for Home Assistant Lovelace UI",
   "keywords": [
     "home-assistant",
@@ -12,7 +12,7 @@
   ],
   "module": "src/main.js",
   "repository": "git@github.com:mlamberts78/weather-chart-card.git",
-  "author": "Marc Lamberts",
+  "author": "Marc Lamberts, enhanced by Mihai",
   "license": "MIT",
   "dependencies": {
     "chart.js": "^4.4.1",
