@@ -47,6 +47,8 @@ static getStubConfig(hass, unusedEntities, allEntities) {
     show_last_changed: false,
     use_12hour_format: false,
     icons_size: 25,
+    main_icon_size: 90,
+    current_temp_size: 38,
     animated_icons: false,
     icon_style: 'style1',
     autoscroll: false,
@@ -91,7 +93,8 @@ setConfig(config) {
     icons_size: 25,
     animated_icons: false,
     icon_style: 'style1',
-    current_temp_size: 28,
+    current_temp_size: 38,
+    main_icon_size: 90,
     time_size: 26,
     day_date_size: 15,
     show_feels_like: false,
@@ -967,24 +970,39 @@ updateChart({ forecasts, forecastChart } = this) {
         .main {
           display: flex;
           align-items: center;
+          justify-content: space-between;
           font-size: ${config.current_temp_size}px;
           margin-bottom: 10px;
+          position: relative;
         }
-        .main ha-icon {
-          --mdc-icon-size: 50px;
-          margin-right: 14px;
-          margin-inline-start: initial;
-          margin-inline-end: 14px;
+        .main .weather-icon {
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 1;
         }
-        .main img {
-          width: ${config.icons_size * 2}px;
-          height: ${config.icons_size * 2}px;
-          margin-right: 14px;
-          margin-inline-start: initial;
-          margin-inline-end: 14px;
+        .main .weather-icon ha-icon {
+          --mdc-icon-size: ${config.main_icon_size || 90}px;
         }
-        .main div {
-          line-height: 0.9;
+        .main .weather-icon img {
+          width: ${config.main_icon_size || 90}px;
+          height: ${config.main_icon_size || 90}px;
+        }
+        .main .temp-info {
+          display: flex;
+          flex-direction: column;
+          z-index: 2;
+        }
+        .main .temp-info > div {
+          line-height: 1.2;
+        }
+        .main .current-temp {
+          font-size: ${config.current_temp_size}px;
+          font-weight: 300;
+        }
+        .main .current-condition {
+          font-size: 18px;
+          margin-top: 4px;
         }
         .main span {
           font-size: 18px;
@@ -1159,36 +1177,43 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
 
   return html`
     <div class="main">
-      ${iconHtml}
-      <div>
-        <div>
+      <!-- Left: Temperature and condition info -->
+      <div class="temp-info">
+        <div class="current-temp">
           ${showTemperature ? html`${roundedTemperature}<span>${this.unitTemperature || this.getUnit('temperature')}</span>` : ''}
-          ${showFeelsLike && roundedFeelsLike ? html`
-            <div class="feels-like">
-              ${this.ll('feelsLike')}
-              ${roundedFeelsLike}${this.unitTemperature || this.getUnit('temperature')}
-            </div>
-          ` : ''}
-          ${showCurrentCondition ? html`
-            <div class="current-condition">
-              <span>${this.ll(weather.state)}</span>
-            </div>
-          ` : ''}
-          ${showDescription ? html`
-            <div class="description">
-              ${description}
-            </div>
-          ` : ''}
         </div>
-        ${showTime ? html`
-          <div class="current-time">
-            <div id="digital-clock"></div>
-            ${showDay ? html`<div class="date-text day"></div>` : ''}
-            ${showDay && showDate ? html` ` : ''}
-            ${showDate ? html`<div class="date-text date"></div>` : ''}
+        ${showCurrentCondition ? html`
+          <div class="current-condition">
+            ${this.ll(weather.state)}
+          </div>
+        ` : ''}
+        ${showFeelsLike && roundedFeelsLike ? html`
+          <div class="feels-like">
+            ${this.ll('feelsLike')}
+            ${roundedFeelsLike}${this.unitTemperature || this.getUnit('temperature')}
+          </div>
+        ` : ''}
+        ${showDescription ? html`
+          <div class="description">
+            ${description}
           </div>
         ` : ''}
       </div>
+      
+      <!-- Center: Large weather icon -->
+      <div class="weather-icon">
+        ${iconHtml}
+      </div>
+      
+      <!-- Right: Time/date info (if enabled) -->
+      ${showTime ? html`
+        <div class="current-time">
+          <div id="digital-clock"></div>
+          ${showDay ? html`<div class="date-text day"></div>` : ''}
+          ${showDay && showDate ? html` ` : ''}
+          ${showDate ? html`<div class="date-text date"></div>` : ''}
+        </div>
+      ` : html`<div></div>`}
     </div>
   `;
 }

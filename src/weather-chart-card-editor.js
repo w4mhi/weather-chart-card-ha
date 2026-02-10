@@ -612,12 +612,20 @@ class WeatherChartCardEditor extends LitElement {
            .value="${this._config.icons_size || '25'}"
            @change="${(e) => this._valueChanged(e, 'icons_size')}"
          ></ha-textfield>
+        <div class="flex-container">
           <ha-textfield
-            label="Curent temperature Font Size"
-           type="number"
-            .value="${this._config.current_temp_size || '28'}"
+            label="Current Temperature Font Size"
+            type="number"
+            .value="${this._config.current_temp_size || '38'}"
             @change="${(e) => this._valueChanged(e, 'current_temp_size')}"
           ></ha-textfield>
+          <ha-textfield
+            label="Main Weather Icon Size"
+            type="number"
+            .value="${this._config.main_icon_size || '90'}"
+            @change="${(e) => this._valueChanged(e, 'main_icon_size')}"
+          ></ha-textfield>
+        </div>
         <ha-textfield
           label="Custom icon path"
           .value="${this._config.icons || ''}"

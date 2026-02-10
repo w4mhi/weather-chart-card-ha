@@ -1,3 +1,5 @@
+'use strict';
+
 const locale = {
   cs: {
     'tempHi': 'Teplota',
@@ -1473,12 +1475,20 @@ class WeatherChartCardEditor extends s {
            .value="${this._config.icons_size || '25'}"
            @change="${(e) => this._valueChanged(e, 'icons_size')}"
          ></ha-textfield>
+        <div class="flex-container">
           <ha-textfield
-            label="Curent temperature Font Size"
-           type="number"
-            .value="${this._config.current_temp_size || '28'}"
+            label="Current Temperature Font Size"
+            type="number"
+            .value="${this._config.current_temp_size || '38'}"
             @change="${(e) => this._valueChanged(e, 'current_temp_size')}"
           ></ha-textfield>
+          <ha-textfield
+            label="Main Weather Icon Size"
+            type="number"
+            .value="${this._config.main_icon_size || '90'}"
+            @change="${(e) => this._valueChanged(e, 'main_icon_size')}"
+          ></ha-textfield>
+        </div>
         <ha-textfield
           label="Custom icon path"
           .value="${this._config.icons || ''}"
@@ -18009,6 +18019,8 @@ static getStubConfig(hass, unusedEntities, allEntities) {
     show_last_changed: false,
     use_12hour_format: false,
     icons_size: 25,
+    main_icon_size: 90,
+    current_temp_size: 38,
     animated_icons: false,
     icon_style: 'style1',
     autoscroll: false,
@@ -18053,7 +18065,8 @@ setConfig(config) {
     icons_size: 25,
     animated_icons: false,
     icon_style: 'style1',
-    current_temp_size: 28,
+    current_temp_size: 38,
+    main_icon_size: 90,
     time_size: 26,
     day_date_size: 15,
     show_feels_like: false,
@@ -18929,24 +18942,39 @@ updateChart({ forecasts, forecastChart } = this) {
         .main {
           display: flex;
           align-items: center;
+          justify-content: space-between;
           font-size: ${config.current_temp_size}px;
           margin-bottom: 10px;
+          position: relative;
         }
-        .main ha-icon {
-          --mdc-icon-size: 50px;
-          margin-right: 14px;
-          margin-inline-start: initial;
-          margin-inline-end: 14px;
+        .main .weather-icon {
+          position: absolute;
+          left: 50%;
+          transform: translateX(-50%);
+          z-index: 1;
         }
-        .main img {
-          width: ${config.icons_size * 2}px;
-          height: ${config.icons_size * 2}px;
-          margin-right: 14px;
-          margin-inline-start: initial;
-          margin-inline-end: 14px;
+        .main .weather-icon ha-icon {
+          --mdc-icon-size: ${config.main_icon_size || 90}px;
         }
-        .main div {
-          line-height: 0.9;
+        .main .weather-icon img {
+          width: ${config.main_icon_size || 90}px;
+          height: ${config.main_icon_size || 90}px;
+        }
+        .main .temp-info {
+          display: flex;
+          flex-direction: column;
+          z-index: 2;
+        }
+        .main .temp-info > div {
+          line-height: 1.2;
+        }
+        .main .current-temp {
+          font-size: ${config.current_temp_size}px;
+          font-weight: 300;
+        }
+        .main .current-condition {
+          font-size: 18px;
+          margin-top: 4px;
         }
         .main span {
           font-size: 18px;
@@ -19121,36 +19149,43 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
 
   return x`
     <div class="main">
-      ${iconHtml}
-      <div>
-        <div>
+      <!-- Left: Temperature and condition info -->
+      <div class="temp-info">
+        <div class="current-temp">
           ${showTemperature ? x`${roundedTemperature}<span>${this.unitTemperature || this.getUnit('temperature')}</span>` : ''}
-          ${showFeelsLike && roundedFeelsLike ? x`
-            <div class="feels-like">
-              ${this.ll('feelsLike')}
-              ${roundedFeelsLike}${this.unitTemperature || this.getUnit('temperature')}
-            </div>
-          ` : ''}
-          ${showCurrentCondition ? x`
-            <div class="current-condition">
-              <span>${this.ll(weather.state)}</span>
-            </div>
-          ` : ''}
-          ${showDescription ? x`
-            <div class="description">
-              ${description}
-            </div>
-          ` : ''}
         </div>
-        ${showTime ? x`
-          <div class="current-time">
-            <div id="digital-clock"></div>
-            ${showDay ? x`<div class="date-text day"></div>` : ''}
-            ${showDay && showDate ? x` ` : ''}
-            ${showDate ? x`<div class="date-text date"></div>` : ''}
+        ${showCurrentCondition ? x`
+          <div class="current-condition">
+            ${this.ll(weather.state)}
+          </div>
+        ` : ''}
+        ${showFeelsLike && roundedFeelsLike ? x`
+          <div class="feels-like">
+            ${this.ll('feelsLike')}
+            ${roundedFeelsLike}${this.unitTemperature || this.getUnit('temperature')}
+          </div>
+        ` : ''}
+        ${showDescription ? x`
+          <div class="description">
+            ${description}
           </div>
         ` : ''}
       </div>
+      
+      <!-- Center: Large weather icon -->
+      <div class="weather-icon">
+        ${iconHtml}
+      </div>
+      
+      <!-- Right: Time/date info (if enabled) -->
+      ${showTime ? x`
+        <div class="current-time">
+          <div id="digital-clock"></div>
+          ${showDay ? x`<div class="date-text day"></div>` : ''}
+          ${showDay && showDate ? x` ` : ''}
+          ${showDate ? x`<div class="date-text date"></div>` : ''}
+        </div>
+      ` : x`<div></div>`}
     </div>
   `;
 }
@@ -19530,4 +19565,3 @@ window.customCards.push({
   preview: true,
   documentationURL: "https://github.com/mlamberts78/weather-chart-card",
 });
-//# sourceMappingURL=weather-chart-card.js.map
