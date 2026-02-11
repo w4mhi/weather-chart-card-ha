@@ -622,7 +622,7 @@ class WeatherChartCardEditor extends LitElement {
           <ha-textfield
             label="Main Weather Icon Size"
             type="number"
-            .value="${this._config.main_icon_size || '90'}"
+            .value="${this._config.main_icon_size || '150'}"
             @change="${(e) => this._valueChanged(e, 'main_icon_size')}"
           ></ha-textfield>
         </div>

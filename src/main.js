@@ -47,7 +47,7 @@ static getStubConfig(hass, unusedEntities, allEntities) {
     show_last_changed: false,
     use_12hour_format: false,
     icons_size: 25,
-    main_icon_size: 90,
+    main_icon_size: 150,
     current_temp_size: 38,
     animated_icons: false,
     icon_style: 'style1',
@@ -94,7 +94,7 @@ setConfig(config) {
     animated_icons: false,
     icon_style: 'style1',
     current_temp_size: 38,
-    main_icon_size: 90,
+    main_icon_size: 150,
     time_size: 26,
     day_date_size: 15,
     show_feels_like: false,
@@ -982,11 +982,11 @@ updateChart({ forecasts, forecastChart } = this) {
           z-index: 1;
         }
         .main .weather-icon ha-icon {
-          --mdc-icon-size: ${config.main_icon_size || 90}px;
+          --mdc-icon-size: ${config.main_icon_size || 150}px;
         }
         .main .weather-icon img {
-          width: ${config.main_icon_size || 90}px;
-          height: ${config.main_icon_size || 90}px;
+          width: ${config.main_icon_size || 150}px;
+          height: ${config.main_icon_size || 150}px;
         }
         .main .temp-info {
           display: flex;
