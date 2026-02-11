@@ -1,3 +1,11 @@
+/**
+ * Weather card constants
+ * 
+ * Weather icons by Bas Milius
+ * https://github.com/basmilius/weather-icons
+ * Licensed under MIT License
+ */
+
 const cardinalDirectionsIcon = [
   'arrow-down', 'arrow-bottom-left', 'arrow-left',
   'arrow-top-left', 'arrow-up', 'arrow-top-right',
@@ -25,14 +33,14 @@ const weatherIcons = {
 const weatherIconsDay = {
   'clear-night': 'clear-night',
   'cloudy': 'cloudy',
-  'exceptional': 'exceptional',
-  'fog': 'fog',
+  'exceptional': 'extreme-day',
+  'fog': 'fog-day',
   'hail': 'hail',
-  'lightning': 'lightning',
-  'lightning-rainy': 'lightning-rain',
-  'partlycloudy': 'partlycloudy-day',
-  'pouring': 'pouring',
-  'rainy': 'rain',
+  'lightning': 'thunderstorms-day',
+  'lightning-rainy': 'thunderstorms-day-rain',
+  'partlycloudy': 'partly-cloudy-day',
+  'pouring': 'extreme-day-rain',
+  'rainy': 'overcast-day-rain',
   'snowy': 'snow',
   'snowy-rainy': 'sleet',
   'sunny': 'clear-day',
@@ -42,8 +50,14 @@ const weatherIconsDay = {
 
 const weatherIconsNight = {
   ...weatherIconsDay,
+  'exceptional': 'extreme-night',
+  'fog': 'fog-night',
+  'lightning': 'thunderstorms-night',
+  'lightning-rainy': 'thunderstorms-night-rain',
+  'partlycloudy': 'partly-cloudy-night',
+  'pouring': 'extreme-night-rain',
+  'rainy': 'overcast-night-rain',
   'sunny': 'clear-night',
-  'partlycloudy': 'partlycloudy-night',
 };
 
 const WeatherEntityFeature = {

@@ -22,6 +22,7 @@ const locale = {
     ],
     'clear-night': 'Jasná noc',
     'cloudy': 'Zataženo',
+    'exceptional': 'Extrémní počasí',
     'fog': 'Mlha',
     'hail': 'Kroupy',
     'lightning': 'Bouřky',
@@ -56,6 +57,7 @@ const locale = {
     ],
     'clear-night': 'Jasná noc',
     'cloudy': 'Oblačno',
+    'exceptional': 'Extrémne počasie',
     'fog': 'Hmla',
     'hail': 'Krúpy',
     'lightning': 'Búrky',
@@ -90,6 +92,7 @@ const locale = {
     ],
     'clear-night': 'Sternenklar',
     'cloudy': 'Bewölkt',
+    'exceptional': 'Unwetter',
     'fog': 'Nebel',
     'hail': 'Hagel',
     'lightning': 'Gewitter',
@@ -124,6 +127,7 @@ const locale = {
     ],
     'clear-night': 'Helder nacht',
     'cloudy': 'Bewolkt',
+    'exceptional': 'Extreem weer',
     'fog': 'Mist',
     'hail': 'Hagel',
     'lightning': 'Bliksem',
@@ -158,6 +162,7 @@ const locale = {
     ],
     'clear-night': 'Clear, night',
     'cloudy': 'Cloudy',
+    'exceptional': 'Exceptional',
     'fog': 'Fog',
     'hail': 'Hail',
     'lightning': 'Lightning',
@@ -192,6 +197,7 @@ const locale = {
     ],
     'clear-night': 'Despejado, noche',
     'cloudy': 'Nublado',
+    'exceptional': 'Clima extremo',
     'fog': 'Niebla',
     'hail': 'Granizo',
     'lightning': 'Truenos',
@@ -226,6 +232,7 @@ const locale = {
     ],
     'clear-night': 'Y\u00f6, selke\u00e4\u00e4',
     'cloudy': 'Pilvist\u00e4',
+    'exceptional': 'Äärimmäinen sää',
     'fog': 'Sumuista',
     'hail': 'Raekuuroja',
     'lightning': 'Ukkoskuuroja',
@@ -260,6 +267,7 @@ const locale = {
     ],
     'clear-night': 'Tiszta, éjszaka',
     'cloudy': 'Felhős',
+    'exceptional': 'Szélsőséges időjárás',
     'fog': 'Ködös',
     'hail': 'Jégeső',
     'lightning': 'Villám',
@@ -294,6 +302,7 @@ const locale = {
     ],
     'clear-night': 'Ясно',
     'cloudy': 'Облачно',
+    'exceptional': 'Экстремальная погода',
     'fog': 'Туман',
     'hail': 'Град',
     'lightning': 'Гроза',
@@ -328,6 +337,7 @@ const locale = {
     ],
     'clear-night': 'Klar natt',
     'cloudy': 'Molnigt',
+    'exceptional': 'Extremt väder',
     'fog': 'Dimma',
     'hail': 'Hagel',
     'lightning': 'Åska',
@@ -362,6 +372,7 @@ const locale = {
     ],
     'clear-night': 'Nuit dégagée',
     'cloudy': 'Nuageux',
+    'exceptional': 'Temps exceptionnel',
     'fog': 'Brouillard',
     'hail': 'Grêle',
     'lightning': 'Orage',
@@ -396,6 +407,7 @@ const locale = {
     ],
     'clear-night': 'Bezchmurna noc',
     'cloudy': 'Pochmurnie',
+    'exceptional': 'Pogoda ekstremalna',
     'fog': 'Mgła',
     'hail': 'Grad',
     'lightning': 'Błyskawice',
@@ -430,6 +442,7 @@ const locale = {
     ],
     'clear-night': 'Klar natt',
     'cloudy': 'Overskyet',
+    'exceptional': 'Ekstremt vær',
     'fog': 'Tåke',
     'hail': 'Hagl',
     'lightning': 'Lyn',
@@ -464,6 +477,7 @@ const locale = {
     ],
     'clear-night': 'Klart',
     'cloudy': 'Overskyet',
+    'exceptional': 'Ekstremt vejr',
     'fog': 'Tåget',
     'hail': 'Hagl',
     'lightning': 'Lyn',
@@ -498,6 +512,7 @@ const locale = {
     ],
     'clear-night': 'Sereno, notte',
     'cloudy': 'Nuvoloso',
+    'exceptional': 'Tempo eccezionale',
     'fog': 'Nebbia',
     'hail': 'Grandine',
     'lightning': 'Tuoni',
@@ -532,6 +547,7 @@ const locale = {
     ],
     'clear-night': 'Noite limpa',
     'cloudy': 'Nublado',
+    'exceptional': 'Tempo excecional',
     'fog': 'Nevoeiro',
     'hail': 'Granizo',
     'lightning': 'Relâmpago ',
@@ -566,6 +582,7 @@ const locale = {
     ],
     'clear-night': 'Καθαρός ουρανός, νύχτα',
     'cloudy': 'Συννεφιά',
+    'exceptional': 'Ακραίος καιρός',
     'fog': 'Ομίχλη',
     'hail': 'Χαλάζι',
     'lightning': 'Κεραυνοί',
@@ -600,6 +617,7 @@ const locale = {
     ],
     'clear-night': 'Ясно,нощ',
     'cloudy': 'Облачно',
+    'exceptional': 'Екстремно време',
     'fog': 'Мъгла',
     'hail': 'Градушка',
     'lightning': 'Гръмотевици',
@@ -634,6 +652,7 @@ const locale = {
     ],
     'clear-night': 'Giedra naktis',
     'cloudy': 'Debesuota',
+    'exceptional': 'Ekstremalios oro sąlygos',
     'fog': 'Rūkas',
     'hail': 'Kruša',
     'lightning': 'Perkūnija',
@@ -668,6 +687,7 @@ const locale = {
     ],
     'clear-night': 'Serè',
     'cloudy': 'Ennuvolat',
+    'exceptional': 'Temps extrem',
     'fog': 'Boira',
     'hail': 'Calamarsa',
     'lightning': 'Tempesta elèctrica',
@@ -692,7 +712,7 @@ const locale = {
       'mph': 'mph',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
       'in': 'in'
     },
@@ -701,19 +721,20 @@ const locale = {
       'S', 'S-SV', 'SV', 'V-SV', 'V', 'V-NV', 'NV', 'N-NV', 'N'
     ],
     'clear-night': 'Cer senin, noapte',
-    'cloudy': 'Noros',
+    'cloudy': 'Cer noros',
+    'exceptional': 'Vreme excepțională',
     'fog': 'Ceață',
     'hail': 'Grindină',
-    'lightning': 'Fulger',
-    'lightning-rainy': 'Fulger, ploios',
+    'lightning': 'Fulgere',
+    'lightning-rainy': 'Ploaie cu fulgere',
     'partlycloudy': 'Parțial noros',
-    'pouring': 'Plouă torențial',
-    'rainy': 'Ploios',
-    'snowy': 'Ninge',
-    'snowy-rainy': 'Ninge, ploios',
-    'sunny': 'Însorit',
+    'pouring': 'Ploaie torențială',
+    'rainy': 'Timp ploios',
+    'snowy': 'Ninsoare',
+    'snowy-rainy': 'Lapoviță',
+    'sunny': 'Cer senin',
     'windy': 'Vânt',
-    'windy-variant': 'Vânt'
+    'windy-variant': 'Vânt in rafale'
   },
   uk: {
     'tempHi': 'Температура',
@@ -736,6 +757,7 @@ const locale = {
     ],
     'clear-night': 'Ясно, ніч',
     'cloudy': 'Хмарно',
+    'exceptional': 'Екстремальна погода',
     'fog': 'Туман',
     'hail': 'Град',
     'lightning': 'Гроза',
@@ -770,6 +792,7 @@ const locale = {
     ],
     'clear-night': '맑음(밤)',
     'cloudy': '흐림',
+    'exceptional': '극한 날씨',
     'fog': '안개',
     'hail': '우박',
     'lightning': '번개',
@@ -784,6 +807,14 @@ const locale = {
     'windy-variant': '강풍'
   },
 };
+
+/**
+ * Weather card constants
+ * 
+ * Weather icons by Bas Milius
+ * https://github.com/basmilius/weather-icons
+ * Licensed under MIT License
+ */
 
 const cardinalDirectionsIcon = [
   'arrow-down', 'arrow-bottom-left', 'arrow-left',
@@ -812,14 +843,14 @@ const weatherIcons = {
 const weatherIconsDay = {
   'clear-night': 'clear-night',
   'cloudy': 'cloudy',
-  'exceptional': 'exceptional',
-  'fog': 'fog',
+  'exceptional': 'extreme-day',
+  'fog': 'fog-day',
   'hail': 'hail',
-  'lightning': 'lightning',
-  'lightning-rainy': 'lightning-rain',
-  'partlycloudy': 'partlycloudy-day',
-  'pouring': 'pouring',
-  'rainy': 'rain',
+  'lightning': 'thunderstorms-day',
+  'lightning-rainy': 'thunderstorms-day-rain',
+  'partlycloudy': 'partly-cloudy-day',
+  'pouring': 'extreme-day-rain',
+  'rainy': 'overcast-day-rain',
   'snowy': 'snow',
   'snowy-rainy': 'sleet',
   'sunny': 'clear-day',
@@ -829,8 +860,14 @@ const weatherIconsDay = {
 
 const weatherIconsNight = {
   ...weatherIconsDay,
+  'exceptional': 'extreme-night',
+  'fog': 'fog-night',
+  'lightning': 'thunderstorms-night',
+  'lightning-rainy': 'thunderstorms-night-rain',
+  'partlycloudy': 'partly-cloudy-night',
+  'pouring': 'extreme-night-rain',
+  'rainy': 'overcast-night-rain',
   'sunny': 'clear-night',
-  'partlycloudy': 'partlycloudy-night',
 };
 
 const WeatherEntityFeature = {
@@ -1472,7 +1509,7 @@ class WeatherChartCardEditor extends s {
          <ha-textfield
            label="Icon Size for animated or custom icons"
            type="number"
-           .value="${this._config.icons_size || '25'}"
+           .value="${this._config.icons_size || '35'}"
            @change="${(e) => this._valueChanged(e, 'icons_size')}"
          ></ha-textfield>
         <div class="flex-container">
@@ -18018,7 +18055,7 @@ static getStubConfig(hass, unusedEntities, allEntities) {
     show_visibility: false,
     show_last_changed: false,
     use_12hour_format: false,
-    icons_size: 25,
+    icons_size: 35,
     main_icon_size: 150,
     current_temp_size: 38,
     animated_icons: false,
@@ -18062,7 +18099,7 @@ static getStubConfig(hass, unusedEntities, allEntities) {
 
 setConfig(config) {
   const cardConfig = {
-    icons_size: 25,
+    icons_size: 35,
     animated_icons: false,
     icon_style: 'style1',
     current_temp_size: 38,
@@ -18104,9 +18141,17 @@ setConfig(config) {
 
   cardConfig.units.speed = config.speed ? config.speed : cardConfig.units.speed;
 
-  this.baseIconPath = cardConfig.icon_style === 'style2' ?
-    'https://cdn.jsdelivr.net/gh/mlamberts78/weather-chart-card/dist/icons2/':
-    'https://cdn.jsdelivr.net/gh/mlamberts78/weather-chart-card/dist/icons/' ;
+  // Icon path configuration: Prioritize CDN, fallback to custom path if specified
+  if (config.icons) {
+    // User specified custom icons path
+    this.baseIconPath = config.icons;
+  } else {
+    // Use Basmilius weather icons CDN from jsDelivr
+    // style1 = fill (default), style2 = line
+    this.baseIconPath = cardConfig.icon_style === 'style2'
+      ? 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons@2.0.0/production/line/svg/'
+      : 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons@2.0.0/production/fill/svg/';
+  }
 
   this.config = cardConfig;
   if (!config.entity) {
@@ -18243,11 +18288,19 @@ measureCard() {
 ll(str) {
   const selectedLocale = this.config.locale || this.language || 'en';
 
-  if (locale[selectedLocale] === undefined) {
-    return locale.en[str];
+  // Try full locale first (e.g., 'ro-RO')
+  if (locale[selectedLocale] !== undefined) {
+    return locale[selectedLocale][str];
   }
 
-  return locale[selectedLocale][str];
+  // Fall back to language code (e.g., 'ro' from 'ro-RO')
+  const languageCode = selectedLocale.split('-')[0];
+  if (locale[languageCode] !== undefined) {
+    return locale[languageCode][str];
+  }
+
+  // Final fallback to English
+  return locale.en[str];
 }
 
 getTimezone() {
@@ -18950,7 +19003,8 @@ updateChart({ forecasts, forecastChart } = this) {
         .main .weather-icon {
           position: absolute;
           left: 50%;
-          transform: translateX(-50%);
+          top: 20px;
+          transform: translate(-50%, -50%);
           z-index: 1;
         }
         .main .weather-icon ha-icon {
@@ -19045,10 +19099,14 @@ updateChart({ forecasts, forecastChart } = this) {
         }
         .current-time {
           position: absolute;
-          top: 20px;
+          top: ${config.title ? '24px' : '20px'};
           right: 16px;
           inset-inline-start: initial;
           inset-inline-end: 16px;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          z-index: 10;
           font-size: ${config.time_size}px;
         }
         .date-text {
@@ -19076,6 +19134,7 @@ updateChart({ forecasts, forecastChart } = this) {
 
       <ha-card header="${config.title}">
         <div class="card">
+          ${this.renderClock()}
           ${this.renderMain()}
           ${this.renderAttributes()}
           <div class="chart-container">
@@ -19094,9 +19153,9 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
     return x``;
 
   config.use_12hour_format;
-  const showTime = config.show_time;
-  const showDay = config.show_day;
-  const showDate = config.show_date;
+  config.show_time;
+  config.show_day;
+  config.show_date;
   const showFeelsLike = config.show_feels_like;
   const showDescription = config.show_description;
   const showCurrentCondition = config.show_current_condition !== false;
@@ -19137,16 +19196,6 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
     ? x`<img src="${this.getWeatherIcon(weather.state, sun.state)}" alt="">`
     : x`<ha-icon icon="${this.getWeatherIcon(weather.state, sun.state)}"></ha-icon>`;
 
-  // Clock update logic - moved outside render
-  if (showTime && !this.clockInterval) {
-    this.clockInterval = setInterval(() => this.updateClock(), 1000);
-    // Initial update
-    setTimeout(() => this.updateClock(), 0);
-  } else if (!showTime && this.clockInterval) {
-    clearInterval(this.clockInterval);
-    this.clockInterval = null;
-  }
-
   return x`
     <div class="main">
       <!-- Left: Temperature and condition info -->
@@ -19177,15 +19226,6 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
         ${iconHtml}
       </div>
       
-      <!-- Right: Time/date info (if enabled) -->
-      ${showTime ? x`
-        <div class="current-time">
-          <div id="digital-clock"></div>
-          ${showDay ? x`<div class="date-text day"></div>` : ''}
-          ${showDay && showDate ? x` ` : ''}
-          ${showDate ? x`<div class="date-text date"></div>` : ''}
-        </div>
-      ` : x`<div></div>`}
     </div>
   `;
 }
@@ -19222,25 +19262,55 @@ updateClock() {
   const currentDayOfWeek = dayFormatter.format(currentDate).toUpperCase();
   const currentDateFormatted = dateFormatter.format(currentDate);
 
-  const mainDiv = this.shadowRoot.querySelector('.main');
-  if (mainDiv) {
-    const clockElement = mainDiv.querySelector('#digital-clock');
+  const cardDiv = this.shadowRoot.querySelector('.card');
+  if (cardDiv) {
+    const clockElement = cardDiv.querySelector('#digital-clock');
     if (clockElement) {
       clockElement.textContent = currentTime;
     }
     if (showDay) {
-      const dayElement = mainDiv.querySelector('.date-text.day');
+      const dayElement = cardDiv.querySelector('.date-text.day');
       if (dayElement) {
         dayElement.textContent = currentDayOfWeek;
       }
     }
     if (showDate) {
-      const dateElement = mainDiv.querySelector('.date-text.date');
+      const dateElement = cardDiv.querySelector('.date-text.date');
       if (dateElement) {
         dateElement.textContent = currentDateFormatted;
       }
     }
   }
+}
+
+renderClock({ config } = this) {
+  const showTime = config.show_time;
+  const showDay = config.show_day;
+  const showDate = config.show_date;
+
+  if (!showTime) {
+    if (this.clockInterval) {
+      clearInterval(this.clockInterval);
+      this.clockInterval = null;
+    }
+    return x``;
+  }
+
+  // Clock update logic
+  if (!this.clockInterval) {
+    this.clockInterval = setInterval(() => this.updateClock(), 1000);
+    // Initial update
+    setTimeout(() => this.updateClock(), 0);
+  }
+
+  return x`
+    <div class="current-time">
+      <div id="digital-clock"></div>
+      ${showDay ? x`<div class="date-text day"></div>` : ''}
+      ${showDay && showDate ? x` ` : ''}
+      ${showDate ? x`<div class="date-text date"></div>` : ''}
+    </div>
+  `;
 }
 
 renderAttributes({ config, humidity, pressure, windSpeed, windDirection, sun, language, uv_index, dew_point, wind_gust_speed, visibility } = this) {

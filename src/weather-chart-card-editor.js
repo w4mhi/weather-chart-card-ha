@@ -609,7 +609,7 @@ class WeatherChartCardEditor extends LitElement {
          <ha-textfield
            label="Icon Size for animated or custom icons"
            type="number"
-           .value="${this._config.icons_size || '25'}"
+           .value="${this._config.icons_size || '35'}"
            @change="${(e) => this._valueChanged(e, 'icons_size')}"
          ></ha-textfield>
         <div class="flex-container">

@@ -46,7 +46,7 @@ static getStubConfig(hass, unusedEntities, allEntities) {
     show_visibility: false,
     show_last_changed: false,
     use_12hour_format: false,
-    icons_size: 25,
+    icons_size: 35,
     main_icon_size: 150,
     current_temp_size: 38,
     animated_icons: false,
@@ -90,7 +90,7 @@ static getStubConfig(hass, unusedEntities, allEntities) {
 
 setConfig(config) {
   const cardConfig = {
-    icons_size: 25,
+    icons_size: 35,
     animated_icons: false,
     icon_style: 'style1',
     current_temp_size: 38,
@@ -132,9 +132,17 @@ setConfig(config) {
 
   cardConfig.units.speed = config.speed ? config.speed : cardConfig.units.speed;
 
-  this.baseIconPath = cardConfig.icon_style === 'style2' ?
-    'https://cdn.jsdelivr.net/gh/mlamberts78/weather-chart-card/dist/icons2/':
-    'https://cdn.jsdelivr.net/gh/mlamberts78/weather-chart-card/dist/icons/' ;
+  // Icon path configuration: Prioritize CDN, fallback to custom path if specified
+  if (config.icons) {
+    // User specified custom icons path
+    this.baseIconPath = config.icons;
+  } else {
+    // Use Basmilius weather icons CDN from jsDelivr
+    // style1 = fill (default), style2 = line
+    this.baseIconPath = cardConfig.icon_style === 'style2'
+      ? 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons@2.0.0/production/line/svg/'
+      : 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons@2.0.0/production/fill/svg/';
+  }
 
   this.config = cardConfig;
   if (!config.entity) {
@@ -271,11 +279,19 @@ measureCard() {
 ll(str) {
   const selectedLocale = this.config.locale || this.language || 'en';
 
-  if (locale[selectedLocale] === undefined) {
-    return locale.en[str];
+  // Try full locale first (e.g., 'ro-RO')
+  if (locale[selectedLocale] !== undefined) {
+    return locale[selectedLocale][str];
   }
 
-  return locale[selectedLocale][str];
+  // Fall back to language code (e.g., 'ro' from 'ro-RO')
+  const languageCode = selectedLocale.split('-')[0];
+  if (locale[languageCode] !== undefined) {
+    return locale[languageCode][str];
+  }
+
+  // Final fallback to English
+  return locale.en[str];
 }
 
 getTimezone() {
@@ -978,7 +994,8 @@ updateChart({ forecasts, forecastChart } = this) {
         .main .weather-icon {
           position: absolute;
           left: 50%;
-          transform: translateX(-50%);
+          top: 20px;
+          transform: translate(-50%, -50%);
           z-index: 1;
         }
         .main .weather-icon ha-icon {
@@ -1073,10 +1090,14 @@ updateChart({ forecasts, forecastChart } = this) {
         }
         .current-time {
           position: absolute;
-          top: 20px;
+          top: ${config.title ? '24px' : '20px'};
           right: 16px;
           inset-inline-start: initial;
           inset-inline-end: 16px;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          z-index: 10;
           font-size: ${config.time_size}px;
         }
         .date-text {
@@ -1104,6 +1125,7 @@ updateChart({ forecasts, forecastChart } = this) {
 
       <ha-card header="${config.title}">
         <div class="card">
+          ${this.renderClock()}
           ${this.renderMain()}
           ${this.renderAttributes()}
           <div class="chart-container">
@@ -1165,16 +1187,6 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
     ? html`<img src="${this.getWeatherIcon(weather.state, sun.state)}" alt="">`
     : html`<ha-icon icon="${this.getWeatherIcon(weather.state, sun.state)}"></ha-icon>`;
 
-  // Clock update logic - moved outside render
-  if (showTime && !this.clockInterval) {
-    this.clockInterval = setInterval(() => this.updateClock(), 1000);
-    // Initial update
-    setTimeout(() => this.updateClock(), 0);
-  } else if (!showTime && this.clockInterval) {
-    clearInterval(this.clockInterval);
-    this.clockInterval = null;
-  }
-
   return html`
     <div class="main">
       <!-- Left: Temperature and condition info -->
@@ -1205,15 +1217,6 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
         ${iconHtml}
       </div>
       
-      <!-- Right: Time/date info (if enabled) -->
-      ${showTime ? html`
-        <div class="current-time">
-          <div id="digital-clock"></div>
-          ${showDay ? html`<div class="date-text day"></div>` : ''}
-          ${showDay && showDate ? html` ` : ''}
-          ${showDate ? html`<div class="date-text date"></div>` : ''}
-        </div>
-      ` : html`<div></div>`}
     </div>
   `;
 }
@@ -1250,25 +1253,55 @@ updateClock() {
   const currentDayOfWeek = dayFormatter.format(currentDate).toUpperCase();
   const currentDateFormatted = dateFormatter.format(currentDate);
 
-  const mainDiv = this.shadowRoot.querySelector('.main');
-  if (mainDiv) {
-    const clockElement = mainDiv.querySelector('#digital-clock');
+  const cardDiv = this.shadowRoot.querySelector('.card');
+  if (cardDiv) {
+    const clockElement = cardDiv.querySelector('#digital-clock');
     if (clockElement) {
       clockElement.textContent = currentTime;
     }
     if (showDay) {
-      const dayElement = mainDiv.querySelector('.date-text.day');
+      const dayElement = cardDiv.querySelector('.date-text.day');
       if (dayElement) {
         dayElement.textContent = currentDayOfWeek;
       }
     }
     if (showDate) {
-      const dateElement = mainDiv.querySelector('.date-text.date');
+      const dateElement = cardDiv.querySelector('.date-text.date');
       if (dateElement) {
         dateElement.textContent = currentDateFormatted;
       }
     }
   }
+}
+
+renderClock({ config } = this) {
+  const showTime = config.show_time;
+  const showDay = config.show_day;
+  const showDate = config.show_date;
+
+  if (!showTime) {
+    if (this.clockInterval) {
+      clearInterval(this.clockInterval);
+      this.clockInterval = null;
+    }
+    return html``;
+  }
+
+  // Clock update logic
+  if (!this.clockInterval) {
+    this.clockInterval = setInterval(() => this.updateClock(), 1000);
+    // Initial update
+    setTimeout(() => this.updateClock(), 0);
+  }
+
+  return html`
+    <div class="current-time">
+      <div id="digital-clock"></div>
+      ${showDay ? html`<div class="date-text day"></div>` : ''}
+      ${showDay && showDate ? html` ` : ''}
+      ${showDate ? html`<div class="date-text date"></div>` : ''}
+    </div>
+  `;
 }
 
 renderAttributes({ config, humidity, pressure, windSpeed, windDirection, sun, language, uv_index, dew_point, wind_gust_speed, visibility } = this) {
