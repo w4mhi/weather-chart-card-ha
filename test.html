@@ -3,13 +3,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Weather Chart Card Test</title>
+  <title>Weather Chart Card - Comprehensive Test Suite</title>
   <link href="https://cdn.jsdelivr.net/npm/@mdi/font@7.4.47/css/materialdesignicons.min.css" rel="stylesheet">
   <style>
     body {
       margin: 0;
       padding: 20px;
-      font-family: sans-serif;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
       background: var(--primary-background-color, #fafafa);
       color: var(--primary-text-color, #212121);
       transition: background 0.3s, color 0.3s;
@@ -35,45 +35,238 @@
       color: #212121;
     }
     
+    .test-header {
+      text-align: center;
+      margin-bottom: 30px;
+      padding: 20px;
+      background: var(--card-background-color, #fff);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .test-header h1 {
+      margin: 0 0 15px 0;
+      font-size: 28px;
+    }
+    
+    .current-date {
+      font-size: 18px;
+      color: var(--secondary-text-color, #727272);
+      margin: 10px 0;
+    }
+    
+    .test-info {
+      display: inline-block;
+      padding: 8px 15px;
+      margin: 5px;
+      background: #4CAF50;
+      color: white;
+      border-radius: 4px;
+      font-size: 14px;
+    }
+    
     .container {
-      max-width: 600px;
+      max-width: 700px;
       margin: 0 auto;
     }
     
     .controls {
       margin-bottom: 20px;
-      text-align: center;
+      padding: 20px;
+      background: var(--card-background-color, #fff);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .control-section {
+      margin-bottom: 15px;
+    }
+    
+    .control-section:last-child {
+      margin-bottom: 0;
+    }
+    
+    .control-section h3 {
+      margin: 0 0 10px 0;
+      font-size: 16px;
+      color: var(--primary-text-color);
+    }
+    
+    .button-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
     }
     
     button {
-      padding: 10px 20px;
-      font-size: 16px;
+      padding: 10px 16px;
+      font-size: 14px;
       cursor: pointer;
       background: var(--card-background-color, #fff);
       color: var(--primary-text-color, #212121);
-      border: 1px solid var(--divider-color, #ccc);
-      border-radius: 4px;
+      border: 2px solid var(--divider-color, #ccc);
+      border-radius: 6px;
+      transition: all 0.2s ease;
+      font-weight: 500;
     }
     
     button:hover {
-      opacity: 0.8;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+    }
+    
+    button.active {
+      background: #2196F3;
+      color: white;
+      border-color: #2196F3;
+    }
+    
+    button.cycle-active {
+      background: #FF9800;
+      color: white;
+      border-color: #FF9800;
+      animation: pulse 2s infinite;
+    }
+    
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.7; }
+    }
+    
+    .card-container {
+      margin-bottom: 20px;
     }
     
     ha-card {
       display: block;
       background: var(--card-background-color, #fff);
-      border-radius: 4px;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      border-radius: 8px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    
+    .status-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding: 10px 15px;
+      background: var(--card-background-color, #fff);
+      border-radius: 6px;
+      margin-top: 15px;
+      font-size: 13px;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.1);
+    }
+    
+    .status-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+    
+    .status-item .label {
+      font-weight: 600;
+      color: var(--secondary-text-color);
+    }
+    
+    .status-item .value {
+      color: var(--primary-text-color);
     }
   </style>
 </head>
 <body class="light-mode">
   <div class="container">
-    <div class="controls">
-      <button onclick="toggleTheme()">Toggle Theme</button>
+    <div class="test-header">
+      <h1>🌤️ Weather Chart Card - Test Suite</h1>
+      <div class="current-date" id="currentDate"></div>
+      <div>
+        <span class="test-info">All Features Enabled</span>
+        <span class="test-info">Mock Data System</span>
+        <span class="test-info">Multi-Language</span>
+      </div>
     </div>
     
-    <weather-chart-card></weather-chart-card>
+    <div class="controls">
+      <div class="control-section">
+        <h3>🎨 Theme</h3>
+        <div class="button-group">
+          <button onclick="toggleTheme()">Toggle Light/Dark Mode</button>
+        </div>
+      </div>
+      
+      <div class="control-section">
+        <h3>🌍 Weather Conditions</h3>
+        <div class="button-group">
+          <button onclick="setCondition('sunny')">☀️ Sunny</button>
+          <button onclick="setCondition('cloudy')">☁️ Cloudy</button>
+          <button onclick="setCondition('partlycloudy')">⛅ Partly Cloudy</button>
+          <button onclick="setCondition('rainy')">🌧️ Rainy</button>
+          <button onclick="setCondition('pouring')">⛈️ Pouring</button>
+          <button onclick="setCondition('snowy')">❄️ Snowy</button>
+          <button onclick="setCondition('fog')">🌫️ Fog</button>
+          <button onclick="setCondition('lightning')">⚡ Lightning</button>
+          <button onclick="setCondition('hail')">🧊 Hail</button>
+          <button onclick="setCondition('windy')">💨 Windy</button>
+        </div>
+      </div>
+      
+      <div class="control-section">
+        <h3>🌐 Languages</h3>
+        <div class="button-group">
+          <button onclick="setLanguage('en')">🇬🇧 English</button>
+          <button onclick="setLanguage('de')">🇩🇪 German</button>
+          <button onclick="setLanguage('fr')">🇫🇷 French</button>
+          <button onclick="setLanguage('es')">🇪🇸 Spanish</button>
+          <button onclick="setLanguage('it')">🇮🇹 Italian</button>
+          <button onclick="setLanguage('nl')">🇳🇱 Dutch</button>
+          <button onclick="setLanguage('pl')">🇵🇱 Polish</button>
+          <button onclick="setLanguage('ru')">🇷🇺 Russian</button>
+          <button onclick="setLanguage('ro')">🇷🇴 Romanian</button>
+          <button onclick="setLanguage('ko')">🇰🇷 Korean</button>
+        </div>
+      </div>
+      
+      <div class="control-section">
+        <h3>🔄 Auto Cycling</h3>
+        <div class="button-group">
+          <button id="cycleBtn" onclick="toggleCycling()">▶️ Start Auto-Cycle (Conditions)</button>
+          <button id="cycleLangBtn" onclick="toggleLanguageCycling()">▶️ Start Auto-Cycle (Languages)</button>
+        </div>
+      </div>
+      
+      <div class="control-section">
+        <h3>📊 Forecast Type</h3>
+        <div class="button-group">
+          <button onclick="setForecastType('daily')">Daily Forecast</button>
+          <button onclick="setForecastType('hourly')">Hourly Forecast</button>
+        </div>
+      </div>
+      
+      <div class="control-section">
+        <h3>🎨 Icon Style</h3>
+        <div class="button-group">
+          <button onclick="setIconStyle('style1')">🌤️ Fill Icons (Style 1)</button>
+          <button onclick="setIconStyle('style2')">☀️ Line Icons (Style 2)</button>
+        </div>
+      </div>
+    </div>
+    
+    <div class="card-container">
+      <weather-chart-card></weather-chart-card>
+    </div>
+    
+    <div class="status-bar">
+      <div class="status-item">
+        <span class="label">Current:</span>
+        <span class="value" id="currentCondition">Sunny</span>
+      </div>
+      <div class="status-item">
+        <span class="label">Language:</span>
+        <span class="value" id="currentLanguage">English</span>
+      </div>
+      <div class="status-item">
+        <span class="label">Forecast:</span>
+        <span class="value" id="currentForecast">Daily</span>
+      </div>
+    </div>
   </div>
 
   <script type="module">
@@ -92,8 +285,8 @@
               :host {
                 display: block;
                 background: var(--card-background-color, #fff);
-                border-radius: 4px;
-                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
               }
               .header {
                 padding: 16px;
@@ -143,20 +336,290 @@
     }
   </script>
 
-  <script type="module" src="./weather-chart-card.js"></script>
+  <script type="module" src="./dist/weather-chart-card-ha.js"></script>
 
   <script>
-    function toggleTheme() {
-      const body = document.body;
-      if (body.classList.contains('light-mode')) {
-        body.classList.remove('light-mode');
-        body.classList.add('dark-mode');
-      } else {
-        body.classList.remove('dark-mode');
-        body.classList.add('light-mode');
-      }
+    // Test Suite State
+    let cycleInterval = null;
+    let languageCycleInterval = null;
+    let currentConditionIndex = 0;
+    let currentLanguageIndex = 0;
+    let currentForecastType = 'daily';
+    let forecastCallback = null; // Store the forecast callback
+    
+    const conditions = [
+      'sunny', 'cloudy', 'partlycloudy', 'rainy', 'pouring', 
+      'snowy', 'fog', 'lightning', 'hail', 'windy', 'clear-night'
+    ];
+    
+    const languages = [
+      { code: 'en', name: 'English' },
+      { code: 'de', name: 'German' },
+      { code: 'fr', name: 'French' },
+      { code: 'es', name: 'Spanish' },
+      { code: 'it', name: 'Italian' },
+      { code: 'nl', name: 'Dutch' },
+      { code: 'pl', name: 'Polish' },
+      { code: 'ru', name: 'Russian' },
+      { code: 'ro', name: 'Romanian' },
+      { code: 'ko', name: 'Korean' }
+    ];
+    
+    // Weather condition configurations
+    const conditionConfigs = {
+      sunny: { temp: 28, humidity: 45, pressure: 1020, wind: 8, visibility: 25 },
+      cloudy: { temp: 18, humidity: 70, pressure: 1010, wind: 12, visibility: 15 },
+      partlycloudy: { temp: 22, humidity: 60, pressure: 1015, wind: 10, visibility: 20 },
+      rainy: { temp: 15, humidity: 85, pressure: 1005, wind: 18, visibility: 8 },
+      pouring: { temp: 14, humidity: 95, pressure: 998, wind: 25, visibility: 5 },
+      snowy: { temp: -2, humidity: 75, pressure: 1025, wind: 15, visibility: 3 },
+      fog: { temp: 10, humidity: 98, pressure: 1012, wind: 3, visibility: 0.5 },
+      lightning: { temp: 20, humidity: 80, pressure: 995, wind: 30, visibility: 10 },
+      hail: { temp: 8, humidity: 70, pressure: 1000, wind: 22, visibility: 7 },
+      windy: { temp: 16, humidity: 55, pressure: 1008, wind: 45, visibility: 18 },
+      'clear-night': { temp: 12, humidity: 65, pressure: 1018, wind: 5, visibility: 22 }
+    };
+    
+    // Function to get translated description for a condition
+    function getTranslatedDescription(condition, langCode) {
+      // Locale translations mapping
+      const localeDescriptions = {
+        en: {
+          sunny: 'Clear sunny weather',
+          cloudy: 'Overcast skies',
+          partlycloudy: 'Partly cloudy skies',
+          rainy: 'Rainy conditions',
+          pouring: 'Heavy rainfall',
+          snowy: 'Snow conditions',
+          fog: 'Foggy conditions',
+          lightning: 'Thunderstorm activity',
+          hail: 'Hail conditions',
+          windy: 'Strong wind conditions',
+          'clear-night': 'Clear night'
+        },
+        de: {
+          sunny: 'Klares sonniges Wetter',
+          cloudy: 'Bedeckter Himmel',
+          partlycloudy: 'Teilweise bewölkt',
+          rainy: 'Regnerisches Wetter',
+          pouring: 'Starker Regen',
+          snowy: 'Schneebedingungen',
+          fog: 'Neblige Bedingungen',
+          lightning: 'Gewitteraktivität',
+          hail: 'Hagelbedingungen',
+          windy: 'Starke Windbedingungen',
+          'clear-night': 'Klare Nacht'
+        },
+        fr: {
+          sunny: 'Temps ensoleillé',
+          cloudy: 'Ciel couvert',
+          partlycloudy: 'Partiellement nuageux',
+          rainy: 'Temps pluvieux',
+          pouring: 'Fortes pluies',
+          snowy: 'Conditions neigeuses',
+          fog: 'Conditions brumeuses',
+          lightning: 'Activité orageuse',
+          hail: 'Conditions de grêle',
+          windy: 'Conditions de vent fort',
+          'clear-night': 'Nuit claire'
+        },
+        es: {
+          sunny: 'Clima soleado',
+          cloudy: 'Cielo nublado',
+          partlycloudy: 'Parcialmente nublado',
+          rainy: 'Condiciones lluviosas',
+          pouring: 'Lluvia fuerte',
+          snowy: 'Condiciones de nieve',
+          fog: 'Condiciones de niebla',
+          lightning: 'Actividad de tormenta',
+          hail: 'Condiciones de granizo',
+          windy: 'Condiciones de viento fuerte',
+          'clear-night': 'Noche clara'
+        },
+        it: {
+          sunny: 'Tempo soleggiato',
+          cloudy: 'Cielo coperto',
+          partlycloudy: 'Parzialmente nuvoloso',
+          rainy: 'Condizioni piovose',
+          pouring: 'Pioggia intensa',
+          snowy: 'Condizioni nevose',
+          fog: 'Condizioni nebbiose',
+          lightning: 'Attività temporalesca',
+          hail: 'Condizioni di grandine',
+          windy: 'Condizioni di forte vento',
+          'clear-night': 'Notte serena'
+        },
+        nl: {
+          sunny: 'Zonnig weer',
+          cloudy: 'Bewolkte lucht',
+          partlycloudy: 'Gedeeltelijk bewolkt',
+          rainy: 'Regenachtig weer',
+          pouring: 'Zware regenval',
+          snowy: 'Sneeuwomstandigheden',
+          fog: 'Mistige omstandigheden',
+          lightning: 'Onweersactiviteit',
+          hail: 'Hagelomstandigheden',
+          windy: 'Sterke wind',
+          'clear-night': 'Heldere nacht'
+        },
+        pl: {
+          sunny: 'Słoneczna pogoda',
+          cloudy: 'Zachmurzone niebo',
+          partlycloudy: 'Częściowo zachmurzone',
+          rainy: 'Deszczowa pogoda',
+          pouring: 'Intensywny deszcz',
+          snowy: 'Śnieżne warunki',
+          fog: 'Mgliście warunki',
+          lightning: 'Burza z piorunami',
+          hail: 'Warunki gradowe',
+          windy: 'Silny wiatr',
+          'clear-night': 'Czysta noc'
+        },
+        ru: {
+          sunny: 'Солнечная погода',
+          cloudy: 'Облачное небо',
+          partlycloudy: 'Переменная облачность',
+          rainy: 'Дождливая погода',
+          pouring: 'Сильный дождь',
+          snowy: 'Снежные условия',
+          fog: 'Туманные условия',
+          lightning: 'Грозовая активность',
+          hail: 'Град',
+          windy: 'Сильный ветер',
+          'clear-night': 'Ясная ночь'
+        },
+        ro: {
+          sunny: 'Vreme însorită',
+          cloudy: 'Cer noros',
+          partlycloudy: 'Parțial noros',
+          rainy: 'Vreme ploioasă',
+          pouring: 'Ploaie torențială',
+          snowy: 'Condiții de ninsoare',
+          fog: 'Condiții de ceață',
+          lightning: 'Activitate de furtună',
+          hail: 'Condiții de grindină',
+          windy: 'Vânt puternic',
+          'clear-night': 'Noapte senină'
+        },
+        ko: {
+          sunny: '맑은 날씨',
+          cloudy: '흐린 하늘',
+          partlycloudy: '부분적으로 흐림',
+          rainy: '비오는 날씨',
+          pouring: '폭우',
+          snowy: '눈 오는 조건',
+          fog: '안개 조건',
+          lightning: '뇌우 활동',
+          hail: '우박 조건',
+          windy: '강한 바람',
+          'clear-night': '맑은 밤'
+        }
+      };
+      
+      const lang = localeDescriptions[langCode] || localeDescriptions['en'];
+      return lang[condition] || lang['sunny'];
     }
-
+    
+    // Update current date display
+    function updateCurrentDate() {
+      const now = new Date();
+      const options = { 
+        weekday: 'long', 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit'
+      };
+      document.getElementById('currentDate').textContent = now.toLocaleDateString('en-US', options);
+    }
+    
+    // Initialize date and update every second
+    updateCurrentDate();
+    setInterval(updateCurrentDate, 1000);
+    
+    // Generate realistic forecast data for a given condition
+    function generateForecastData(forecastType, baseCondition) {
+      const forecasts = [];
+      const now = new Date();
+      const itemCount = forecastType === 'hourly' ? 24 : 10;
+      const timeIncrement = forecastType === 'hourly' ? 1 : 24; // hours
+      
+      // Define condition patterns for realistic transitions
+      const conditionPatterns = {
+        sunny: ['sunny', 'sunny', 'partlycloudy', 'sunny', 'partlycloudy'],
+        cloudy: ['cloudy', 'cloudy', 'rainy', 'partlycloudy', 'cloudy'],
+        partlycloudy: ['partlycloudy', 'cloudy', 'sunny', 'partlycloudy', 'rainy'],
+        rainy: ['rainy', 'rainy', 'pouring', 'rainy', 'cloudy'],
+        pouring: ['pouring', 'rainy', 'rainy', 'cloudy', 'partlycloudy'],
+        snowy: ['snowy', 'snowy', 'snowy', 'cloudy', 'snowy'],
+        fog: ['fog', 'fog', 'cloudy', 'partlycloudy', 'sunny'],
+        lightning: ['lightning', 'pouring', 'rainy', 'cloudy', 'partlycloudy'],
+        hail: ['hail', 'rainy', 'cloudy', 'partlycloudy', 'sunny'],
+        windy: ['windy', 'partlycloudy', 'cloudy', 'partlycloudy', 'sunny'],
+        'clear-night': ['clear-night', 'clear-night', 'partlycloudy', 'sunny', 'partlycloudy']
+      };
+      
+      const pattern = conditionPatterns[baseCondition] || ['sunny', 'partlycloudy', 'cloudy'];
+      const baseConfig = conditionConfigs[baseCondition];
+      
+      for (let i = 0; i < itemCount; i++) {
+        const date = new Date(now);
+        date.setHours(date.getHours() + (i * timeIncrement));
+        
+        // Select condition from pattern
+        const condition = pattern[i % pattern.length];
+        const condConfig = conditionConfigs[condition];
+        
+        // Add some variation to temperature
+        const tempVariation = (Math.random() - 0.5) * 6;
+        const temp = condConfig.temp + tempVariation;
+        const tempLow = temp - (3 + Math.random() * 4);
+        
+        // Precipitation logic
+        let precipitation = 0;
+        let precipProbability = 0;
+        
+        if (['rainy', 'pouring', 'snowy', 'hail', 'lightning'].includes(condition)) {
+          if (condition === 'pouring') {
+            precipitation = 15 + Math.random() * 25;
+            precipProbability = 85 + Math.random() * 15;
+          } else if (condition === 'rainy') {
+            precipitation = 5 + Math.random() * 10;
+            precipProbability = 60 + Math.random() * 30;
+          } else if (condition === 'snowy') {
+            precipitation = 8 + Math.random() * 15;
+            precipProbability = 70 + Math.random() * 25;
+          } else if (condition === 'lightning' || condition === 'hail') {
+            precipitation = 10 + Math.random() * 20;
+            precipProbability = 75 + Math.random() * 20;
+          }
+        } else if (condition === 'partlycloudy') {
+          precipitation = Math.random() * 2;
+          precipProbability = Math.random() * 30;
+        }
+        
+        // Wind variation
+        const windVariation = (Math.random() - 0.5) * 10;
+        const windSpeed = Math.max(0, condConfig.wind + windVariation);
+        const windBearing = Math.floor(Math.random() * 360);
+        
+        forecasts.push({
+          datetime: date.toISOString(),
+          temperature: Math.round(temp * 10) / 10,
+          templow: Math.round(tempLow * 10) / 10,
+          condition: condition,
+          precipitation: Math.round(precipitation * 10) / 10,
+          precipitation_probability: Math.round(precipProbability),
+          wind_speed: Math.round(windSpeed),
+          wind_bearing: windBearing,
+        });
+      }
+      
+      return forecasts;
+    }
+    
     // Mock Home Assistant object
     const mockHass = {
       language: 'en',
@@ -186,6 +649,11 @@
             wind_speed: 15,
             wind_bearing: 180,
             visibility: 10,
+            apparent_temperature: 23,
+            dew_point: 15,
+            wind_gust_speed: 25,
+            uv_index: 6,
+            description: 'Clear sunny weather',
             temperature_unit: '°C',
             pressure_unit: 'hPa',
             wind_speed_unit: 'km/h',
@@ -197,27 +665,11 @@
       },
       connection: {
         subscribeMessage: (callback, config) => {
-          // Generate mock forecast data
-          const forecasts = [];
-          const now = new Date();
+          // Store the callback for later updates
+          forecastCallback = callback;
           
-          for (let i = 0; i < 10; i++) {
-            const date = new Date(now);
-            date.setDate(date.getDate() + i);
-            
-            const temp = 15 + Math.sin(i * 0.5) * 10 + Math.random() * 5;
-            
-            forecasts.push({
-              datetime: date.toISOString(),
-              temperature: Math.round(temp),
-              templow: Math.round(temp - 5 - Math.random() * 3),
-              condition: ['sunny', 'cloudy', 'rainy', 'partly-cloudy'][Math.floor(Math.random() * 4)],
-              precipitation: Math.random() * 10,
-              precipitation_probability: Math.random() * 100,
-              wind_speed: 10 + Math.random() * 20,
-              wind_bearing: Math.random() * 360,
-            });
-          }
+          const currentCondition = mockHass.states['weather.home'].state;
+          const forecasts = generateForecastData(currentForecastType, currentCondition);
           
           setTimeout(() => {
             callback({ forecast: forecasts });
@@ -227,21 +679,202 @@
         },
       },
     };
-
+    
+    // Function to trigger forecast update
+    function triggerForecastUpdate() {
+      if (forecastCallback) {
+        const currentCondition = mockHass.states['weather.home'].state;
+        const forecasts = generateForecastData(currentForecastType, currentCondition);
+        forecastCallback({ forecast: forecasts });
+      }
+    }
+    
+    // Theme toggle
+    function toggleTheme() {
+      const body = document.body;
+      if (body.classList.contains('light-mode')) {
+        body.classList.remove('light-mode');
+        body.classList.add('dark-mode');
+      } else {
+        body.classList.remove('dark-mode');
+        body.classList.add('light-mode');
+      }
+    }
+    
+    // Set specific weather condition
+    function setCondition(condition) {
+      const config = conditionConfigs[condition];
+      if (!config) return;
+      
+      // Update mock hass weather state
+      mockHass.states['weather.home'].state = condition;
+      mockHass.states['weather.home'].attributes.temperature = config.temp;
+      mockHass.states['weather.home'].attributes.humidity = config.humidity;
+      mockHass.states['weather.home'].attributes.pressure = config.pressure;
+      mockHass.states['weather.home'].attributes.wind_speed = config.wind;
+      mockHass.states['weather.home'].attributes.visibility = config.visibility;
+      // Set translated description based on current language
+      mockHass.states['weather.home'].attributes.description = getTranslatedDescription(condition, mockHass.language);
+      mockHass.states['weather.home'].attributes.apparent_temperature = config.temp + (Math.random() - 0.5) * 2;
+      mockHass.states['weather.home'].attributes.wind_bearing = Math.floor(Math.random() * 360);
+      mockHass.states['weather.home'].last_changed = new Date().toISOString();
+      
+      // Update sun state based on condition
+      if (condition === 'clear-night') {
+        mockHass.states['sun.sun'].state = 'below_horizon';
+      } else {
+        mockHass.states['sun.sun'].state = 'above_horizon';
+      }
+      
+      // Update card with new hass object
+      const card = document.querySelector('weather-chart-card');
+      if (card) {
+        // Create a deep copy to ensure reactivity
+        const newHass = JSON.parse(JSON.stringify(mockHass));
+        // Restore the connection object (can't be stringified)
+        newHass.connection = mockHass.connection;
+        card.hass = newHass;
+        
+        // Trigger forecast update with new condition
+        triggerForecastUpdate();
+      }
+      
+      // Update status
+      document.getElementById('currentCondition').textContent = condition.charAt(0).toUpperCase() + condition.slice(1);
+    }
+    
+    // Set language
+    function setLanguage(langCode) {
+      mockHass.language = langCode;
+      mockHass.selectedLanguage = langCode;
+      
+      // Update description with new language
+      const currentCondition = mockHass.states['weather.home'].state;
+      mockHass.states['weather.home'].attributes.description = getTranslatedDescription(currentCondition, langCode);
+      
+      const card = document.querySelector('weather-chart-card');
+      if (card) {
+        // Update card config locale
+        const currentConfig = card.config;
+        currentConfig.locale = langCode;
+        card.setConfig(currentConfig);
+        
+        // Create a deep copy to ensure reactivity
+        const newHass = JSON.parse(JSON.stringify(mockHass));
+        // Restore the connection object (can't be stringified)
+        newHass.connection = mockHass.connection;
+        card.hass = newHass;
+      }
+      
+      const lang = languages.find(l => l.code === langCode);
+      document.getElementById('currentLanguage').textContent = lang ? lang.name : langCode;
+    }
+    
+    // Toggle condition cycling
+    function toggleCycling() {
+      const btn = document.getElementById('cycleBtn');
+      
+      if (cycleInterval) {
+        clearInterval(cycleInterval);
+        cycleInterval = null;
+        btn.textContent = '▶️ Start Auto-Cycle (Conditions)';
+        btn.classList.remove('cycle-active');
+      } else {
+        cycleInterval = setInterval(() => {
+          currentConditionIndex = (currentConditionIndex + 1) % conditions.length;
+          setCondition(conditions[currentConditionIndex]);
+        }, 5000); // Change every 5 seconds
+        
+        btn.textContent = '⏸️ Stop Auto-Cycle (Conditions)';
+        btn.classList.add('cycle-active');
+        
+        // Start immediately
+        setCondition(conditions[currentConditionIndex]);
+      }
+    }
+    
+    // Toggle language cycling
+    function toggleLanguageCycling() {
+      const btn = document.getElementById('cycleLangBtn');
+      
+      if (languageCycleInterval) {
+        clearInterval(languageCycleInterval);
+        languageCycleInterval = null;
+        btn.textContent = '▶️ Start Auto-Cycle (Languages)';
+        btn.classList.remove('cycle-active');
+      } else {
+        languageCycleInterval = setInterval(() => {
+          currentLanguageIndex = (currentLanguageIndex + 1) % languages.length;
+          setLanguage(languages[currentLanguageIndex].code);
+        }, 4000); // Change every 4 seconds
+        
+        btn.textContent = '⏸️ Stop Auto-Cycle (Languages)';
+        btn.classList.add('cycle-active');
+        
+        // Start immediately
+        setLanguage(languages[currentLanguageIndex].code);
+      }
+    }
+    
+    // Set forecast type
+    function setForecastType(type) {
+      currentForecastType = type;
+      
+      const card = document.querySelector('weather-chart-card');
+      if (card) {
+        const currentConfig = card.config;
+        currentConfig.forecast.type = type;
+        card.setConfig(currentConfig);
+        
+        // Create a deep copy to ensure reactivity
+        const newHass = JSON.parse(JSON.stringify(mockHass));
+        newHass.connection = mockHass.connection;
+        card.hass = newHass;
+        
+        // Trigger forecast update with new type
+        triggerForecastUpdate();
+      }
+      
+      document.getElementById('currentForecast').textContent = type.charAt(0).toUpperCase() + type.slice(1);
+    }
+    
+    // Set icon style
+    function setIconStyle(style) {
+      const card = document.querySelector('weather-chart-card');
+      if (card) {
+        const currentConfig = card.config;
+        currentConfig.icon_style = style;
+        // Update icon path based on style
+        if (style === 'style1') {
+          currentConfig.icons = './dist/icons/';
+        } else {
+          currentConfig.icons = './dist/icons2/';
+        }
+        card.setConfig(currentConfig);
+        
+        // Create a deep copy to ensure reactivity
+        const newHass = JSON.parse(JSON.stringify(mockHass));
+        newHass.connection = mockHass.connection;
+        card.hass = newHass;
+      }
+    }
+    
     // Wait for the custom element to be defined
     customElements.whenDefined('weather-chart-card').then(() => {
       const card = document.querySelector('weather-chart-card');
       
-      // Set config
+      // Set config with all features enabled
       card.setConfig({
         entity: 'weather.home',
-        title: 'Weather Chart Card Test',
+        title: 'Comprehensive Weather Test',
+        locale: 'en',
+        timezone: '',
         show_main: true,
         show_temperature: true,
         show_current_condition: true,
         show_attributes: true,
         show_time: true,
-        show_time_seconds: false,
+        show_time_seconds: true,
         show_day: true,
         show_date: true,
         show_humidity: true,
@@ -249,10 +882,24 @@
         show_wind_direction: true,
         show_wind_speed: true,
         show_sun: true,
+        show_feels_like: true,
+        show_dew_point: true,
+        show_wind_gust_speed: true,
+        show_visibility: true,
+        show_last_changed: true,
+        show_description: true,
+        use_12hour_format: false,
         animated_icons: false,
+        icons: './dist/icons/',
+        icon_style: 'style1',
+        icons_size: 35,
+        main_icon_size: 150,
+        current_temp_size: 38,
+        time_size: 26,
+        day_date_size: 15,
         forecast: {
           precipitation_type: 'rainfall',
-          show_probability: false,
+          show_probability: true,
           labels_font_size: '11',
           precip_bar_size: '100',
           style: 'style2',
@@ -268,8 +915,31 @@
         },
       });
       
-      // Set hass
+      // Set initial hass
       card.hass = mockHass;
+      
+      // Debug: Check if card is rendering
+      setTimeout(() => {
+        console.log('Card config:', card.config);
+        console.log('Card hass:', card.hass);
+        console.log('Card shadow root:', card.shadowRoot);
+        const clockEl = card.shadowRoot?.querySelector('#digital-clock');
+        console.log('Clock element in card:', clockEl);
+      }, 500);
+      
+      // Set initial condition to ensure everything is loaded
+      setTimeout(() => {
+        setCondition('sunny');
+      }, 1000);
+      
+      // Make functions globally available
+      window.toggleTheme = toggleTheme;
+      window.setCondition = setCondition;
+      window.setLanguage = setLanguage;
+      window.toggleCycling = toggleCycling;
+      window.toggleLanguageCycling = toggleLanguageCycling;
+      window.setForecastType = setForecastType;
+      window.setIconStyle = setIconStyle;
     });
   </script>
 </body>

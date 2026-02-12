@@ -5,7 +5,7 @@ import copy from 'rollup-plugin-copy';
 export default {
   input: 'src/main.js',
   output: {
-    file: 'dist/weather-chart-card.js',
+    file: 'dist/weather-chart-card-ha.js',
     format: 'es',
     sourcemap: true,
   },

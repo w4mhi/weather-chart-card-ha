@@ -18991,6 +18991,7 @@ updateChart({ forecasts, forecastChart } = this) {
           padding-right: 16px;
           padding-bottom: ${config.show_last_changed === true ? '2px' : '16px'};
           padding-left: 16px;
+          position: relative;
         }
         .main {
           display: flex;
@@ -18999,11 +19000,12 @@ updateChart({ forecasts, forecastChart } = this) {
           font-size: ${config.current_temp_size}px;
           margin-bottom: 10px;
           position: relative;
+          min-height: ${(config.main_icon_size || 150) + 40}px;
         }
         .main .weather-icon {
           position: absolute;
           left: 50%;
-          top: 20px;
+          top: 50%;
           transform: translate(-50%, -50%);
           z-index: 1;
         }
