@@ -20,6 +20,23 @@ jobs:
         with:
           node-version: '18'
       
+      - name: Diagnostic - Check environment
+        run: |
+          echo "=== Current directory ==="
+          pwd
+          echo ""
+          echo "=== Files in current directory ==="
+          ls -la
+          echo ""
+          echo "=== Checking for package-lock.json ==="
+          ls -la package-lock.json || echo "⚠️ package-lock.json NOT FOUND"
+          echo ""
+          echo "=== Checking for package.json ==="
+          ls -la package.json || echo "⚠️ package.json NOT FOUND"
+          echo ""
+          echo "=== Git status ==="
+          git log -1 --oneline
+      
       - name: Install dependencies
         run: npm ci
       
