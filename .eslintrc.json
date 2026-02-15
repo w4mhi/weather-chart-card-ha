@@ -3,7 +3,7 @@
     "es6": true
   },
   "parserOptions": {
-    "ecmaVersion": 10,
+    "ecmaVersion": 2022,
     "sourceType": "module",
     "ecmaFeatures": {
       "jsx": true

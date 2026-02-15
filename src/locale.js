@@ -4,6 +4,8 @@ const locale = {
     'tempLo': 'Teplota v noci',
     'precip': 'Srážky',
     'feelsLike': 'Pocitová teplota',
+    'days': ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'],
+    'months': ['leden', 'únor', 'březen', 'duben', 'květen', 'červen', 'červenec', 'srpen', 'září', 'říjen', 'listopad', 'prosinec'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -39,6 +41,8 @@ const locale = {
     'tempLo': 'Teplota v noci',
     'precip': 'Zrážky',
     'feelsLike': 'Pocitová teplota',
+    'days': ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'],
+    'months': ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -74,6 +78,8 @@ const locale = {
     'tempLo': 'Nachttemperatur',
     'precip': 'Niederschlag',
     'feelsLike': 'Gefühlt',
+    'days': ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
+    'months': ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -109,6 +115,8 @@ const locale = {
     'tempLo': 'Nachttemperatuur',
     'precip': 'Neerslag',
     'feelsLike': 'Voelt als',
+    'days': ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'],
+    'months': ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -144,6 +152,8 @@ const locale = {
     'tempLo': 'Temperature night',
     'precip': 'Precipitations',
     'feelsLike': 'Feels like',
+    'days': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    'months': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -179,6 +189,8 @@ const locale = {
     'tempLo': 'Temperatura mínima',
     'precip': 'Precipitación',
     'feelsLike': 'Sensación térmica',
+    'days': ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+    'months': ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -214,6 +226,8 @@ const locale = {
     'tempLo': 'Lämpötila alin',
     'precip': 'Sademäärä',
     'feelsLike': 'Tuntuu kuin',
+    'days': ['Sunnuntai', 'Maanantai', 'Tiistai', 'Keskiviikko', 'Torstai', 'Perjantai', 'Lauantai'],
+    'months': ['tammikuu', 'helmikuu', 'maaliskuu', 'huhtikuu', 'toukokuu', 'kesäkuu', 'heinäkuu', 'elokuu', 'syyskuu', 'lokakuu', 'marraskuu', 'joulukuu'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -249,6 +263,8 @@ const locale = {
     'tempLo': 'Min. hőmérséklet',
     'precip': 'Csapadék',
     'feelsLike': 'Hőérzet',
+    'days': ['Vasárnap', 'Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat'],
+    'months': ['január', 'február', 'március', 'április', 'május', 'június', 'július', 'augusztus', 'szeptember', 'október', 'november', 'december'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -284,6 +300,8 @@ const locale = {
     'tempLo': 'Температура ночью',
     'precip': 'Осадки',
     'feelsLike': 'Ощущается как',
+    'days': ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+    'months': ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
     'units': {
       'km/h': 'км/ч',
       'm/s': 'м/с',
@@ -319,6 +337,8 @@ const locale = {
     'tempLo': 'Temperatur min',
     'precip': 'Nederbörd',
     'feelsLike': 'Känns som',
+    'days': ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'],
+    'months': ['januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli', 'augusti', 'september', 'oktober', 'november', 'december'],
     'units': {
         'km/h': 'km/h',
         'm/s': 'm/s',
@@ -354,6 +374,8 @@ const locale = {
     'tempLo': 'Température min',
     'precip': 'Précipitations',
     'feelsLike': 'Ressenti',
+    'days': ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+    'months': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -389,6 +411,8 @@ const locale = {
     'tempLo': 'Temperatura w nocy',
     'precip': 'Opady',
     'feelsLike': 'Odczuwalna',
+    'days': ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'],
+    'months': ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec', 'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -424,6 +448,8 @@ const locale = {
     'tempLo': 'Minimumstemperatur',
     'precip': 'Nedbør',
     'feelsLike': 'Føles som',
+    'days': ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'],
+    'months': ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'],
     'units': {
       'km/h': 'km/t',
       'm/s': 'm/s',
@@ -459,6 +485,8 @@ const locale = {
     'tempLo': 'Nattemperatur',
     'precip': 'Nedbør',
     'feelsLike': 'Føles som',
+    'days': ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'],
+    'months': ['januar', 'februar', 'marts', 'april', 'maj', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'december'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -494,6 +522,8 @@ const locale = {
     'tempLo': 'Temperatura notte',
     'precip': 'Precipitazioni',
     'feelsLike': 'Percepito come',
+    'days': ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'],
+    'months': ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -529,6 +559,8 @@ const locale = {
     'tempLo': 'Temperatura noite',
     'precip': 'Precipitação',
     'feelsLike': 'Sensação Térmica',
+    'days': ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
+    'months': ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -564,6 +596,8 @@ const locale = {
     'tempLo': 'Ελάχιστη θερμοκρασία νύχτας',
     'precip': 'Υετός',
     'feelsLike': 'Αίσθηση σαν',
+    'days': ['Κυριακή', 'Δευτέρα', 'Τρίτη', 'Τετάρτη', 'Πέμπτη', 'Παρασκευή', 'Σάββατο'],
+    'months': ['Ιανουάριος', 'Φεβρουάριος', 'Μάρτιος', 'Απρίλιος', 'Μάιος', 'Ιούνιος', 'Ιούλιος', 'Αύγουστος', 'Σεπτέμβριος', 'Οκτώβριος', 'Νοέμβριος', 'Δεκέμβριος'],
     'units': {
       'km/h': 'χλμ/ώρα',
       'm/s': 'μ/δ',
@@ -599,6 +633,8 @@ const locale = {
     'tempLo': 'Минимална температура',
     'precip': 'Валежи',
     'feelsLike': 'Усеща се като',
+    'days': ['Неделя', 'Понеделник', 'Вторник', 'Сряда', 'Четвъртък', 'Петък', 'Събота'],
+    'months': ['януари', 'февруари', 'март', 'април', 'май', 'юни', 'юли', 'август', 'септември', 'октомври', 'ноември', 'декември'],
     'units': {
       'km/h': 'км/ч',
       'm/s': 'м/с',
@@ -634,6 +670,8 @@ const locale = {
     'tempLo': 'Naktį',
     'precip': 'Krituliai',
     'feelsLike': 'Jaučiama',
+    'days': ['Sekmadienis', 'Pirmadienis', 'Antradienis', 'Trečiadienis', 'Ketvirtadienis', 'Penktadienis', 'Šeštadienis'],
+    'months': ['sausis', 'vasaris', 'kovas', 'balandis', 'gegužė', 'birželis', 'liepa', 'rugpjūtis', 'rugsėjis', 'spalis', 'lapkritis', 'gruodis'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -669,6 +707,8 @@ const locale = {
     'tempLo': 'Temperatura mínima',
     'precip': 'Precipitació',
     'feelsLike': 'Sensació tèrmica',
+    'days': ['Diumenge', 'Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte'],
+    'months': ['gener', 'febrer', 'març', 'abril', 'maig', 'juny', 'juliol', 'agost', 'setembre', 'octubre', 'novembre', 'desembre'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -704,6 +744,8 @@ const locale = {
     'tempLo': 'Temperatură noaptea',
     'precip': 'Precipitații',
     'feelsLike': 'Se simte ca',
+    'days': ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'],
+    'months': ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -739,6 +781,8 @@ const locale = {
     'tempLo': 'Температура вночі',
     'precip': 'Опади',
     'feelsLike': 'Відчувається як',
+    'days': ['Неділя', 'Понеділок', 'Вівторок', 'Середа', 'Четвер', 'П\'ятниця', 'Субота'],
+    'months': ['січень', 'лютий', 'березень', 'квітень', 'травень', 'червень', 'липень', 'серпень', 'вересень', 'жовтень', 'листопад', 'грудень'],
     'units': {
       'km/h': 'км/год',
       'm/s': 'м/с',
@@ -774,6 +818,8 @@ const locale = {
     'tempLo': '최저 기온',
     'precip': '강수',
     'feelsLike': '체감',
+    'days': ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+    'months': ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
