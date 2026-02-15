@@ -18070,9 +18070,6 @@ Chart.register(...registerables, plugin);
 
 class WeatherChartCard extends s {
 
-// Regex to detect Latin script characters for uppercase formatting
-static LATIN_SCRIPT_REGEX = /^[A-Za-z]+$/;
-
 static getConfigElement() {
   return document.createElement("weather-chart-card-editor");
 }
@@ -18338,13 +18335,13 @@ ll(str) {
   const selectedLocale = this.config.locale || this.language || 'en';
 
   // Try full locale first (e.g., 'ro-RO')
-  if (locale[selectedLocale]?.[str]) {
+  if (locale[selectedLocale] && locale[selectedLocale][str]) {
     return locale[selectedLocale][str];
   }
 
   // Fall back to language code (e.g., 'ro' from 'ro-RO')
   const languageCode = selectedLocale.split('-')[0];
-  if (locale[languageCode]?.[str]) {
+  if (locale[languageCode] && locale[languageCode][str]) {
     return locale[languageCode][str];
   }
 
@@ -18365,18 +18362,18 @@ getLocaleArray(key) {
   const selectedLocale = this.config.locale || this.language || 'en';
   
   // Try full locale first (e.g., 'ro-RO')
-  if (locale[selectedLocale]?.[key]?.length) {
+  if (locale[selectedLocale] && locale[selectedLocale][key] && locale[selectedLocale][key].length) {
     return locale[selectedLocale][key];
   }
   
   // Try language code (e.g., 'ro' from 'ro-RO')
   const languageCode = selectedLocale.split('-')[0];
-  if (locale[languageCode]?.[key]?.length) {
+  if (locale[languageCode] && locale[languageCode][key] && locale[languageCode][key].length) {
     return locale[languageCode][key];
   }
   
   // English fallback with safety check
-  if (locale.en?.[key]?.length) {
+  if (locale.en && locale.en[key] && locale.en[key].length) {
     return locale.en[key];
   }
   
@@ -18389,7 +18386,7 @@ getLocalizedDayName(date, timezone) {
   
   // Priority 1: Try translation array from locale.js
   const days = this.getLocaleArray('days');
-  if (days?.[dayIndex] && typeof days[dayIndex] === 'string' && days[dayIndex].length > 0) {
+  if (days && days[dayIndex] && typeof days[dayIndex] === 'string' && days[dayIndex].length > 0) {
     const dayName = days[dayIndex].substring(0, 3);
     // Only uppercase for Latin-script languages
     return WeatherChartCard.LATIN_SCRIPT_REGEX.test(dayName) ? dayName.toUpperCase() : dayName;
@@ -18425,7 +18422,7 @@ getLocalizedDayNameFull(date, timezone) {
   
   // Priority 1: Try translation array from locale.js
   const days = this.getLocaleArray('days');
-  if (days?.[dayIndex] && typeof days[dayIndex] === 'string' && days[dayIndex].length > 0) {
+  if (days && days[dayIndex] && typeof days[dayIndex] === 'string' && days[dayIndex].length > 0) {
     return days[dayIndex];
   }
   
@@ -18468,7 +18465,7 @@ getLocalizedMonthName(date, timezone) {
   
   // Priority 1: Try translation array from locale.js
   const months = this.getLocaleArray('months');
-  if (months?.[monthIndex] && typeof months[monthIndex] === 'string' && months[monthIndex].length > 0) {
+  if (months && months[monthIndex] && typeof months[monthIndex] === 'string' && months[monthIndex].length > 0) {
     return months[monthIndex].charAt(0).toUpperCase() + months[monthIndex].slice(1);
   }
   
@@ -18500,7 +18497,7 @@ getLocalizedMonthNameShort(date, timezone) {
   
   // Priority 1: Try translation array from locale.js
   const months = this.getLocaleArray('months');
-  if (months?.[monthIndex] && typeof months[monthIndex] === 'string' && months[monthIndex].length > 0) {
+  if (months && months[monthIndex] && typeof months[monthIndex] === 'string' && months[monthIndex].length > 0) {
     const monthName = months[monthIndex].substring(0, 3);
     // Only uppercase for Latin-script languages
     return WeatherChartCard.LATIN_SCRIPT_REGEX.test(monthName) ? monthName.toUpperCase() : monthName;
@@ -19271,22 +19268,19 @@ updateChart({ forecasts, forecastChart } = this) {
           padding-right: 16px;
           padding-bottom: ${config.show_last_changed === true ? '2px' : '16px'};
           padding-left: 16px;
-          position: relative;
         }
         .main {
           display: flex;
           align-items: center;
           justify-content: space-between;
           font-size: ${config.current_temp_size}px;
-          margin-top: ${config.title ? '-16px' : '0px'};
           margin-bottom: 10px;
           position: relative;
-          min-height: ${config.main_icon_size || 150}px;
         }
         .main .weather-icon {
           position: absolute;
           left: 50%;
-          top: 50%;
+          top: 10px;
           transform: translate(-50%, -50%);
           z-index: 1;
         }
@@ -19904,6 +19898,9 @@ renderLastUpdated() {
     this._fire('hass-more-info', { entityId: entity });
   }
 }
+
+// Regex to detect Latin script characters for uppercase formatting (ES2019 compatible)
+WeatherChartCard.LATIN_SCRIPT_REGEX = /^[A-Za-z]+$/;
 
 customElements.define('weather-chart-card', WeatherChartCard);
 
