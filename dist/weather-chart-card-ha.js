@@ -6,6 +6,8 @@ const locale = {
     'tempLo': 'Teplota v noci',
     'precip': 'Srážky',
     'feelsLike': 'Pocitová teplota',
+    'days': ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'],
+    'months': ['leden', 'únor', 'březen', 'duben', 'květen', 'červen', 'červenec', 'srpen', 'září', 'říjen', 'listopad', 'prosinec'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -41,6 +43,8 @@ const locale = {
     'tempLo': 'Teplota v noci',
     'precip': 'Zrážky',
     'feelsLike': 'Pocitová teplota',
+    'days': ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'],
+    'months': ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -76,6 +80,8 @@ const locale = {
     'tempLo': 'Nachttemperatur',
     'precip': 'Niederschlag',
     'feelsLike': 'Gefühlt',
+    'days': ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
+    'months': ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -111,6 +117,8 @@ const locale = {
     'tempLo': 'Nachttemperatuur',
     'precip': 'Neerslag',
     'feelsLike': 'Voelt als',
+    'days': ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'],
+    'months': ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -146,6 +154,8 @@ const locale = {
     'tempLo': 'Temperature night',
     'precip': 'Precipitations',
     'feelsLike': 'Feels like',
+    'days': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+    'months': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -181,6 +191,8 @@ const locale = {
     'tempLo': 'Temperatura mínima',
     'precip': 'Precipitación',
     'feelsLike': 'Sensación térmica',
+    'days': ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
+    'months': ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -216,6 +228,8 @@ const locale = {
     'tempLo': 'Lämpötila alin',
     'precip': 'Sademäärä',
     'feelsLike': 'Tuntuu kuin',
+    'days': ['Sunnuntai', 'Maanantai', 'Tiistai', 'Keskiviikko', 'Torstai', 'Perjantai', 'Lauantai'],
+    'months': ['tammikuu', 'helmikuu', 'maaliskuu', 'huhtikuu', 'toukokuu', 'kesäkuu', 'heinäkuu', 'elokuu', 'syyskuu', 'lokakuu', 'marraskuu', 'joulukuu'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -251,6 +265,8 @@ const locale = {
     'tempLo': 'Min. hőmérséklet',
     'precip': 'Csapadék',
     'feelsLike': 'Hőérzet',
+    'days': ['Vasárnap', 'Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat'],
+    'months': ['január', 'február', 'március', 'április', 'május', 'június', 'július', 'augusztus', 'szeptember', 'október', 'november', 'december'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -286,6 +302,8 @@ const locale = {
     'tempLo': 'Температура ночью',
     'precip': 'Осадки',
     'feelsLike': 'Ощущается как',
+    'days': ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
+    'months': ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
     'units': {
       'km/h': 'км/ч',
       'm/s': 'м/с',
@@ -321,6 +339,8 @@ const locale = {
     'tempLo': 'Temperatur min',
     'precip': 'Nederbörd',
     'feelsLike': 'Känns som',
+    'days': ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'],
+    'months': ['januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli', 'augusti', 'september', 'oktober', 'november', 'december'],
     'units': {
         'km/h': 'km/h',
         'm/s': 'm/s',
@@ -356,6 +376,8 @@ const locale = {
     'tempLo': 'Température min',
     'precip': 'Précipitations',
     'feelsLike': 'Ressenti',
+    'days': ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
+    'months': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -391,6 +413,8 @@ const locale = {
     'tempLo': 'Temperatura w nocy',
     'precip': 'Opady',
     'feelsLike': 'Odczuwalna',
+    'days': ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'],
+    'months': ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec', 'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -426,6 +450,8 @@ const locale = {
     'tempLo': 'Minimumstemperatur',
     'precip': 'Nedbør',
     'feelsLike': 'Føles som',
+    'days': ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'],
+    'months': ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'],
     'units': {
       'km/h': 'km/t',
       'm/s': 'm/s',
@@ -461,6 +487,8 @@ const locale = {
     'tempLo': 'Nattemperatur',
     'precip': 'Nedbør',
     'feelsLike': 'Føles som',
+    'days': ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'],
+    'months': ['januar', 'februar', 'marts', 'april', 'maj', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'december'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -496,6 +524,8 @@ const locale = {
     'tempLo': 'Temperatura notte',
     'precip': 'Precipitazioni',
     'feelsLike': 'Percepito come',
+    'days': ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'],
+    'months': ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -531,6 +561,8 @@ const locale = {
     'tempLo': 'Temperatura noite',
     'precip': 'Precipitação',
     'feelsLike': 'Sensação Térmica',
+    'days': ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
+    'months': ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -566,6 +598,8 @@ const locale = {
     'tempLo': 'Ελάχιστη θερμοκρασία νύχτας',
     'precip': 'Υετός',
     'feelsLike': 'Αίσθηση σαν',
+    'days': ['Κυριακή', 'Δευτέρα', 'Τρίτη', 'Τετάρτη', 'Πέμπτη', 'Παρασκευή', 'Σάββατο'],
+    'months': ['Ιανουάριος', 'Φεβρουάριος', 'Μάρτιος', 'Απρίλιος', 'Μάιος', 'Ιούνιος', 'Ιούλιος', 'Αύγουστος', 'Σεπτέμβριος', 'Οκτώβριος', 'Νοέμβριος', 'Δεκέμβριος'],
     'units': {
       'km/h': 'χλμ/ώρα',
       'm/s': 'μ/δ',
@@ -601,6 +635,8 @@ const locale = {
     'tempLo': 'Минимална температура',
     'precip': 'Валежи',
     'feelsLike': 'Усеща се като',
+    'days': ['Неделя', 'Понеделник', 'Вторник', 'Сряда', 'Четвъртък', 'Петък', 'Събота'],
+    'months': ['януари', 'февруари', 'март', 'април', 'май', 'юни', 'юли', 'август', 'септември', 'октомври', 'ноември', 'декември'],
     'units': {
       'km/h': 'км/ч',
       'm/s': 'м/с',
@@ -636,6 +672,8 @@ const locale = {
     'tempLo': 'Naktį',
     'precip': 'Krituliai',
     'feelsLike': 'Jaučiama',
+    'days': ['Sekmadienis', 'Pirmadienis', 'Antradienis', 'Trečiadienis', 'Ketvirtadienis', 'Penktadienis', 'Šeštadienis'],
+    'months': ['sausis', 'vasaris', 'kovas', 'balandis', 'gegužė', 'birželis', 'liepa', 'rugpjūtis', 'rugsėjis', 'spalis', 'lapkritis', 'gruodis'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -671,6 +709,8 @@ const locale = {
     'tempLo': 'Temperatura mínima',
     'precip': 'Precipitació',
     'feelsLike': 'Sensació tèrmica',
+    'days': ['Diumenge', 'Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte'],
+    'months': ['gener', 'febrer', 'març', 'abril', 'maig', 'juny', 'juliol', 'agost', 'setembre', 'octubre', 'novembre', 'desembre'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -706,6 +746,8 @@ const locale = {
     'tempLo': 'Temperatură noaptea',
     'precip': 'Precipitații',
     'feelsLike': 'Se simte ca',
+    'days': ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'],
+    'months': ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -741,6 +783,8 @@ const locale = {
     'tempLo': 'Температура вночі',
     'precip': 'Опади',
     'feelsLike': 'Відчувається як',
+    'days': ['Неділя', 'Понеділок', 'Вівторок', 'Середа', 'Четвер', 'П\'ятниця', 'Субота'],
+    'months': ['січень', 'лютий', 'березень', 'квітень', 'травень', 'червень', 'липень', 'серпень', 'вересень', 'жовтень', 'листопад', 'грудень'],
     'units': {
       'km/h': 'км/год',
       'm/s': 'м/с',
@@ -776,6 +820,8 @@ const locale = {
     'tempLo': '최저 기온',
     'precip': '강수',
     'feelsLike': '체감',
+    'days': ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
+    'months': ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -18289,13 +18335,13 @@ ll(str) {
   const selectedLocale = this.config.locale || this.language || 'en';
 
   // Try full locale first (e.g., 'ro-RO')
-  if (locale[selectedLocale] !== undefined) {
+  if (locale[selectedLocale] && locale[selectedLocale][str]) {
     return locale[selectedLocale][str];
   }
 
   // Fall back to language code (e.g., 'ro' from 'ro-RO')
   const languageCode = selectedLocale.split('-')[0];
-  if (locale[languageCode] !== undefined) {
+  if (locale[languageCode] && locale[languageCode][str]) {
     return locale[languageCode][str];
   }
 
@@ -18305,6 +18351,178 @@ ll(str) {
 
 getTimezone() {
   return this.config.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
+/**
+ * Get locale data with fallback logic
+ * @param {string} key - 'days' or 'months'
+ * @returns {Array|null} - locale array or null if not found
+ */
+getLocaleArray(key) {
+  const selectedLocale = this.config.locale || this.language || 'en';
+  
+  // Try full locale first (e.g., 'ro-RO')
+  if (locale[selectedLocale] && locale[selectedLocale][key] && locale[selectedLocale][key].length) {
+    return locale[selectedLocale][key];
+  }
+  
+  // Try language code (e.g., 'ro' from 'ro-RO')
+  const languageCode = selectedLocale.split('-')[0];
+  if (locale[languageCode] && locale[languageCode][key] && locale[languageCode][key].length) {
+    return locale[languageCode][key];
+  }
+  
+  // English fallback with safety check
+  if (locale.en && locale.en[key] && locale.en[key].length) {
+    return locale.en[key];
+  }
+  
+  // Ultimate fallback: return null if nothing works
+  return null;
+}
+
+getLocalizedDayName(date, timezone) {
+  const dayIndex = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
+  
+  // Priority 1: Try translation array from locale.js
+  const days = this.getLocaleArray('days');
+  if (days && days[dayIndex] && typeof days[dayIndex] === 'string' && days[dayIndex].length > 0) {
+    const dayName = days[dayIndex].substring(0, 3);
+    // Only uppercase for Latin-script languages
+    return WeatherChartCard.LATIN_SCRIPT_REGEX.test(dayName) ? dayName.toUpperCase() : dayName;
+  }
+  
+  // Priority 2: Browser Intl fallback
+  try {
+    const selectedLocale = this.config.locale || this.language || 'en';
+    const dayFormatter = new Intl.DateTimeFormat(selectedLocale, {
+      weekday: 'long',
+      timeZone: timezone
+    });
+    const formatted = dayFormatter.format(date);
+    if (formatted && formatted.length > 0) {
+      const dayName = formatted.substring(0, 3);
+      // Only uppercase for Latin-script languages
+      return WeatherChartCard.LATIN_SCRIPT_REGEX.test(dayName) ? dayName.toUpperCase() : dayName;
+    }
+  } catch (e) {
+    // Intl failed, continue to ultimate fallback
+  }
+  
+  // Priority 3: Hardcoded English fallback
+  const englishDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  return englishDays[dayIndex].substring(0, 3).toUpperCase();
+}
+
+/**
+ * Get localized day name (full)
+ */
+getLocalizedDayNameFull(date, timezone) {
+  const dayIndex = date.getDay(); // 0 = Sunday, 1 = Monday, etc.
+  
+  // Priority 1: Try translation array from locale.js
+  const days = this.getLocaleArray('days');
+  if (days && days[dayIndex] && typeof days[dayIndex] === 'string' && days[dayIndex].length > 0) {
+    return days[dayIndex];
+  }
+  
+  // Priority 2: Browser Intl fallback
+  try {
+    const selectedLocale = this.config.locale || this.language || 'en';
+    const dayFormatter = new Intl.DateTimeFormat(selectedLocale, {
+      weekday: 'long',
+      timeZone: timezone
+    });
+    const formatted = dayFormatter.format(date);
+    if (formatted && formatted.length > 0) {
+      return formatted;
+    }
+  } catch (e) {
+    // Intl failed, continue to ultimate fallback
+  }
+  
+  // Priority 3: Hardcoded English fallback
+  const englishDays = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+  return englishDays[dayIndex];
+}
+
+/**
+ * Get localized day number
+ */
+getLocalizedDayNumber(date, locale, timezone) {
+  try {
+    return date.toLocaleString(locale, { day: 'numeric', timeZone: timezone });
+  } catch (error) {
+    return date.getDate().toString();
+  }
+}
+
+/**
+ * Get localized month name (full)
+ */
+getLocalizedMonthName(date, timezone) {
+  const monthIndex = date.getMonth(); // 0 = January, 1 = February, etc.
+  
+  // Priority 1: Try translation array from locale.js
+  const months = this.getLocaleArray('months');
+  if (months && months[monthIndex] && typeof months[monthIndex] === 'string' && months[monthIndex].length > 0) {
+    return months[monthIndex].charAt(0).toUpperCase() + months[monthIndex].slice(1);
+  }
+  
+  // Priority 2: Browser Intl fallback
+  try {
+    const selectedLocale = this.config.locale || this.language || 'en';
+    const monthFormatter = new Intl.DateTimeFormat(selectedLocale, {
+      month: 'long',
+      timeZone: timezone
+    });
+    const formatted = monthFormatter.format(date);
+    if (formatted && formatted.length > 0) {
+      return formatted.charAt(0).toUpperCase() + formatted.slice(1);
+    }
+  } catch (e) {
+    // Intl failed, continue to ultimate fallback
+  }
+  
+  // Priority 3: Hardcoded English fallback
+  const englishMonths = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+  return englishMonths[monthIndex].charAt(0).toUpperCase() + englishMonths[monthIndex].slice(1);
+}
+
+/**
+ * Get localized month name (short - 3 letters uppercase)
+ */
+getLocalizedMonthNameShort(date, timezone) {
+  const monthIndex = date.getMonth(); // 0 = January, 1 = February, etc.
+  
+  // Priority 1: Try translation array from locale.js
+  const months = this.getLocaleArray('months');
+  if (months && months[monthIndex] && typeof months[monthIndex] === 'string' && months[monthIndex].length > 0) {
+    const monthName = months[monthIndex].substring(0, 3);
+    // Only uppercase for Latin-script languages
+    return WeatherChartCard.LATIN_SCRIPT_REGEX.test(monthName) ? monthName.toUpperCase() : monthName;
+  }
+  
+  // Priority 2: Browser Intl fallback
+  try {
+    const selectedLocale = this.config.locale || this.language || 'en';
+    const monthFormatter = new Intl.DateTimeFormat(selectedLocale, {
+      month: 'long',
+      timeZone: timezone
+    });
+    const formatted = monthFormatter.format(date);
+    if (formatted && formatted.length > 0) {
+      const monthName = formatted.substring(0, 3);
+      // Only uppercase for Latin-script languages
+      return WeatherChartCard.LATIN_SCRIPT_REGEX.test(monthName) ? monthName.toUpperCase() : monthName;
+    }
+  } catch (e) {
+    // Intl failed, continue to ultimate fallback
+  }
+  
+  // Priority 3: Hardcoded English fallback
+  const englishMonths = ['january', 'february', 'march', 'april', 'may', 'june', 'july', 'august', 'september', 'october', 'november', 'december'];
+  return englishMonths[monthIndex].substring(0, 3).toUpperCase();
 }
 
   getCardSize() {
@@ -18324,6 +18542,58 @@ getTimezone() {
       return `${this.config.icons}${iconName}.svg`;
     }
     return weatherIcons[condition];
+  }
+
+  /**
+   * Get local icon path - tries different common paths for HACS/manual installation
+   */
+  getLocalIconPath() {
+    // Get the card's script URL to determine installation path
+    const scripts = document.querySelectorAll('script[src*="weather-chart-card"]');
+    if (scripts.length > 0) {
+      const scriptSrc = scripts[scripts.length - 1].src;
+      const basePath = scriptSrc.substring(0, scriptSrc.lastIndexOf('/'));
+      return `${basePath}/icons/`;
+    }
+    // Fallback paths for common installations
+    return '/hacsfiles/weather-chart-card-ha/icons/';
+  }
+
+  /**
+   * Handle icon loading error - fallback to local icons or MDI icons
+   */
+  handleIconError(event, condition, sun) {
+    const img = event.target;
+    const currentSrc = img.src;
+    
+    // If already tried local bundled icons, try custom path if configured
+    if (img.dataset.fallbackAttempted === 'bundled') {
+      if (this.config.icons && !currentSrc.includes(this.config.icons)) {
+        img.dataset.fallbackAttempted = 'custom';
+        const iconName = sun === 'below_horizon' ? weatherIconsNight[condition] : weatherIconsDay[condition];
+        img.src = `${this.config.icons}${iconName}.svg`;
+        return;
+      }
+      img.dataset.fallbackAttempted = 'final';
+    }
+    
+    // If all fallbacks failed, use MDI icon
+    if (img.dataset.fallbackAttempted === 'custom' || img.dataset.fallbackAttempted === 'final') {
+      // Replace img with ha-icon
+      const haIcon = document.createElement('ha-icon');
+      haIcon.setAttribute('icon', weatherIcons[condition]);
+      haIcon.style.cssText = img.style.cssText;
+      img.parentNode.replaceChild(haIcon, img);
+      return;
+    }
+    
+    // First fallback: try local bundled icons
+    if (!img.dataset.fallbackAttempted) {
+      img.dataset.fallbackAttempted = 'bundled';
+      const iconName = sun === 'below_horizon' ? weatherIconsNight[condition] : weatherIconsDay[condition];
+      const localPath = this.getLocalIconPath();
+      img.src = `${localPath}${iconName}.svg`;
+    }
   }
 
 getWindDirIcon(deg) {
@@ -18548,6 +18818,8 @@ createTemperatureGradient(data, unit, ctx, chartArea) {
 }
 
 drawChart({ config, language, weather, forecastItems } = this) {
+  const self = this; // Capture component instance for use in Chart.js callbacks
+  
   if (!this.forecasts || !this.forecasts.length) {
     return [];
   }
@@ -18775,22 +19047,19 @@ drawChart({ config, language, weather, forecastItems } = this) {
                   var tzMinutes = parseInt(new Intl.DateTimeFormat('en-US', { minute: 'numeric', timeZone: timezone }).format(dateObj));
 
                   if (tzHours === 0 && tzMinutes === 0 && config.forecast.type === 'hourly') {
-                      var dateFormatOptions = {
-                          day: 'numeric',
-                          month: 'short',
-                          timeZone: timezone,
-                      };
-                      var date = dateObj.toLocaleDateString(locale, dateFormatOptions);
+                      var monthShort = self.getLocalizedMonthNameShort(dateObj, timezone);
+                      var dayNumber = self.getLocalizedDayNumber(dateObj, locale, timezone);
+                      var date = monthShort + ' ' + dayNumber;
                       time = time.replace('a.m.', 'AM').replace('p.m.', 'PM');
                       return [date, time];
                   }
 
                   if (config.forecast.type !== 'hourly') {
-                      var weekday = dateObj.toLocaleString(locale, { weekday: 'short', timeZone: timezone }).toUpperCase();
+                      var weekday = self.getLocalizedDayName(dateObj, timezone);
                       
                       // Add date number if show_date_labels is enabled
                       if (config.forecast.show_date_labels) {
-                          var dayNumber = dateObj.toLocaleString(locale, { day: 'numeric', timeZone: timezone });
+                          var dayNumber = self.getLocalizedDayNumber(dateObj, locale, timezone);
                           return [weekday, dayNumber];  // Return as array for multi-line display
                       }
                       
@@ -18854,16 +19123,21 @@ drawChart({ config, language, weather, forecastItems } = this) {
             title: function (TooltipItem) {
               var datetime = TooltipItem[0].label;
               var timezone = config.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
-              var locale = config.locale || undefined;
-              return new Date(datetime).toLocaleDateString(locale, {
-                month: 'short',
-                day: 'numeric',
-                weekday: 'short',
+              var dateObj = new Date(datetime);
+              
+              var monthShort = self.getLocalizedMonthNameShort(dateObj, timezone);
+              var dayNumber = self.getLocalizedDayNumber(dateObj, config.locale, timezone);
+              var weekdayShort = self.getLocalizedDayName(dateObj, timezone);
+              
+              var timeFormatter = new Intl.DateTimeFormat(config.locale || 'en-US', {
                 hour: 'numeric',
                 minute: 'numeric',
                 hour12: config.use_12hour_format,
-                timeZone: timezone,
+                timeZone: timezone
               });
+              var timeStr = timeFormatter.format(dateObj);
+              
+              return weekdayShort + ', ' + monthShort + ' ' + dayNumber + ', ' + timeStr;
             },
     label: function (context) {
       var label = context.dataset.label;
@@ -18979,6 +19253,9 @@ updateChart({ forecasts, forecastChart } = this) {
     }
     return x`
       <style>
+        ha-card {
+          ${config.title ? 'padding-bottom: 8px;' : ''}
+        }
         ha-icon {
           color: var(--paper-item-icon-color);
         }
@@ -18991,7 +19268,6 @@ updateChart({ forecasts, forecastChart } = this) {
           padding-right: 16px;
           padding-bottom: ${config.show_last_changed === true ? '2px' : '16px'};
           padding-left: 16px;
-          position: relative;
         }
         .main {
           display: flex;
@@ -19000,12 +19276,11 @@ updateChart({ forecasts, forecastChart } = this) {
           font-size: ${config.current_temp_size}px;
           margin-bottom: 10px;
           position: relative;
-          min-height: ${(config.main_icon_size || 150) + 40}px;
         }
         .main .weather-icon {
           position: absolute;
           left: 50%;
-          top: 50%;
+          top: 10px;
           transform: translate(-50%, -50%);
           z-index: 1;
         }
@@ -19195,7 +19470,9 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
   }
 
   const iconHtml = config.animated_icons || config.icons
-    ? x`<img src="${this.getWeatherIcon(weather.state, sun.state)}" alt="">`
+    ? x`<img src="${this.getWeatherIcon(weather.state, sun.state)}" 
+                 @error="${(e) => this.handleIconError(e, weather.state, sun.state)}" 
+                 alt="">`
     : x`<ha-icon icon="${this.getWeatherIcon(weather.state, sun.state)}"></ha-icon>`;
 
   return x`
@@ -19249,20 +19526,11 @@ updateClock() {
     timeZone: timezone
   });
   
-  const dayFormatter = new Intl.DateTimeFormat(this.config.locale || 'en-US', {
-    weekday: 'long',
-    timeZone: timezone
-  });
-  
-  const dateFormatter = new Intl.DateTimeFormat(this.config.locale || 'en-US', {
-    month: 'long',
-    day: 'numeric',
-    timeZone: timezone
-  });
-  
   const currentTime = timeFormatter.format(currentDate);
-  const currentDayOfWeek = dayFormatter.format(currentDate).toUpperCase();
-  const currentDateFormatted = dateFormatter.format(currentDate);
+  const currentDayOfWeek = this.getLocalizedDayNameFull(currentDate, timezone);
+  const monthName = this.getLocalizedMonthName(currentDate, timezone);
+  const dayNumber = this.getLocalizedDayNumber(currentDate, this.config.locale, timezone);
+  const currentDateFormatted = monthName + ' ' + dayNumber;
 
   const cardDiv = this.shadowRoot.querySelector('.card');
   if (cardDiv) {
@@ -19503,7 +19771,11 @@ renderForecastConditionIcons({ config, forecastItems, sun } = this) {
           const iconSrc = config.animated_icons ?
             `${this.baseIconPath}${weatherIcons[condition]}.svg` :
             `${this.config.icons}${weatherIcons[condition]}.svg`;
-          iconHtml = x`<img class="icon" src="${iconSrc}" alt="">`;
+          const sunState = isDayTime ? 'above_horizon' : 'below_horizon';
+          iconHtml = x`<img class="icon" 
+                               src="${iconSrc}" 
+                               @error="${(e) => this.handleIconError(e, condition, sunState)}" 
+                               alt="">`;
         } else {
           iconHtml = x`<ha-icon icon="${this.getWeatherIcon(condition, sun.state)}"></ha-icon>`;
         }
@@ -19626,6 +19898,9 @@ renderLastUpdated() {
     this._fire('hass-more-info', { entityId: entity });
   }
 }
+
+// Regex to detect Latin script characters for uppercase formatting (ES2019 compatible)
+WeatherChartCard.LATIN_SCRIPT_REGEX = /^[A-Za-z]+$/;
 
 customElements.define('weather-chart-card', WeatherChartCard);
 
