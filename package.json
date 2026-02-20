@@ -1,6 +1,6 @@
 {
   "name": "weather-chart-card-ha",
-  "version": "1.4.0",
+  "version": "1.4.2",
   "description": "Enhanced weather chart card with temperature gradients, timezone support, and customizable layouts for Home Assistant",
   "keywords": [
     "home-assistant",

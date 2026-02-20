@@ -1852,8 +1852,8 @@ customElements.define('weather-chart-card', WeatherChartCard);
 window.customCards = window.customCards || [];
 window.customCards.push({
   type: "weather-chart-card",
-  name: "Weather Chart Card",
-  description: "A custom weather card with chart.",
+  name: "Enhanced Weather Chart Card",
+  description: "Enhanced custom weather card with charts.",
   preview: true,
-  documentationURL: "https://github.com/mlamberts78/weather-chart-card",
+  documentationURL: "https://github.com/w4mhi/weather-chart-card-ha",
 });
