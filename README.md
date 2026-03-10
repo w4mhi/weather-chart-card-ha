@@ -9,8 +9,9 @@
 
 </div>
 
-![weather-chart-card-ha](https://github.com/mlamberts78/weather-chart-card-ha/assets/93537082/bd5b9f6e-4125-4a19-9773-463e6d054bce)
-![15-days](https://github.com/mlamberts78/weather-chart-card-ha/assets/93537082/f4de6060-7005-4a6d-b1f3-3aa17c856c73)
+![weather-chart-ha-en-US](./screenshots/weather-en.png)
+![weather-chart-card-ro-RO](./screenshots/weather-ro.png)
+![weather-chart-card-hourly](./screenshots/weather-hourly.png)
 
 ## About This Fork
 
