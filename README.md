@@ -3,9 +3,9 @@
 <div align="center">
 
 [![HACS](https://img.shields.io/badge/HACS-Default-41BDF5.svg)](https://github.com/hacs/integration)
-[![GitHub Release](https://img.shields.io/github/v/release/w4mhi/weather-chart-card-ha-ha.svg)](https://github.com/w4mhi/weather-chart-card-ha-ha/releases)
-![GitHub downloads](https://img.shields.io/github/downloads/w4mhi/weather-chart-card-ha-ha/total?style=flat-square)
-[![License](https://img.shields.io/github/license/w4mhi/weather-chart-card-ha-ha.svg)](LICENSE)
+[![GitHub Release](https://img.shields.io/github/v/release/w4mhi/weather-chart-card-ha.svg)](https://github.com/w4mhi/weather-chart-card-ha/releases)
+![GitHub downloads](https://img.shields.io/github/downloads/w4mhi/weather-chart-card-ha/total?style=flat-square)
+[![License](https://img.shields.io/github/license/w4mhi/weather-chart-card-ha.svg)](LICENSE)
 
 </div>
 
@@ -42,7 +42,7 @@ This version continues to receive updates and bug fixes to ensure compatibility 
 
 ### Manual Installation
 
-1. Download `weather-chart-card-ha.js` from the [latest release](https://github.com/w4mhi/weather-chart-card-ha-ha/releases/latest)
+1. Download `weather-chart-card-ha.js` from the [latest release](https://github.com/w4mhi/weather-chart-card-ha/releases/latest)
 2. Copy the file to your `config/www` folder
 3. Add the resource in **Settings** → **Dashboards** → **Resources**:
    ```
@@ -490,8 +490,8 @@ Contributions are welcome! Please feel free to submit issues and pull requests.
 
 ```bash
 # Clone the repository
-git clone https://github.com/w4mhi/weather-chart-card-ha-ha.git
-cd weather-chart-card-ha-ha
+git clone https://github.com/w4mhi/weather-chart-card-ha.git
+cd weather-chart-card-ha
 
 # Install dependencies
 npm install
@@ -507,7 +507,7 @@ npm run build
 
 ## 📋 Changelog
 
-See [Releases](https://github.com/w4mhi/weather-chart-card-ha-ha/releases) for version history and changes.
+See [Releases](https://github.com/w4mhi/weather-chart-card-ha/releases) for version history and changes.
 
 ---
 
