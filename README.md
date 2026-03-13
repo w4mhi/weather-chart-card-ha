@@ -9,9 +9,11 @@
 
 </div>
 
-![weather-chart-ha-en-US](./screenshots/weather-en.png)
-![weather-chart-card-ro-RO](./screenshots/weather-ro.png)
-![weather-chart-card-hourly](./screenshots/weather-hourly.png)
+<div align="center">
+  <img src="./screenshots/weather-en.png" width="30%" alt="English locale">
+  <img src="./screenshots/weather-ro.png" width="30%" alt="Romanian locale">
+  <img src="./screenshots/weather-hourly.png" width="30%" alt="Hourly view">
+</div>
 
 ## About This Fork
 
