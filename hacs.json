@@ -3,5 +3,7 @@
   "content_in_root": false,
   "render_readme": true,
   "filename": "weather-chart-card-ha.js",
-  "homeassistant": "2024.1.0"
+  "homeassistant": "2024.1.0",
+  "maintainer": ["w4mhi"],
+  "license": "MIT"
 }

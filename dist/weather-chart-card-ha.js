@@ -977,6 +977,12 @@ class WeatherChartCardEditor extends s {
     this._entity = '';
     this.entities = [];
     this._formValueChanged = this._formValueChanged.bind(this);
+    
+    // Initialize with empty config to prevent crashes
+    this._config = {
+      forecast: {},
+      units: {}
+    };
   }
 
   setConfig(config) {
@@ -1204,10 +1210,32 @@ class WeatherChartCardEditor extends s {
         .radio-group label {
           margin-left: 4px;
         }
-	div.buttons-container {
-          border-bottom: 2px solid #ccc;
-          padding-bottom: 10px;
-          margin-bottom: 20px;
+        .buttons-container {
+          display: flex;
+          gap: 4px;
+          border-bottom: 2px solid var(--divider-color);
+          margin: 20px 0;
+        }
+        .page-button {
+          background: transparent;
+          border: none;
+          border-bottom: 3px solid transparent;
+          padding: 12px 16px;
+          cursor: pointer;
+          color: var(--secondary-text-color);
+          font-size: 14px;
+          font-weight: 400;
+          transition: all 0.2s ease;
+          outline: none;
+        }
+        .page-button:hover {
+          background: var(--secondary-background-color, rgba(0, 0, 0, 0.05));
+          color: var(--primary-text-color);
+        }
+        .page-button.active {
+          border-bottom-color: var(--primary-color);
+          color: var(--primary-color);
+          font-weight: 500;
         }
         .flex-container {
           display: flex;
@@ -1227,8 +1255,7 @@ class WeatherChartCardEditor extends s {
   label="Entity"
   .configValue=${'entity'}
   .value=${this._entity}
-  @change=${(e) => this._EntityChanged(e, 'entity')}
-  @closed=${(ev) => ev.stopPropagation()}
+  @value-changed=${(e) => this._EntityChanged(e, 'entity')}
 >
   ${this.entities.map((entity) => x`<ha-list-item .value=${entity}>${entity}</ha-list-item>`)}
 </ha-select>
@@ -1237,32 +1264,118 @@ class WeatherChartCardEditor extends s {
         .value="${this._config.title || ''}"
         @change="${(e) => this._valueChanged(e, 'title')}"
       ></ha-textfield>
+      
+      <div>
+        <label>Select custom language</label>
+        <select
+          style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
+          .value=${this._config.locale || ''}
+          @change=${(e) => {
+            const evt = { target: { value: e.target.value } };
+            this._valueChanged(evt, 'locale');
+          }}
+        >
+          <option value="">HA Default</option>
+          <option value="bg">🇧🇬 Bulgarian</option>
+          <option value="ca">🇪🇸 Catalan</option>
+          <option value="cs">🇨🇿 Czech</option>
+          <option value="da">🇩🇰 Danish</option>
+          <option value="nl">🇳🇱 Dutch</option>
+          <option value="en">🇬🇧 English</option>
+          <option value="fi">🇫🇮 Finnish</option>
+          <option value="fr">🇫🇷 French</option>
+          <option value="de">🇩🇪 German</option>
+          <option value="el">🇬🇷 Greek</option>
+          <option value="hu">🇭🇺 Hungarian</option>
+          <option value="it">🇮🇹 Italian</option>
+          <option value="lt">🇱🇹 Lithuanian</option>
+          <option value="no">🇳🇴 Norwegian</option>
+          <option value="pl">🇵🇱 Polish</option>
+          <option value="pt">🇵🇹 Portuguese</option>
+          <option value="ro">🇷🇴 Romanian</option>
+          <option value="ru">🇷🇺 Russian</option>
+          <option value="sk">🇸🇰 Slovak</option>
+          <option value="es">🇪🇸 Spanish</option>
+          <option value="sv">🇸🇪 Swedish</option>
+          <option value="uk">🇺🇦 Ukrainian</option>
+          <option value="ko">🇰🇷 한국어</option>
+        </select>
+      </div>
+
+      <div>
+        <label>Timezone</label>
+        <select
+          style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
+          .value=${this._config.timezone || ''}
+          @change=${(e) => {
+            console.log('TIMEZONE CHANGED!', e.target.value);
+            const evt = { target: { value: e.target.value } };
+            this._valueChanged(evt, 'timezone');
+          }}
+        >
+          <option value="">HA Default (Auto-detect)</option>
+          <option value="America/New_York">🇺🇸 America/New_York (EST/EDT)</option>
+          <option value="America/Chicago">🇺🇸 America/Chicago (CST/CDT)</option>
+          <option value="America/Denver">🇺🇸 America/Denver (MST/MDT)</option>
+          <option value="America/Los_Angeles">🇺🇸 America/Los_Angeles (PST/PDT)</option>
+          <option value="America/Anchorage">🇺🇸 America/Anchorage (AKST/AKDT)</option>
+          <option value="Pacific/Honolulu">🇺🇸 Pacific/Honolulu (HST)</option>
+          <option value="America/Toronto">🇨🇦 America/Toronto (EST/EDT)</option>
+          <option value="America/Vancouver">🇨🇦 America/Vancouver (PST/PDT)</option>
+          <option value="Europe/London">🇬🇧 Europe/London (GMT/BST)</option>
+          <option value="Europe/Paris">🇫🇷 Europe/Paris (CET/CEST)</option>
+          <option value="Europe/Berlin">🇩🇪 Europe/Berlin (CET/CEST)</option>
+          <option value="Europe/Rome">🇮🇹 Europe/Rome (CET/CEST)</option>
+          <option value="Europe/Madrid">🇪🇸 Europe/Madrid (CET/CEST)</option>
+          <option value="Europe/Amsterdam">🇳🇱 Europe/Amsterdam (CET/CEST)</option>
+          <option value="Europe/Brussels">🇧🇪 Europe/Brussels (CET/CEST)</option>
+          <option value="Europe/Vienna">🇦🇹 Europe/Vienna (CET/CEST)</option>
+          <option value="Europe/Zurich">🇨🇭 Europe/Zurich (CET/CEST)</option>
+          <option value="Europe/Stockholm">🇸🇪 Europe/Stockholm (CET/CEST)</option>
+          <option value="Europe/Warsaw">🇵🇱 Europe/Warsaw (CET/CEST)</option>
+          <option value="Europe/Prague">🇨🇿 Europe/Prague (CET/CEST)</option>
+          <option value="Europe/Budapest">🇭🇺 Europe/Budapest (CET/CEST)</option>
+          <option value="Europe/Bucharest">🇷🇴 Europe/Bucharest (EET/EEST)</option>
+          <option value="Europe/Athens">🇬🇷 Europe/Athens (EET/EEST)</option>
+          <option value="Europe/Helsinki">🇫🇮 Europe/Helsinki (EET/EEST)</option>
+          <option value="Europe/Moscow">🇷🇺 Europe/Moscow (MSK)</option>
+          <option value="Asia/Dubai">🇦🇪 Asia/Dubai (GST)</option>
+          <option value="Asia/Shanghai">🇨🇳 Asia/Shanghai (CST)</option>
+          <option value="Asia/Tokyo">🇯🇵 Asia/Tokyo (JST)</option>
+          <option value="Asia/Seoul">🇰🇷 Asia/Seoul (KST)</option>
+          <option value="Asia/Singapore">🇸🇬 Asia/Singapore (SGT)</option>
+          <option value="Australia/Sydney">🇦🇺 Australia/Sydney (AEDT/AEST)</option>
+          <option value="Australia/Melbourne">🇦🇺 Australia/Melbourne (AEDT/AEST)</option>
+          <option value="Pacific/Auckland">🇳🇿 Pacific/Auckland (NZDT/NZST)</option>
+        </select>
+      </div>
        </div>
 
       <h5>Forecast type:</h5>
+      <div class="radio-container">
+        <div class="switch-right">
+          <ha-radio
+            name="type"
+            value="daily"
+            @change="${this._handleTypeChange}"
+            .checked="${forecastConfig.type === 'daily'}"
+          ></ha-radio>
+          <label class="check-label">
+            Daily forecast
+          </label>
+        </div>
 
-      <div class="radio-group">
-        <ha-radio
-          name="type"
-          value="daily"
-          @change="${this._handleTypeChange}"
-          .checked="${forecastConfig.type === 'daily'}"
-        ></ha-radio>
-        <label class="check-label">
-          Daily forecast
-        </label>
-      </div>
-
-      <div class="radio-group">
-        <ha-radio
-          name="type"
-          value="hourly"
-          @change="${this._handleTypeChange}"
-          .checked="${forecastConfig.type === 'hourly'}"
-        ></ha-radio>
-        <label class="check-label">
-          Hourly forecast
-        </label>
+        <div class="switch-right">
+          <ha-radio
+            name="type"
+            value="hourly"
+            @change="${this._handleTypeChange}"
+            .checked="${forecastConfig.type === 'hourly'}"
+          ></ha-radio>
+          <label class="check-label">
+            Hourly forecast
+          </label>
+        </div>
       </div>
 
       <h5>Chart style:</h5>
@@ -1292,14 +1405,61 @@ class WeatherChartCardEditor extends s {
         </div>
       </div>
 
-        <!-- Buttons to switch between pages -->
-       <h4>Settings:</h4>
-       <div class="buttons-container">
-         <mwc-button @click="${() => this.showPage('card')}">Main</mwc-button>
-         <mwc-button @click="${() => this.showPage('forecast')}">Forecast</mwc-button>
-         <mwc-button @click="${() => this.showPage('units')}">Units</mwc-button>
-         <mwc-button @click="${() => this.showPage('alternate')}">Alternate entities</mwc-button>
-       </div>
+      <h5>Icons settings:</h5>
+      <div class="icon-container">
+        <div class="switch-right">
+          <ha-switch
+            @change="${(e) => this._valueChanged(e, 'animated_icons')}"
+            .checked="${this._config.animated_icons === true}"
+          ></ha-switch>
+          <label class="switch-label">
+            Use Animated Icons
+          </label>
+        </div>
+        <div class="switch-right radio-container" style="${this._config.animated_icons ? 'display: flex;' : 'display: none;'}">
+          <ha-radio
+            name="icon_style"
+            value="style1"
+            @change="${this._handleIconStyleChange}"
+            .checked="${this._config.icon_style === 'style1'}"
+          ></ha-radio>
+          <label class="check-label">
+            Style 1
+          </label>
+        </div>
+        <div class="switch-right radio-container" style="${this._config.animated_icons ? 'display: flex;' : 'display: none;'}">
+          <ha-radio
+            name="icon_style"
+            value="style2"
+            @change="${this._handleIconStyleChange}"
+            .checked="${this._config.icon_style === 'style2'}"
+          ></ha-radio>
+          <label class="check-label">
+            Style 2
+          </label>
+        </div>
+      </div>
+      <div class="flex-container">
+        <ha-textfield
+          label="Size for daily icons"
+          type="number"
+          .value="${this._config.icons_size || '35'}"
+          @change="${(e) => this._valueChanged(e, 'icons_size')}"
+        ></ha-textfield>
+        <ha-textfield
+          label="Main Weather Icon Size"
+          type="number"
+          .value="${this._config.main_icon_size || '150'}"
+          @change="${(e) => this._valueChanged(e, 'main_icon_size')}"
+        ></ha-textfield>
+      </div>
+
+      <div class="buttons-container">
+        <button class="page-button ${this.currentPage === 'card' ? 'active' : ''}" @click="${() => this.showPage('card')}">Main</button>
+        <button class="page-button ${this.currentPage === 'forecast' ? 'active' : ''}" @click="${() => this.showPage('forecast')}">Forecast</button>
+        <button class="page-button ${this.currentPage === 'units' ? 'active' : ''}" @click="${() => this.showPage('units')}">Units</button>
+        <button class="page-button ${this.currentPage === 'alternate' ? 'active' : ''}" @click="${() => this.showPage('alternate')}">Alternate entities</button>
+      </div>
 
         <!-- Card Settings Page -->
         <div class="page-container ${this.currentPage === 'card' ? 'active' : ''}">
@@ -1506,117 +1666,24 @@ class WeatherChartCardEditor extends s {
           </div>
             <div class="flex-container" style="${this._config.show_time ? 'display: flex;' : 'display: none;'}">
               <ha-textfield
-                label="Time text size"
+                label="Time Font Size"
                 type="number"
                 .value="${this._config.time_size || '26'}"
                 @change="${(e) => this._valueChanged(e, 'time_size')}"
               ></ha-textfield>
               <ha-textfield
-                label="Day and date text size"
+                label="Date Font Size"
                 type="number"
                 .value="${this._config.day_date_size || '15'}"
                 @change="${(e) => this._valueChanged(e, 'day_date_size')}"
               ></ha-textfield>
+              <ha-textfield
+                label="Temp Font Size"
+                type="number"
+                .value="${this._config.current_temp_size || '38'}"
+                @change="${(e) => this._valueChanged(e, 'current_temp_size')}"
+              ></ha-textfield>
               </div>
-            <div class="icon-container">
-              <div class="switch-right">
-                <ha-switch
-                  @change="${(e) => this._valueChanged(e, 'animated_icons')}"
-                  .checked="${this._config.animated_icons === true}"
-                ></ha-switch>
-                <label class="switch-label">
-                  Use Animated Icons
-                </label>
-              </div>
-              <div class="switch-right radio-container" style="${this._config.animated_icons ? 'display: flex;' : 'display: none;'}">
-                  <ha-radio
-                    name="icon_style"
-                    value="style1"
-                    @change="${this._handleIconStyleChange}"
-                    .checked="${this._config.icon_style === 'style1'}"
-                  ></ha-radio>
-                  <label class="check-label">
-                    Style 1
-                  </label>
-                </div>
-              <div class="switch-right radio-container" style="${this._config.animated_icons ? 'display: flex;' : 'display: none;'}">
-                  <ha-radio
-                    name="icon_style"
-                    value="style2"
-                    @change="${this._handleIconStyleChange}"
-                    .checked="${this._config.icon_style === 'style2'}"
-                  ></ha-radio>
-                  <label class="check-label">
-                    Style 2
-                  </label>
-                </div>
-              </div>
-       <div class="textfield-container">
-         <ha-textfield
-           label="Icon Size for animated or custom icons"
-           type="number"
-           .value="${this._config.icons_size || '35'}"
-           @change="${(e) => this._valueChanged(e, 'icons_size')}"
-         ></ha-textfield>
-        <div class="flex-container">
-          <ha-textfield
-            label="Current Temperature Font Size"
-            type="number"
-            .value="${this._config.current_temp_size || '38'}"
-            @change="${(e) => this._valueChanged(e, 'current_temp_size')}"
-          ></ha-textfield>
-          <ha-textfield
-            label="Main Weather Icon Size"
-            type="number"
-            .value="${this._config.main_icon_size || '150'}"
-            @change="${(e) => this._valueChanged(e, 'main_icon_size')}"
-          ></ha-textfield>
-        </div>
-        <ha-textfield
-          label="Custom icon path"
-          .value="${this._config.icons || ''}"
-          @change="${(e) => this._valueChanged(e, 'icons')}"
-        ></ha-textfield>
-         <ha-select
-           naturalMenuWidth
-           fixedMenuPosition
-           label="Select custom language"
-           .configValue=${''}
-           .value=${this._config.locale}
-           @change=${(e) => this._valueChanged(e, 'locale')}
-           @closed=${(ev) => ev.stopPropagation()}
-         >
-           <ha-list-item .value=${''}>HA Default</ha-list-item>
-           <ha-list-item .value=${'bg'}>Bulgarian</ha-list-item>
-           <ha-list-item .value=${'ca'}>Catalan</ha-list-item>
-           <ha-list-item .value=${'cs'}>Czech</ha-list-item>
-           <ha-list-item .value=${'da'}>Danish</ha-list-item>
-           <ha-list-item .value=${'nl'}>Dutch</ha-list-item>
-           <ha-list-item .value=${'en'}>English</ha-list-item>
-           <ha-list-item .value=${'fi'}>Finnish</ha-list-item>
-           <ha-list-item .value=${'fr'}>French</ha-list-item>
-           <ha-list-item .value=${'de'}>German</ha-list-item>
-           <ha-list-item .value=${'el'}>Greek</ha-list-item>
-           <ha-list-item .value=${'hu'}>Hungarian</ha-list-item>
-           <ha-list-item .value=${'it'}>Italian</ha-list-item>
-           <ha-list-item .value=${'lt'}>Lithuanian</ha-list-item>
-           <ha-list-item .value=${'no'}>Norwegian</ha-list-item>
-           <ha-list-item .value=${'pl'}>Polish</ha-list-item>
-           <ha-list-item .value=${'pt'}>Portuguese</ha-list-item>
-           <ha-list-item .value=${'ro'}>Romanian</ha-list-item>
-           <ha-list-item .value=${'ru'}>Russian</ha-list-item>
-           <ha-list-item .value=${'sk'}>Slovak</ha-list-item>
-           <ha-list-item .value=${'es'}>Spanish</ha-list-item>
-           <ha-list-item .value=${'sv'}>Swedish</ha-list-item>
-	   <ha-list-item .value=${'uk'}>Ukrainian</ha-list-item>
-    	   <ha-list-item .value=${'ko'}>한국어</ha-list-item>
-        </ha-select>
-        <ha-textfield
-          label="Timezone (e.g., America/New_York, Europe/London)"
-          .value="${this._config.timezone || ''}"
-          @change="${(e) => this._valueChanged(e, 'timezone')}"
-        ></ha-textfield>
-        </div>
       </div>
 
         <!-- Forecast Settings Page -->
@@ -1658,18 +1725,20 @@ class WeatherChartCardEditor extends s {
             </label>
           </div>
 	  <div class="textfield-container">
-          <ha-select
-            naturalMenuWidth
-            fixedMenuPosition
-            label="Precipitation Type (Probability if supported by the weather entity)"
-            .configValue=${'forecast.precipitation_type'}
-            .value=${forecastConfig.precipitation_type}
-            @change=${(e) => this._valueChanged(e, 'forecast.precipitation_type')}
-            @closed=${(ev) => ev.stopPropagation()}
-          >
-            <ha-list-item .value=${'rainfall'}>Rainfall</ha-list-item>
-            <ha-list-item .value=${'probability'}>Probability</ha-list-item>
-          </ha-select>
+          <div>
+            <label>Precipitation Type (Probability if supported by the weather entity)</label>
+            <select
+              style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
+              .value=${forecastConfig.precipitation_type || 'rainfall'}
+              @change=${(e) => {
+                const evt = { target: { value: e.target.value } };
+                this._valueChanged(evt, 'forecast.precipitation_type');
+              }}
+            >
+              <option value="rainfall">Rainfall</option>
+              <option value="probability">Probability</option>
+            </select>
+          </div>
          <div class="switch-container" ?hidden=${forecastConfig.precipitation_type !== 'rainfall'}>
              <ha-switch
                @change="${(e) => this._valueChanged(e, 'forecast.show_probability')}"
@@ -1717,45 +1786,54 @@ class WeatherChartCardEditor extends s {
         <!-- Units Page -->
         <div class="page-container ${this.currentPage === 'units' ? 'active' : ''}">
           <div class="textfield-container">
-            <ha-select
-              naturalMenuWidth
-              fixedMenuPosition
-              label="Convert temperature to"
-              .configValue=${'units.temperature'}
-              .value=${unitsConfig.temperature}
-              @change=${(e) => this._valueChanged(e, 'units.temperature')}
-              @closed=${(ev) => ev.stopPropagation()}
-            >
-              <ha-list-item .value=${'°C'}>Celsius (°C)</ha-list-item>
-              <ha-list-item .value=${'°F'}>Fahrenheit (°F)</ha-list-item>
-            </ha-select>
-            <ha-select
-              naturalMenuWidth
-              fixedMenuPosition
-              label="Convert pressure to"
-              .configValue=${'units.pressure'}
-              .value=${unitsConfig.pressure}
-              @change=${(e) => this._valueChanged(e, 'units.pressure')}
-              @closed=${(ev) => ev.stopPropagation()}
-            >
-              <ha-list-item .value=${'hPa'}>hPa</ha-list-item>
-              <ha-list-item .value=${'mmHg'}>mmHg</ha-list-item>
-              <ha-list-item .value=${'inHg'}>inHg</ha-list-item>
-            </ha-select>
-            <ha-select
-              naturalMenuWidth
-              fixedMenuPosition
-              label="Convert wind speed to"
-              .configValue=${'units.speed'}
-              .value=${unitsConfig.speed}
-              @change=${(e) => this._valueChanged(e, 'units.speed')}
-              @closed=${(ev) => ev.stopPropagation()}
-            >
-              <ha-list-item .value=${'km/h'}>km/h</ha-list-item>
-              <ha-list-item .value=${'m/s'}>m/s</ha-list-item>
-              <ha-list-item .value=${'Bft'}>Bft</ha-list-item>
-              <ha-list-item .value=${'mph'}>mph</ha-list-item>
-            </ha-select>
+            <div>
+              <label>Convert temperature to</label>
+              <select
+                style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
+                .value=${unitsConfig.temperature || ''}
+                @change=${(e) => {
+                  const evt = { target: { value: e.target.value } };
+                  this._valueChanged(evt, 'units.temperature');
+                }}
+              >
+                <option value="">Default</option>
+                <option value="°C">Celsius (°C)</option>
+                <option value="°F">Fahrenheit (°F)</option>
+              </select>
+            </div>
+            <div>
+              <label>Convert pressure to</label>
+              <select
+                style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
+                .value=${unitsConfig.pressure || ''}
+                @change=${(e) => {
+                  const evt = { target: { value: e.target.value } };
+                  this._valueChanged(evt, 'units.pressure');
+                }}
+              >
+                <option value="">Default</option>
+                <option value="hPa">hPa</option>
+                <option value="mmHg">mmHg</option>
+                <option value="inHg">inHg</option>
+              </select>
+            </div>
+            <div>
+              <label>Convert wind speed to</label>
+              <select
+                style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
+                .value=${unitsConfig.speed || ''}
+                @change=${(e) => {
+                  const evt = { target: { value: e.target.value } };
+                  this._valueChanged(evt, 'units.speed');
+                }}
+              >
+                <option value="">Default</option>
+                <option value="km/h">km/h</option>
+                <option value="m/s">m/s</option>
+                <option value="Bft">Bft</option>
+                <option value="mph">mph</option>
+              </select>
+            </div>
           </div>
         </div>
 
