@@ -139,11 +139,12 @@ setConfig(config) {
     // User specified custom icons path
     this.baseIconPath = config.icons;
   } else {
-    // Use Basmilius weather icons CDN from jsDelivr
+    // Use icons from GitHub repository via jsdelivr CDN
+    // jsdelivr automatically serves from latest commit on master branch
     // style1 = fill (default), style2 = line
     this.baseIconPath = cardConfig.icon_style === 'style2'
-      ? 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons@2.0.0/production/line/svg/'
-      : 'https://cdn.jsdelivr.net/gh/basmilius/weather-icons@2.0.0/production/fill/svg/';
+      ? 'https://cdn.jsdelivr.net/gh/w4mhi/weather-chart-card-ha@master/dist/icons2/'
+      : 'https://cdn.jsdelivr.net/gh/w4mhi/weather-chart-card-ha@master/dist/icons/';
   }
 
   this.config = cardConfig;
