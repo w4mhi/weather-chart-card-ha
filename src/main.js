@@ -140,11 +140,11 @@ setConfig(config) {
     this.baseIconPath = config.icons;
   } else {
     // Use icons from GitHub repository via jsdelivr CDN
-    // jsdelivr automatically serves from latest commit on master branch
+    // Using @latest for better CDN caching and reliability
     // style1 = fill (default), style2 = line
     this.baseIconPath = cardConfig.icon_style === 'style2'
-      ? 'https://cdn.jsdelivr.net/gh/w4mhi/weather-chart-card-ha@master/dist/icons2/'
-      : 'https://cdn.jsdelivr.net/gh/w4mhi/weather-chart-card-ha@master/dist/icons/';
+      ? 'https://cdn.jsdelivr.net/gh/w4mhi/weather-chart-card-ha@latest/dist/icons2/'
+      : 'https://cdn.jsdelivr.net/gh/w4mhi/weather-chart-card-ha@latest/dist/icons/';
   }
 
   this.config = cardConfig;
