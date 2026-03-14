@@ -1772,7 +1772,7 @@ class WeatherChartCardEditor extends s {
     `;
   }
 }
-customElements.define("weather-chart-card-editor", WeatherChartCardEditor);
+customElements.define("weather-chart-card-ha-editor", WeatherChartCardEditor);
 
 /**
  * @license
@@ -18071,7 +18071,7 @@ Chart.register(...registerables, plugin);
 class WeatherChartCard extends s {
 
 static getConfigElement() {
-  return document.createElement("weather-chart-card-editor");
+  return document.createElement("weather-chart-card-ha-editor");
 }
 
 static getStubConfig(hass, unusedEntities, allEntities) {

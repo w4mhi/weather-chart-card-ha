@@ -16,7 +16,7 @@ Chart.register(...registerables, ChartDataLabels);
 class WeatherChartCard extends LitElement {
 
 static getConfigElement() {
-  return document.createElement("weather-chart-card-editor");
+  return document.createElement("weather-chart-card-ha-editor");
 }
 
 static getStubConfig(hass, unusedEntities, allEntities) {
