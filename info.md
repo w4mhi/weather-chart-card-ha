@@ -19,7 +19,7 @@ Perfect for dual-location weather monitoring or detailed single-location forecas
 ## 🚀 Quick Start
 
 ```yaml
-type: custom:weather-chart-card
+type: custom:weather-chart-card-ha
 entity: weather.your_weather_entity
 location_name: "Home"
 timezone: "America/Los_Angeles"

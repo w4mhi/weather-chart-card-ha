@@ -50,11 +50,23 @@ jobs:
             exit 1
           fi
           echo "Build successful! File size: $(wc -c < dist/weather-chart-card-ha.js) bytes"
+          echo ""
+          echo "=== Dist folder contents ==="
+          ls -lR dist/
+      
+      - name: Package release files
+        run: |
+          cd dist
+          zip -r ../weather-chart-card-ha.zip weather-chart-card-ha.js icons/ icons2/
+          cd ..
+          echo "Package created: weather-chart-card-ha.zip"
+          unzip -l weather-chart-card-ha.zip
       
       - name: Create Release
         uses: softprops/action-gh-release@v1
         with:
           files: |
+            weather-chart-card-ha.zip
             dist/weather-chart-card-ha.js
           generate_release_notes: true
           draft: false

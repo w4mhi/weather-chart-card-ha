@@ -10,9 +10,9 @@
 </div>
 
 <div align="center">
-  <img src="./screenshots/weather-en.png" width="30%" alt="English locale">
-  <img src="./screenshots/weather-ro.png" width="30%" alt="Romanian locale">
-  <img src="./screenshots/weather-hourly.png" width="30%" alt="Hourly view">
+  <img src="https://raw.githubusercontent.com/w4mhi/weather-chart-card-ha/master/screenshots/weather-en.png" width="30%" alt="English locale">
+  <img src="https://raw.githubusercontent.com/w4mhi/weather-chart-card-ha/master/screenshots/weather-ro.png" width="30%" alt="Romanian locale">
+  <img src="https://raw.githubusercontent.com/w4mhi/weather-chart-card-ha/master/screenshots/weather-hourly.png" width="30%" alt="Hourly view">
 </div>
 
 ## About This Fork

@@ -26,6 +26,7 @@ static getStubConfig(hass, unusedEntities, allEntities) {
   }
   return {
     entity,
+    title: 'Enhanced Weather Chart Card',
     show_main: true,
     show_temperature: true,
     show_current_condition: true,
@@ -90,6 +91,7 @@ static getStubConfig(hass, unusedEntities, allEntities) {
 
 setConfig(config) {
   const cardConfig = {
+    title: 'Enhanced Weather Chart Card',
     icons_size: 35,
     animated_icons: false,
     icon_style: 'style1',
@@ -1847,11 +1849,11 @@ renderLastUpdated() {
 // Regex to detect Latin script characters for uppercase formatting (ES2019 compatible)
 WeatherChartCard.LATIN_SCRIPT_REGEX = /^[A-Za-z]+$/;
 
-customElements.define('weather-chart-card', WeatherChartCard);
+customElements.define('weather-chart-card-ha', WeatherChartCard);
 
 window.customCards = window.customCards || [];
 window.customCards.push({
-  type: "weather-chart-card",
+  type: "weather-chart-card-ha",
   name: "Enhanced Weather Chart Card",
   description: "Enhanced custom weather card with charts.",
   preview: true,

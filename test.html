@@ -250,7 +250,7 @@
     </div>
     
     <div class="card-container">
-      <weather-chart-card></weather-chart-card>
+      <weather-chart-card-ha></weather-chart-card-ha>
     </div>
     
     <div class="status-bar">
@@ -727,7 +727,7 @@
       }
       
       // Update card with new hass object
-      const card = document.querySelector('weather-chart-card');
+      const card = document.querySelector('weather-chart-card-ha');
       if (card) {
         // Create a deep copy to ensure reactivity
         const newHass = JSON.parse(JSON.stringify(mockHass));
@@ -752,7 +752,7 @@
       const currentCondition = mockHass.states['weather.home'].state;
       mockHass.states['weather.home'].attributes.description = getTranslatedDescription(currentCondition, langCode);
       
-      const card = document.querySelector('weather-chart-card');
+      const card = document.querySelector('weather-chart-card-ha');
       if (card) {
         // Update card config locale
         const currentConfig = card.config;
@@ -820,7 +820,7 @@
     function setForecastType(type) {
       currentForecastType = type;
       
-      const card = document.querySelector('weather-chart-card');
+      const card = document.querySelector('weather-chart-card-ha');
       if (card) {
         const currentConfig = card.config;
         currentConfig.forecast.type = type;
@@ -840,7 +840,7 @@
     
     // Set icon style
     function setIconStyle(style) {
-      const card = document.querySelector('weather-chart-card');
+      const card = document.querySelector('weather-chart-card-ha');
       if (card) {
         const currentConfig = card.config;
         currentConfig.icon_style = style;
@@ -860,8 +860,8 @@
     }
     
     // Wait for the custom element to be defined
-    customElements.whenDefined('weather-chart-card').then(() => {
-      const card = document.querySelector('weather-chart-card');
+    customElements.whenDefined('weather-chart-card-ha').then(() => {
+      const card = document.querySelector('weather-chart-card-ha');
       
       // Set config with all features enabled
       card.setConfig({
