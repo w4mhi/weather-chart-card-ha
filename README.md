@@ -7,6 +7,8 @@
 ![GitHub downloads](https://img.shields.io/github/downloads/w4mhi/weather-chart-card-ha/total?style=flat-square)
 [![License](https://img.shields.io/github/license/w4mhi/weather-chart-card-ha.svg)](LICENSE)
 
+[![Open your Home Assistant instance and open a repository inside the Home Assistant Community Store.](https://my.home-assistant.io/badges/hacs_repository.svg)](https://my.home-assistant.io/redirect/hacs_repository/?repository=https%3A%2F%2Fgithub.com%2Fw4mhi%2Fweather-chart-card-ha&owner=Mihai)
+
 </div>
 
 <div align="center">
@@ -17,8 +19,9 @@
 
 ## About This Fork
 
-This is an actively maintained fork of the [original weather-chart-card-ha project by mlamberts78](https://github.com/mlamberts78/weather-chart-card-ha). We've added significant improvements including:
+This is an actively maintained fork of the [original weather-chart-card project by mlamberts78](https://github.com/mlamberts78/weather-chart-card). We've added significant improvements including:
 
+- � **Daily/Hourly Toggle** - Runtime button to switch between forecast types
 - 🌡️ **Enhanced Temperature Gradients** - 6-level comfort-based color spectrum
 - 🌙 **Improved Day/Night Distinction** - Dashed lines for night temperatures  
 - 📅 **Date Labels** - Show date numbers below day names
@@ -28,6 +31,29 @@ This is an actively maintained fork of the [original weather-chart-card-ha proje
 - ⚡ **Development Tools** - Local test server for easy development
 
 This version continues to receive updates and bug fixes to ensure compatibility with the latest Home Assistant releases.
+
+---
+
+## ✨ Recent Updates
+
+### New Features
+
+- **Daily/Hourly Toggle**: Runtime toggle button to switch between daily and hourly forecasts
+  - Optional button that appears in the top-right corner (disabled by default)
+  - Seamlessly switches between forecast types without editing configuration
+  - Automatically checks entity support for the requested forecast type
+- **Temperature Gradient Colors**: Automatic color-coded temperature lines based on comfort levels (6-level spectrum)
+  - High/day temperature line displays with gradient colors from cold (blue) to hot (red)
+  - Low/night temperature line displays as a dashed line in solid color for easy distinction
+- **Date Labels**: Display date numbers below weekday labels in daily forecast view
+- **Enhanced Visual Design**: 
+  - Gradient colors based on actual temperature comfort: < 5°C (Cold/Dark Blue), 5-15°C (Cool/Light Blue), 15-22°C (Comfortable/Green), 22-26°C (Pleasant/Yellow), 26-32°C (Hot/Orange), > 32°C (Very Hot/Red)
+  - Dashed border for night temperature line for better visual distinction
+  - Solid border for day temperature line with gradient colors
+  - Customizable icon sizes with multiplier support (0.5x - 4x)
+  - Large centered main weather icon option
+- **Timezone Support**: Display weather for multiple locations with proper timezone handling
+- **Development Tools**: Local test server for easier development without Home Assistant installation
 
 ---
 
@@ -54,25 +80,6 @@ This version continues to receive updates and bug fixes to ensure compatibility 
    ```
 4. Restart Home Assistant
 5. Clear browser cache
-
----
-
-## ✨ Recent Updates
-
-### New Features
-
-- **Temperature Gradient Colors**: Automatic color-coded temperature lines based on comfort levels (6-level spectrum)
-  - High/day temperature line displays with gradient colors from cold (blue) to hot (red)
-  - Low/night temperature line displays as a dashed line in solid color for easy distinction
-- **Date Labels**: Display date numbers below weekday labels in daily forecast view
-- **Enhanced Visual Design**: 
-  - Gradient colors based on actual temperature comfort: < 5°C (Cold/Dark Blue), 5-15°C (Cool/Light Blue), 15-22°C (Comfortable/Green), 22-26°C (Pleasant/Yellow), 26-32°C (Hot/Orange), > 32°C (Very Hot/Red)
-  - Dashed border for night temperature line for better visual distinction
-  - Solid border for day temperature line with gradient colors
-  - Customizable icon sizes with multiplier support (0.5x - 4x)
-  - Large centered main weather icon option
-- **Timezone Support**: Display weather for multiple locations with proper timezone handling
-- **Development Tools**: Local test server for easier development without Home Assistant installation
 
 ---
 
@@ -154,6 +161,7 @@ units:
 | show_visibility       | boolean | false                    | Show or hide visibility on the card.                                                               |
 | show_description      | boolean | false                    | Show or hide the weather description on the card.                                                  |
 | show_last_changed     | boolean | false                    | Show or hide when last data changed on the card.                                                   |
+| show_forecast_toggle  | boolean | false                    | Show or hide the Daily/Hourly toggle button in the top-right corner.                               |
 | use_12hour_format     | boolean | false                    | Display time in 12-hour format (AM/PM) instead of 24-hour format.                                  |
 | icons                 | string  | none                     | Path to the location of custom icons in svg format, for example `/local/weather-icons/`.           |
 | animated_icons        | boolean | false                    | Enable the use of animated icons                                                                   |
@@ -205,7 +213,6 @@ units:
 ## 📸 Example Configurations
 
 ### Card with Current Time, Date and Day
-![date-time](https://github.com/mlamberts78/weather-chart-card-ha/assets/93537082/ab2c32f7-8c6a-4a7e-84fc-f857a519a725)
 ```yaml
 type: custom:weather-chart-card-ha
 entity: weather.weather_home
@@ -216,8 +223,20 @@ animated_icons: true
 icon_style: style1
 ```
 
+### Card with Daily/Hourly Toggle
+```yaml
+type: custom:weather-chart-card-ha
+entity: weather.weather_home
+show_forecast_toggle: true
+show_time: true
+show_day: true
+show_date: true
+animated_icons: true
+forecast:
+  type: daily  # Starting view (user can toggle to hourly)
+```
+
 ### Style2 Chart
-![style2](https://github.com/mlamberts78/weather-chart-card-ha/assets/93537082/3067cc43-0e80-492c-b4a5-771b1e44ea17)
 ```yaml
 type: custom:weather-chart-card-ha
 entity: weather.my_home
@@ -226,7 +245,6 @@ forecast:
 ```
 
 ### Chart Only (Minimal View)
-![Chart-only](https://github.com/mlamberts78/weather-chart-card-ha/assets/93537082/c99d85a4-30d1-4fd9-90ff-877421b39e9b)
 ```yaml
 type: custom:weather-chart-card-ha
 entity: weather.my_home
@@ -238,7 +256,6 @@ forecast:
 ```
 
 ### Custom Units
-![Units](https://github.com/mlamberts78/weather-chart-card-ha/assets/93537082/e72862ee-9bb7-4f97-9a3c-b17663c458aa)
 ```yaml
 type: custom:weather-chart-card-ha
 entity: weather.my_home
@@ -517,8 +534,8 @@ See [Releases](https://github.com/w4mhi/weather-chart-card-ha/releases) for vers
 ## 🙏 Credits
 
 - **Original Card**: [mlamberts78](https://github.com/mlamberts78/weather-chart-card-ha) - Created the original weather-chart-card-ha
-- **Weather Icons**: [Basmilius](https://github.com/basmilius/weather-icons) - Beautiful animated weather icons
-- **Enhancements**: [W4MHI](https://github.com/w4mhi) - Temperature gradients, timezone support, layout improvements
+- **Weather Icons**: [Basmilius](https://github.com/basmilius/weather-icons) - Beautiful animated weather icons (served via this project's CDN for reliability)
+- **Enhancements**: [W4MHI](https://github.com/w4mhi) - Temperature gradients, timezone support, daily/hourly toggle, layout improvements
 
 ---
 

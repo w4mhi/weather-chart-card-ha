@@ -46,6 +46,7 @@ static getStubConfig(hass, unusedEntities, allEntities) {
     show_wind_gust_speed: false,
     show_visibility: false,
     show_last_changed: false,
+    show_forecast_toggle: false,
     use_12hour_format: false,
     icons_size: 30,
     main_icon_size: 150,
@@ -105,6 +106,7 @@ setConfig(config) {
     show_visibility: false,
     show_last_changed: false,
     show_description: false,
+    show_forecast_toggle: false,
     ...config,
     forecast: {
       precipitation_type: 'rainfall',
@@ -211,6 +213,40 @@ subscribeForecastEvents() {
     forecast_type: isHourly ? 'hourly' : 'daily',
     entity_id: this.config.entity,
   });
+}
+
+handleForecastTypeToggle() {
+  // Toggle between daily and hourly
+  const currentType = this.config.forecast.type || 'daily';
+  const newType = currentType === 'daily' ? 'hourly' : 'daily';
+  
+  // Check if the new type is supported
+  const feature = newType === 'hourly' ? WeatherEntityFeature.FORECAST_HOURLY : WeatherEntityFeature.FORECAST_DAILY;
+  if (!this.supportsFeature(feature)) {
+    console.warn(`Weather entity "${this.config.entity}" does not support ${newType} forecasts.`);
+    return;
+  }
+  
+  // Update config
+  this.config = {
+    ...this.config,
+    forecast: {
+      ...this.config.forecast,
+      type: newType
+    }
+  };
+  
+  // Unsubscribe from old forecast
+  if (this.forecastSubscriber) {
+    this.forecastSubscriber.then((unsub) => unsub());
+    this.forecastSubscriber = null;
+  }
+  
+  // Subscribe to new forecast type
+  this.subscribeForecastEvents();
+  
+  // Request update to re-render
+  this.requestUpdate();
 }
 
   supportsFeature(feature) {
@@ -1036,9 +1072,13 @@ drawChart({ config, language, weather, forecastItems } = this) {
         PrecipAxis: {
           position: 'right',
           suggestedMax: precipMax,
+          beginAtZero: true,
           grid: {
-            display: false,
+            display: true,
+            drawOnChartArea: true,
             drawTicks: false,
+            lineWidth: (context) => context.tick.value === 0 ? 1 : 0,
+            color: (context) => context.tick.value === 0 ? 'rgba(128, 128, 128, 0.2)' : 'transparent',
           },
           ticks: {
             display: false,
@@ -1344,7 +1384,7 @@ updateChart({ forecasts, forecastChart } = this) {
           font-weight: 400;
         }
         .main .description {
-	  font-style: italic;
+	        font-style: italic;
           font-size: 13px;
           margin-top: 5px;
           font-weight: 400;
@@ -1354,6 +1394,22 @@ updateChart({ forecasts, forecastChart } = this) {
           align-items: right;
           font-weight: 300;
           margin-bottom: 1px;
+        }
+        .forecast-toggle {
+          cursor: pointer;
+          background: var(--primary-color);
+          color: var(--text-primary-color);
+          border: none;
+          border-radius: 4px;
+          padding: 6px 10px;
+          font-size: 12px;
+          font-weight: 700;
+          opacity: 0.9;
+          transition: opacity 0.2s;
+          margin-bottom: 4px;
+        }
+        .forecast-toggle:hover {
+          opacity: 1;
         }
       </style>
 
@@ -1523,6 +1579,11 @@ renderClock({ config } = this) {
 
   return html`
     <div class="current-time">
+      ${config.show_forecast_toggle ? html`
+        <button class="forecast-toggle" @click="${this.handleForecastTypeToggle.bind(this)}">
+          ${this.config.forecast.type === 'daily' ? 'Daily' : 'Hourly'}
+        </button>
+      ` : ''}
       <div id="digital-clock"></div>
       ${showDay ? html`<div class="date-text day"></div>` : ''}
       ${showDay && showDate ? html` ` : ''}

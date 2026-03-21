@@ -432,6 +432,18 @@ class WeatherChartCardEditor extends LitElement {
         </div>
       </div>
 
+      <div class="switch-container">
+        <div class="switch-right">
+          <ha-switch
+            @change="${(e) => this._valueChanged(e, 'show_forecast_toggle')}"
+            .checked="${this._config.show_forecast_toggle === true}"
+          ></ha-switch>
+          <label class="switch-label">
+            Show Daily/Hourly toggle button
+          </label>
+        </div>
+      </div>
+
       <h5>Chart style:</h5>
       <div class="radio-container">
         <div class="switch-right">
