@@ -1308,7 +1308,7 @@ updateChart({ forecasts, forecastChart } = this) {
           display: flex;
           flex-direction: column;
           align-items: flex-end;
-          z-index: 10;
+          z-index: 1;
           font-size: ${config.time_size}px;
         }
         .date-text {
