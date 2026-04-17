@@ -760,6 +760,7 @@ autoscroll() {
 cancelAutoscroll() {
   if (this.autoscrollTimeout) {
     clearTimeout(this.autoscrollTimeout);
+    this.autoscrollTimeout = null;
   }
 }
 
