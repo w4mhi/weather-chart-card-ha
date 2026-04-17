@@ -747,7 +747,7 @@ const locale = {
     'precip': 'Precipitații',
     'feelsLike': 'Se simte ca',
     'days': ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'],
-    'months': ['ianuarie', 'februarie', 'martie', 'aprilie', 'mai', 'iunie', 'iulie', 'august', 'septembrie', 'octombrie', 'noiembrie', 'decembrie'],
+    'months': ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'],
     'units': {
       'km/h': 'km/h',
       'm/s': 'm/s',
@@ -18316,7 +18316,7 @@ set hass(hass) {
     this.temperature = this.config.temp ? hass.states[this.config.temp].state : this.weather.attributes.temperature;
     this.humidity = this.config.humid ? hass.states[this.config.humid].state : this.weather.attributes.humidity;
     this.pressure = this.config.press ? hass.states[this.config.press].state : this.weather.attributes.pressure;
-    this.uv_index = this.config.uv ? hass.states[this.config.uv].state : this.weather.attributes.uv_index;
+    this.uv_index = this.config.uv ? hass.states[this.config.uv].state : (this.config.show_uv !== false ? this.weather.attributes.uv_index : undefined);
     this.windSpeed = this.config.windspeed ? hass.states[this.config.windspeed].state : this.weather.attributes.wind_speed;
     this.dew_point = this.config.dew_point ? hass.states[this.config.dew_point].state : this.weather.attributes.dew_point;
     this.wind_gust_speed = this.config.wind_gust_speed ? hass.states[this.config.wind_gust_speed].state : this.weather.attributes.wind_gust_speed;
@@ -18893,7 +18893,7 @@ autoscroll() {
     this.autoscrollTimeout = setTimeout(() => {
       this.autoscrollTimeout = null;
       this.updateChart();
-      drawChartOncePerHour();
+      updateChartOncePerHour();
     }, nextHour - now);
   };
 
@@ -19388,6 +19388,7 @@ updateChart({ forecasts, forecastChart } = this) {
       <style>
         ha-card {
           ${config.title ? 'padding-bottom: 8px;' : ''}
+          overflow: hidden;
         }
         ha-icon {
           color: var(--paper-item-icon-color);
@@ -19439,6 +19440,22 @@ updateChart({ forecasts, forecastChart } = this) {
         .main .current-condition {
           font-size: 18px;
           margin-top: 4px;
+        }
+        .current-time {
+          position: absolute;
+          top: ${config.title ? '24px' : '20px'};
+          right: 16px;
+          inset-inline-start: initial;
+          inset-inline-end: 16px;
+          display: flex;
+          flex-direction: column;
+          align-items: flex-end;
+          z-index: 1;
+          font-size: ${config.time_size}px;
+        }
+        .date-text {
+          font-size: ${config.day_date_size}px;
+          color: var(--secondary-text-color);
         }
         .main span {
           font-size: 18px;
@@ -19507,22 +19524,6 @@ updateChart({ forecasts, forecastChart } = this) {
           margin-inline-start: 1px;
           margin-inline-end: initial;
         }
-        .current-time {
-          position: absolute;
-          top: ${config.title ? '24px' : '20px'};
-          right: 16px;
-          inset-inline-start: initial;
-          inset-inline-end: 16px;
-          display: flex;
-          flex-direction: column;
-          align-items: flex-end;
-          z-index: 10;
-          font-size: ${config.time_size}px;
-        }
-        .date-text {
-          font-size: ${config.day_date_size}px;
-          color: var(--secondary-text-color);
-        }
         .main .feels-like {
           font-size: 13px;
           margin-top: 5px;
@@ -19551,7 +19552,7 @@ updateChart({ forecasts, forecastChart } = this) {
           font-weight: 700;
           opacity: 0.9;
           transition: opacity 0.2s;
-          margin-bottom: 4px;
+          margin-top: 4px;
         }
         .forecast-toggle:hover {
           opacity: 1;
@@ -19677,9 +19678,10 @@ updateClock() {
   
   const currentTime = timeFormatter.format(currentDate);
   const currentDayOfWeek = this.getLocalizedDayNameFull(currentDate, timezone);
-  const monthName = this.getLocalizedMonthName(currentDate, timezone);
-  const dayNumber = this.getLocalizedDayNumber(currentDate, this.config.locale, timezone);
-  const currentDateFormatted = monthName + ' ' + dayNumber;
+  const selectedLocale = this.config.locale || this.language || 'en';
+  const currentDateFormatted = new Intl.DateTimeFormat(selectedLocale, {
+    day: 'numeric', month: 'long', timeZone: timezone
+  }).format(currentDate);
 
   const cardDiv = this.shadowRoot.querySelector('.card');
   if (cardDiv) {
@@ -19724,15 +19726,15 @@ renderClock({ config } = this) {
 
   return x`
     <div class="current-time">
+      <div id="digital-clock"></div>
+      ${showDay ? x`<div class="date-text day"></div>` : ''}
+      ${showDay && showDate ? x` ` : ''}
+      ${showDate ? x`<div class="date-text date"></div>` : ''}
       ${config.show_forecast_toggle ? x`
         <button class="forecast-toggle" @click="${this.handleForecastTypeToggle.bind(this)}">
           ${this.config.forecast.type === 'daily' ? 'Daily' : 'Hourly'}
         </button>
       ` : ''}
-      <div id="digital-clock"></div>
-      ${showDay ? x`<div class="date-text day"></div>` : ''}
-      ${showDay && showDate ? x` ` : ''}
-      ${showDate ? x`<div class="date-text date"></div>` : ''}
     </div>
   `;
 }
