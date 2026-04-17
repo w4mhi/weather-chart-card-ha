@@ -18316,7 +18316,9 @@ set hass(hass) {
     this.temperature = this.config.temp ? hass.states[this.config.temp].state : this.weather.attributes.temperature;
     this.humidity = this.config.humid ? hass.states[this.config.humid].state : this.weather.attributes.humidity;
     this.pressure = this.config.press ? hass.states[this.config.press].state : this.weather.attributes.pressure;
-    this.uv_index = this.config.uv ? hass.states[this.config.uv].state : (this.config.show_uv !== false ? this.weather.attributes.uv_index : undefined);
+    this.uv_index = this.config.show_uv === false
+      ? undefined
+      : (this.config.uv ? hass.states[this.config.uv].state : this.weather.attributes.uv_index);
     this.windSpeed = this.config.windspeed ? hass.states[this.config.windspeed].state : this.weather.attributes.wind_speed;
     this.dew_point = this.config.dew_point ? hass.states[this.config.dew_point].state : this.weather.attributes.dew_point;
     this.wind_gust_speed = this.config.wind_gust_speed ? hass.states[this.config.wind_gust_speed].state : this.weather.attributes.wind_gust_speed;
@@ -18903,6 +18905,7 @@ autoscroll() {
 cancelAutoscroll() {
   if (this.autoscrollTimeout) {
     clearTimeout(this.autoscrollTimeout);
+    this.autoscrollTimeout = null;
   }
 }
 
