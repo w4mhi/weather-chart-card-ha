@@ -239,7 +239,7 @@ class WeatherChartCardEditor extends LitElement {
         sun_city: city,
         sun_latitude: lat,
         sun_longitude: lon,
-        ...(sunTimezone ? { sun_timezone: sunTimezone } : {}),
+        sun_timezone: sunTimezone,
       };
       this._geoStatus = `ok:${displayName}${sunTimezone ? ` (${sunTimezone})` : ''}`;
       this.configChanged(newConfig);
