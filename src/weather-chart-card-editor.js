@@ -445,6 +445,14 @@ class WeatherChartCardEditor extends LitElement {
         </select>
       </div>
 
+      <ha-textfield
+        label="Timezone override"
+        .value="${this._config.timezone || ''}"
+        @change="${(e) => this._valueChanged(e, 'timezone')}"
+        helperpersistent
+        helper="Optional IANA timezone for forecast labels/clock (for example: Europe/Bucharest). Leave empty to use the default behavior."
+      ></ha-textfield>
+
       <div>
         <label>Sunrise/Sunset city <small style="color:var(--secondary-text-color)">(optional — if not set, uses HA server location)</small></label>
         <div style="display:flex; gap:8px; margin-top:8px; align-items:center;">
