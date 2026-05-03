@@ -22,6 +22,8 @@ class WeatherChartCardEditor extends LitElement {
       entities: { type: Array },
       hass: { type: Object },
       _entity: { type: String },
+      _cityInput: { type: String },
+      _geoStatus: { type: String },
     };
   }
 
@@ -30,6 +32,8 @@ class WeatherChartCardEditor extends LitElement {
     this.currentPage = 'card';
     this._entity = '';
     this.entities = [];
+    this._cityInput = '';
+    this._geoStatus = '';
     this._formValueChanged = this._formValueChanged.bind(this);
     
     // Initialize with empty config to prevent crashes
@@ -45,6 +49,7 @@ class WeatherChartCardEditor extends LitElement {
     }
     this._config = config;
     this._entity = config.entity || '';
+    this._cityInput = config.sun_city || '';
     this.hasApparentTemperature = (
       this.hass &&
       this.hass.states[config.entity] &&
@@ -198,6 +203,67 @@ class WeatherChartCardEditor extends LitElement {
     }
   }
 
+  async _validateCity() {
+    const city = this._cityInput && this._cityInput.trim();
+    if (!city) {
+      this._geoStatus = 'error:Please enter a city name.';
+      this.requestUpdate();
+      return;
+    }
+    this._geoStatus = 'loading';
+    this.requestUpdate();
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json&limit=1`;
+      const response = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+      const data = await response.json();
+      if (!data || data.length === 0) {
+        this._geoStatus = 'error:City not found. Try a different name.';
+        this.requestUpdate();
+        return;
+      }
+      const lat = parseFloat(data[0].lat);
+      const lon = parseFloat(data[0].lon);
+      const displayName = data[0].display_name;
+
+      // Auto-detect timezone from coordinates
+      let sunTimezone = null;
+      try {
+        const tzUrl = `https://timeapi.io/api/timezone/coordinate?latitude=${lat}&longitude=${lon}`;
+        const tzResponse = await fetch(tzUrl);
+        const tzData = await tzResponse.json();
+        if (tzData && tzData.timeZone) sunTimezone = tzData.timeZone;
+      } catch (_) { /* timezone fetch is best-effort */ }
+
+      const newConfig = {
+        ...this._config,
+        sun_city: city,
+        sun_latitude: lat,
+        sun_longitude: lon,
+        sun_timezone: sunTimezone,
+      };
+      this._geoStatus = `ok:${displayName}${sunTimezone ? ` (${sunTimezone})` : ''}`;
+      this.configChanged(newConfig);
+      this._config = newConfig;
+      this.requestUpdate();
+    } catch (e) {
+      this._geoStatus = 'error:Geocoding failed. Check your internet connection.';
+      this.requestUpdate();
+    }
+  }
+
+  _clearCity() {
+    const newConfig = { ...this._config };
+    delete newConfig.sun_city;
+    delete newConfig.sun_latitude;
+    delete newConfig.sun_longitude;
+    delete newConfig.sun_timezone;
+    this._cityInput = '';
+    this._geoStatus = '';
+    this.configChanged(newConfig);
+    this._config = newConfig;
+    this.requestUpdate();
+  }
+
   showPage(pageName) {
     this.currentPage = pageName;
     this.requestUpdate();
@@ -300,6 +366,29 @@ class WeatherChartCardEditor extends LitElement {
           flex-basis: 50%;
           flex-grow: 1;
         }
+        .field-label-row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .experimental-badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 2px 8px;
+          border-radius: 999px;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.2px;
+          text-transform: uppercase;
+          background: rgba(255, 152, 0, 0.2);
+          color: rgb(245, 124, 0);
+          border: 1px solid rgba(255, 152, 0, 0.5);
+        }
+        .adaptive-note {
+          font-size: 12px;
+          color: var(--secondary-text-color);
+          margin-top: -8px;
+        }
       </style>
       <div>
       <div class="textfield-container">
@@ -356,52 +445,46 @@ class WeatherChartCardEditor extends LitElement {
         </select>
       </div>
 
+      <ha-textfield
+        label="Timezone override"
+        .value="${this._config.timezone || ''}"
+        @change="${(e) => this._valueChanged(e, 'timezone')}"
+        helperpersistent
+        helper="Optional IANA timezone for forecast labels/clock (for example: Europe/Bucharest). Leave empty to use the default behavior."
+      ></ha-textfield>
+
       <div>
-        <label>Timezone</label>
-        <select
-          style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
-          .value=${this._config.timezone || ''}
-          @change=${(e) => {
-            console.log('TIMEZONE CHANGED!', e.target.value);
-            const evt = { target: { value: e.target.value } };
-            this._valueChanged(evt, 'timezone');
-          }}
-        >
-          <option value="">HA Default (Auto-detect)</option>
-          <option value="America/New_York">🇺🇸 America/New_York (EST/EDT)</option>
-          <option value="America/Chicago">🇺🇸 America/Chicago (CST/CDT)</option>
-          <option value="America/Denver">🇺🇸 America/Denver (MST/MDT)</option>
-          <option value="America/Los_Angeles">🇺🇸 America/Los_Angeles (PST/PDT)</option>
-          <option value="America/Anchorage">🇺🇸 America/Anchorage (AKST/AKDT)</option>
-          <option value="Pacific/Honolulu">🇺🇸 Pacific/Honolulu (HST)</option>
-          <option value="America/Toronto">🇨🇦 America/Toronto (EST/EDT)</option>
-          <option value="America/Vancouver">🇨🇦 America/Vancouver (PST/PDT)</option>
-          <option value="Europe/London">🇬🇧 Europe/London (GMT/BST)</option>
-          <option value="Europe/Paris">🇫🇷 Europe/Paris (CET/CEST)</option>
-          <option value="Europe/Berlin">🇩🇪 Europe/Berlin (CET/CEST)</option>
-          <option value="Europe/Rome">🇮🇹 Europe/Rome (CET/CEST)</option>
-          <option value="Europe/Madrid">🇪🇸 Europe/Madrid (CET/CEST)</option>
-          <option value="Europe/Amsterdam">🇳🇱 Europe/Amsterdam (CET/CEST)</option>
-          <option value="Europe/Brussels">🇧🇪 Europe/Brussels (CET/CEST)</option>
-          <option value="Europe/Vienna">🇦🇹 Europe/Vienna (CET/CEST)</option>
-          <option value="Europe/Zurich">🇨🇭 Europe/Zurich (CET/CEST)</option>
-          <option value="Europe/Stockholm">🇸🇪 Europe/Stockholm (CET/CEST)</option>
-          <option value="Europe/Warsaw">🇵🇱 Europe/Warsaw (CET/CEST)</option>
-          <option value="Europe/Prague">🇨🇿 Europe/Prague (CET/CEST)</option>
-          <option value="Europe/Budapest">🇭🇺 Europe/Budapest (CET/CEST)</option>
-          <option value="Europe/Bucharest">🇷🇴 Europe/Bucharest (EET/EEST)</option>
-          <option value="Europe/Athens">🇬🇷 Europe/Athens (EET/EEST)</option>
-          <option value="Europe/Helsinki">🇫🇮 Europe/Helsinki (EET/EEST)</option>
-          <option value="Europe/Moscow">🇷🇺 Europe/Moscow (MSK)</option>
-          <option value="Asia/Dubai">🇦🇪 Asia/Dubai (GST)</option>
-          <option value="Asia/Shanghai">🇨🇳 Asia/Shanghai (CST)</option>
-          <option value="Asia/Tokyo">🇯🇵 Asia/Tokyo (JST)</option>
-          <option value="Asia/Seoul">🇰🇷 Asia/Seoul (KST)</option>
-          <option value="Asia/Singapore">🇸🇬 Asia/Singapore (SGT)</option>
-          <option value="Australia/Sydney">🇦🇺 Australia/Sydney (AEDT/AEST)</option>
-          <option value="Australia/Melbourne">🇦🇺 Australia/Melbourne (AEDT/AEST)</option>
-          <option value="Pacific/Auckland">🇳🇿 Pacific/Auckland (NZDT/NZST)</option>
-        </select>
+        <label>Sunrise/Sunset city <small style="color:var(--secondary-text-color)">(optional — if not set, uses HA server location)</small></label>
+        <div style="display:flex; gap:8px; margin-top:8px; align-items:center;">
+          <input
+            type="text"
+            placeholder="e.g. Bucharest, Romania"
+            style="flex:1; padding:8px; font-size:14px; border:1px solid var(--divider-color); border-radius:4px; background:var(--card-background-color); color:var(--primary-text-color);"
+            .value="${this._cityInput || ''}"
+            @input="${(e) => { this._cityInput = e.target.value; this.requestUpdate(); }}"
+            @keydown="${(e) => { if (e.key === 'Enter') this._validateCity(); }}"
+          />
+          <button
+            style="padding:8px 14px; background:var(--primary-color); color:var(--text-primary-color, #fff); border:none; border-radius:4px; cursor:pointer; font-size:14px; white-space:nowrap;"
+            @click="${() => this._validateCity()}"
+          >Validate</button>
+          ${this._config.sun_city ? html`
+            <button
+              style="padding:8px 10px; background:var(--error-color, #c62828); color:#fff; border:none; border-radius:4px; cursor:pointer; font-size:14px;"
+              @click="${() => this._clearCity()}"
+              title="Clear city, use HA server location"
+            >✕</button>
+          ` : ''}
+        </div>
+        ${(this._cityInput || '').trim() && (this._cityInput || '').trim() !== (this._config.sun_city || '') && !this._geoStatus.startsWith('ok:') && this._geoStatus !== 'loading' ? html`
+          <div style="margin-top:6px; padding:6px 10px; background:var(--error-color, #c62828); color:#fff; border-radius:4px; font-size:13px;">
+            ⚠ City not validated — click Validate before saving.
+          </div>
+        ` : ''}
+        ${this._geoStatus === 'loading' ? html`<div style="margin-top:6px; color:var(--secondary-text-color); font-size:13px;">Looking up coordinates...</div>` : ''}
+        ${this._geoStatus.startsWith('ok:') ? html`<div style="margin-top:6px; color:var(--success-color, #388e3c); font-size:13px;">✓ ${this._geoStatus.slice(3)}<br><small>lat: ${this._config.sun_latitude}, lon: ${this._config.sun_longitude}</small></div>` : ''}
+        ${this._geoStatus.startsWith('error:') ? html`<div style="margin-top:6px; color:var(--error-color, #c62828); font-size:13px;">✗ ${this._geoStatus.slice(6)}</div>` : ''}
+        ${!this._geoStatus && this._config.sun_city ? html`<div style="margin-top:6px; color:var(--success-color, #388e3c); font-size:13px;">✓ ${this._config.sun_city}<br><small>lat: ${this._config.sun_latitude}, lon: ${this._config.sun_longitude}${this._config.sun_timezone ? `, tz: ${this._config.sun_timezone}` : ''}</small></div>` : ''}
       </div>
        </div>
 
@@ -523,6 +606,7 @@ class WeatherChartCardEditor extends LitElement {
       <div class="buttons-container">
         <button class="page-button ${this.currentPage === 'card' ? 'active' : ''}" @click="${() => this.showPage('card')}">Main</button>
         <button class="page-button ${this.currentPage === 'forecast' ? 'active' : ''}" @click="${() => this.showPage('forecast')}">Forecast</button>
+        <button class="page-button ${this.currentPage === 'climate' ? 'active' : ''}" @click="${() => this.showPage('climate')}">Climate</button>
         <button class="page-button ${this.currentPage === 'units' ? 'active' : ''}" @click="${() => this.showPage('units')}">Units</button>
         <button class="page-button ${this.currentPage === 'alternate' ? 'active' : ''}" @click="${() => this.showPage('alternate')}">Alternate entities</button>
       </div>
@@ -713,6 +797,15 @@ class WeatherChartCardEditor extends LitElement {
             </div>
             <div class="switch-right checkbox-container" style="${this._config.show_time ? 'display: flex;' : 'display: none;'}">
               <ha-checkbox
+                @change="${(e) => this._valueChanged(e, 'show_hour_leading_zero')}"
+                .checked="${this._config.show_hour_leading_zero !== false}"
+              ></ha-checkbox>
+              <label class="check-label">
+                Leading zero for hour
+              </label>
+            </div>
+            <div class="switch-right checkbox-container" style="${this._config.show_time ? 'display: flex;' : 'display: none;'}">
+              <ha-checkbox
                 @change="${(e) => this._valueChanged(e, 'show_day')}"
                 .checked="${this._config.show_day !== false}"
               ></ha-checkbox>
@@ -849,6 +942,50 @@ class WeatherChartCardEditor extends LitElement {
           </div>
         </div>
 
+        <!-- Climate Settings Page -->
+        <div class="page-container ${this.currentPage === 'climate' ? 'active' : ''}">
+	  <div class="textfield-container">
+            <div>
+              <div class="field-label-row">
+                <label>Temperature Gradient Mode</label>
+                <span class="experimental-badge" ?hidden=${(forecastConfig.gradient_mode || 'classic') !== 'adaptive'}>Experimental</span>
+              </div>
+              <select
+                style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
+                .value=${forecastConfig.gradient_mode || 'classic'}
+                @change=${(e) => {
+                  const evt = { target: { value: e.target.value } };
+                  this._valueChanged(evt, 'forecast.gradient_mode');
+                }}
+              >
+                <option value="classic">Classic</option>
+                <option value="climate_preset">Climate Preset</option>
+                <option value="adaptive">Adaptive (experimental)</option>
+              </select>
+            </div>
+            <div ?hidden=${(forecastConfig.gradient_mode || 'classic') === 'classic'}>
+              <label>Climate Preset Range</label>
+              <select
+                style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
+                .value=${forecastConfig.gradient_preset || 'temperate'}
+                @change=${(e) => {
+                  const evt = { target: { value: e.target.value } };
+                  this._valueChanged(evt, 'forecast.gradient_preset');
+                }}
+              >
+                <option value="temperate">Temperate (-10 to 35 C)</option>
+                <option value="continental">Continental (-30 to 35 C)</option>
+                <option value="subarctic">Subarctic (-45 to 20 C)</option>
+                <option value="polar">Polar (-55 to 10 C)</option>
+                <option value="hot_arid">Hot/Arid (0 to 50 C)</option>
+              </select>
+            </div>
+            <div class="adaptive-note" ?hidden=${(forecastConfig.gradient_mode || 'classic') !== 'adaptive'}>
+              Adaptive is experimental. We welcome feedback on color quality across seasons.
+            </div>
+          </div>
+        </div>
+
         <!-- Units Page -->
         <div class="page-container ${this.currentPage === 'units' ? 'active' : ''}">
           <div class="textfield-container">
@@ -898,6 +1035,25 @@ class WeatherChartCardEditor extends LitElement {
                 <option value="m/s">m/s</option>
                 <option value="Bft">Bft</option>
                 <option value="mph">mph</option>
+                <option value="kn">kn</option>
+              </select>
+            </div>
+            <div>
+              <label>Display precipitation unit</label>
+              <select
+                style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
+                .value=${unitsConfig.precipitation || ''}
+                @change=${(e) => {
+                  const evt = { target: { value: e.target.value } };
+                  this._valueChanged(evt, 'units.precipitation');
+                }}
+              >
+                <option value="">Default</option>
+                <option value="mm">mm</option>
+                <option value="cm">cm</option>
+                <option value="in">in</option>
+                <option value="l/m2">l/m2</option>
+                <option value="kg/m2">kg/m2</option>
               </select>
             </div>
           </div>

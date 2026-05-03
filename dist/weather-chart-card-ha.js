@@ -12,11 +12,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'S', 'S-SV', 'SV', 'V-SV', 'V', 'V-JV', 'JV', 'J-JV',
@@ -49,11 +53,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'S', 'S-SV', 'SV', 'V-SV', 'V', 'V-JV', 'JV', 'J-JV',
@@ -86,11 +94,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NO', 'NO', 'O-NO', 'O', 'O-SO', 'SO', 'S-SO',
@@ -123,11 +135,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NO', 'NO', 'O-NO', 'O', 'O-ZO', 'ZO', 'Z-ZO',
@@ -160,11 +176,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -197,11 +217,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -234,11 +258,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -271,11 +299,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'É', 'É-ÉK', 'ÉK', 'K-ÉK', 'K', 'K-DK', 'DK', 'D-DK',
@@ -308,11 +340,15 @@ const locale = {
       'km/h': 'км/ч',
       'm/s': 'м/с',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'гПа',
       'mmHg': 'мм рт.ст.',
       'mm': 'мм',
-      'in': 'in'
+      'cm': 'см',
+      'in': 'in',
+      'l/m2': 'л/м2',
+      'kg/m2': 'кг/м2'
     },
     'cardinalDirections': [
       'С', 'С-СВ', 'СВ', 'В-СВ', 'В', 'В-ЮВ', 'ЮВ', 'Ю-ЮВ',
@@ -342,14 +378,18 @@ const locale = {
     'days': ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'],
     'months': ['januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli', 'augusti', 'september', 'oktober', 'november', 'december'],
     'units': {
-        'km/h': 'km/h',
-        'm/s': 'm/s',
+      'km/h': 'km/h',
+      'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
-        'hPa': 'hPa',
-        'mmHg': 'mm Hg',
-        'mm': 'mm',
-        'in': 'in'
+      'hPa': 'hPa',
+      'mmHg': 'mmHg',
+      'mm': 'mm',
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
         'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -382,11 +422,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'po'
+      'cm': 'cm',
+      'in': 'po',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -419,11 +463,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -456,11 +504,15 @@ const locale = {
       'km/h': 'km/t',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
         'N', 'N-NE', 'NE', 'Ø-NØ', 'Ø', 'Ø-SØ', 'SØ', 'S-SØ',
@@ -493,11 +545,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NØ', 'NO', 'Ø-NØ', 'Ø', 'Ø-SØ', 'SØ', 'S-SØ',
@@ -530,11 +586,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -567,11 +627,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -604,11 +668,15 @@ const locale = {
       'km/h': 'χλμ/ώρα',
       'm/s': 'μ/δ',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
       'mmHg': 'χιλ. υδράργυρου',
       'mm': 'χιλ.',
-      'in': 'ίντσες'
+      'cm': 'cm',
+      'in': 'ίντσες',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'Β', 'Β-ΒΔ', 'ΒΔ', 'Δ-ΒΔ', 'Δ', 'Δ-ΝΔ', 'ΝΔ', 'Ν-ΝΔ',
@@ -641,11 +709,15 @@ const locale = {
       'km/h': 'км/ч',
       'm/s': 'м/с',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
       'mmHg': 'mmHg',
       'mm': 'мм',
-      'in': 'in'
+      'cm': 'см',
+      'in': 'in',
+      'l/m2': 'л/м2',
+      'kg/m2': 'кг/м2'
     },
     'cardinalDirections': [
       'С', 'С-СИ', 'СИ', 'И-СИ', 'И', 'И-ЮИ', 'ЮИ', 'Ю-ЮИ',
@@ -678,11 +750,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'Š', 'Š-ŠR', 'ŠR', 'R-ŠR', 'R', 'R-PR', 'PR', 'P-PR',
@@ -715,11 +791,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -752,11 +832,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
       'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -789,11 +873,15 @@ const locale = {
       'km/h': 'км/год',
       'm/s': 'м/с',
       'mph': 'миль/год',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'гПа',
       'mmHg': 'мм рт. ст.',
       'mm': 'мм',
-      'in': 'in'
+      'cm': 'см',
+      'in': 'in',
+      'l/m2': 'л/м2',
+      'kg/m2': 'кг/м2'
     },
     'cardinalDirections': [
       'Пн', 'Пн-ПнСх', 'ПнСх', 'Сх-ПнСх', 'Сх', 'Сх-ПдСх', 'ПдСх', 'Пд-ПдСх',
@@ -826,11 +914,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       '북', '북북동', '북동', '동북동', '동', '동남동', '남동', '남남동',
@@ -968,6 +1060,8 @@ class WeatherChartCardEditor extends s {
       entities: { type: Array },
       hass: { type: Object },
       _entity: { type: String },
+      _cityInput: { type: String },
+      _geoStatus: { type: String },
     };
   }
 
@@ -976,6 +1070,8 @@ class WeatherChartCardEditor extends s {
     this.currentPage = 'card';
     this._entity = '';
     this.entities = [];
+    this._cityInput = '';
+    this._geoStatus = '';
     this._formValueChanged = this._formValueChanged.bind(this);
     
     // Initialize with empty config to prevent crashes
@@ -991,6 +1087,7 @@ class WeatherChartCardEditor extends s {
     }
     this._config = config;
     this._entity = config.entity || '';
+    this._cityInput = config.sun_city || '';
     this.hasApparentTemperature = (
       this.hass &&
       this.hass.states[config.entity] &&
@@ -1144,6 +1241,67 @@ class WeatherChartCardEditor extends s {
     }
   }
 
+  async _validateCity() {
+    const city = this._cityInput && this._cityInput.trim();
+    if (!city) {
+      this._geoStatus = 'error:Please enter a city name.';
+      this.requestUpdate();
+      return;
+    }
+    this._geoStatus = 'loading';
+    this.requestUpdate();
+    try {
+      const url = `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(city)}&format=json&limit=1`;
+      const response = await fetch(url, { headers: { 'Accept-Language': 'en' } });
+      const data = await response.json();
+      if (!data || data.length === 0) {
+        this._geoStatus = 'error:City not found. Try a different name.';
+        this.requestUpdate();
+        return;
+      }
+      const lat = parseFloat(data[0].lat);
+      const lon = parseFloat(data[0].lon);
+      const displayName = data[0].display_name;
+
+      // Auto-detect timezone from coordinates
+      let sunTimezone = null;
+      try {
+        const tzUrl = `https://timeapi.io/api/timezone/coordinate?latitude=${lat}&longitude=${lon}`;
+        const tzResponse = await fetch(tzUrl);
+        const tzData = await tzResponse.json();
+        if (tzData && tzData.timeZone) sunTimezone = tzData.timeZone;
+      } catch (_) { /* timezone fetch is best-effort */ }
+
+      const newConfig = {
+        ...this._config,
+        sun_city: city,
+        sun_latitude: lat,
+        sun_longitude: lon,
+        ...(sunTimezone ? { sun_timezone: sunTimezone } : {}),
+      };
+      this._geoStatus = `ok:${displayName}${sunTimezone ? ` (${sunTimezone})` : ''}`;
+      this.configChanged(newConfig);
+      this._config = newConfig;
+      this.requestUpdate();
+    } catch (e) {
+      this._geoStatus = 'error:Geocoding failed. Check your internet connection.';
+      this.requestUpdate();
+    }
+  }
+
+  _clearCity() {
+    const newConfig = { ...this._config };
+    delete newConfig.sun_city;
+    delete newConfig.sun_latitude;
+    delete newConfig.sun_longitude;
+    delete newConfig.sun_timezone;
+    this._cityInput = '';
+    this._geoStatus = '';
+    this.configChanged(newConfig);
+    this._config = newConfig;
+    this.requestUpdate();
+  }
+
   showPage(pageName) {
     this.currentPage = pageName;
     this.requestUpdate();
@@ -1246,6 +1404,29 @@ class WeatherChartCardEditor extends s {
           flex-basis: 50%;
           flex-grow: 1;
         }
+        .field-label-row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+        .experimental-badge {
+          display: inline-flex;
+          align-items: center;
+          padding: 2px 8px;
+          border-radius: 999px;
+          font-size: 11px;
+          font-weight: 600;
+          letter-spacing: 0.2px;
+          text-transform: uppercase;
+          background: rgba(255, 152, 0, 0.2);
+          color: rgb(245, 124, 0);
+          border: 1px solid rgba(255, 152, 0, 0.5);
+        }
+        .adaptive-note {
+          font-size: 12px;
+          color: var(--secondary-text-color);
+          margin-top: -8px;
+        }
       </style>
       <div>
       <div class="textfield-container">
@@ -1303,51 +1484,37 @@ class WeatherChartCardEditor extends s {
       </div>
 
       <div>
-        <label>Timezone</label>
-        <select
-          style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
-          .value=${this._config.timezone || ''}
-          @change=${(e) => {
-            console.log('TIMEZONE CHANGED!', e.target.value);
-            const evt = { target: { value: e.target.value } };
-            this._valueChanged(evt, 'timezone');
-          }}
-        >
-          <option value="">HA Default (Auto-detect)</option>
-          <option value="America/New_York">🇺🇸 America/New_York (EST/EDT)</option>
-          <option value="America/Chicago">🇺🇸 America/Chicago (CST/CDT)</option>
-          <option value="America/Denver">🇺🇸 America/Denver (MST/MDT)</option>
-          <option value="America/Los_Angeles">🇺🇸 America/Los_Angeles (PST/PDT)</option>
-          <option value="America/Anchorage">🇺🇸 America/Anchorage (AKST/AKDT)</option>
-          <option value="Pacific/Honolulu">🇺🇸 Pacific/Honolulu (HST)</option>
-          <option value="America/Toronto">🇨🇦 America/Toronto (EST/EDT)</option>
-          <option value="America/Vancouver">🇨🇦 America/Vancouver (PST/PDT)</option>
-          <option value="Europe/London">🇬🇧 Europe/London (GMT/BST)</option>
-          <option value="Europe/Paris">🇫🇷 Europe/Paris (CET/CEST)</option>
-          <option value="Europe/Berlin">🇩🇪 Europe/Berlin (CET/CEST)</option>
-          <option value="Europe/Rome">🇮🇹 Europe/Rome (CET/CEST)</option>
-          <option value="Europe/Madrid">🇪🇸 Europe/Madrid (CET/CEST)</option>
-          <option value="Europe/Amsterdam">🇳🇱 Europe/Amsterdam (CET/CEST)</option>
-          <option value="Europe/Brussels">🇧🇪 Europe/Brussels (CET/CEST)</option>
-          <option value="Europe/Vienna">🇦🇹 Europe/Vienna (CET/CEST)</option>
-          <option value="Europe/Zurich">🇨🇭 Europe/Zurich (CET/CEST)</option>
-          <option value="Europe/Stockholm">🇸🇪 Europe/Stockholm (CET/CEST)</option>
-          <option value="Europe/Warsaw">🇵🇱 Europe/Warsaw (CET/CEST)</option>
-          <option value="Europe/Prague">🇨🇿 Europe/Prague (CET/CEST)</option>
-          <option value="Europe/Budapest">🇭🇺 Europe/Budapest (CET/CEST)</option>
-          <option value="Europe/Bucharest">🇷🇴 Europe/Bucharest (EET/EEST)</option>
-          <option value="Europe/Athens">🇬🇷 Europe/Athens (EET/EEST)</option>
-          <option value="Europe/Helsinki">🇫🇮 Europe/Helsinki (EET/EEST)</option>
-          <option value="Europe/Moscow">🇷🇺 Europe/Moscow (MSK)</option>
-          <option value="Asia/Dubai">🇦🇪 Asia/Dubai (GST)</option>
-          <option value="Asia/Shanghai">🇨🇳 Asia/Shanghai (CST)</option>
-          <option value="Asia/Tokyo">🇯🇵 Asia/Tokyo (JST)</option>
-          <option value="Asia/Seoul">🇰🇷 Asia/Seoul (KST)</option>
-          <option value="Asia/Singapore">🇸🇬 Asia/Singapore (SGT)</option>
-          <option value="Australia/Sydney">🇦🇺 Australia/Sydney (AEDT/AEST)</option>
-          <option value="Australia/Melbourne">🇦🇺 Australia/Melbourne (AEDT/AEST)</option>
-          <option value="Pacific/Auckland">🇳🇿 Pacific/Auckland (NZDT/NZST)</option>
-        </select>
+        <label>Sunrise/Sunset city <small style="color:var(--secondary-text-color)">(optional — if not set, uses HA server location)</small></label>
+        <div style="display:flex; gap:8px; margin-top:8px; align-items:center;">
+          <input
+            type="text"
+            placeholder="e.g. Bucharest, Romania"
+            style="flex:1; padding:8px; font-size:14px; border:1px solid var(--divider-color); border-radius:4px; background:var(--card-background-color); color:var(--primary-text-color);"
+            .value="${this._cityInput || ''}"
+            @input="${(e) => { this._cityInput = e.target.value; this.requestUpdate(); }}"
+            @keydown="${(e) => { if (e.key === 'Enter') this._validateCity(); }}"
+          />
+          <button
+            style="padding:8px 14px; background:var(--primary-color); color:var(--text-primary-color, #fff); border:none; border-radius:4px; cursor:pointer; font-size:14px; white-space:nowrap;"
+            @click="${() => this._validateCity()}"
+          >Validate</button>
+          ${this._config.sun_city ? x`
+            <button
+              style="padding:8px 10px; background:var(--error-color, #c62828); color:#fff; border:none; border-radius:4px; cursor:pointer; font-size:14px;"
+              @click="${() => this._clearCity()}"
+              title="Clear city, use HA server location"
+            >✕</button>
+          ` : ''}
+        </div>
+        ${(this._cityInput || '').trim() && (this._cityInput || '').trim() !== (this._config.sun_city || '') && !this._geoStatus.startsWith('ok:') && this._geoStatus !== 'loading' ? x`
+          <div style="margin-top:6px; padding:6px 10px; background:var(--error-color, #c62828); color:#fff; border-radius:4px; font-size:13px;">
+            ⚠ City not validated — click Validate before saving.
+          </div>
+        ` : ''}
+        ${this._geoStatus === 'loading' ? x`<div style="margin-top:6px; color:var(--secondary-text-color); font-size:13px;">Looking up coordinates...</div>` : ''}
+        ${this._geoStatus.startsWith('ok:') ? x`<div style="margin-top:6px; color:var(--success-color, #388e3c); font-size:13px;">✓ ${this._geoStatus.slice(3)}<br><small>lat: ${this._config.sun_latitude}, lon: ${this._config.sun_longitude}</small></div>` : ''}
+        ${this._geoStatus.startsWith('error:') ? x`<div style="margin-top:6px; color:var(--error-color, #c62828); font-size:13px;">✗ ${this._geoStatus.slice(6)}</div>` : ''}
+        ${!this._geoStatus && this._config.sun_city ? x`<div style="margin-top:6px; color:var(--success-color, #388e3c); font-size:13px;">✓ ${this._config.sun_city}<br><small>lat: ${this._config.sun_latitude}, lon: ${this._config.sun_longitude}${this._config.sun_timezone ? `, tz: ${this._config.sun_timezone}` : ''}</small></div>` : ''}
       </div>
        </div>
 
@@ -1469,6 +1636,7 @@ class WeatherChartCardEditor extends s {
       <div class="buttons-container">
         <button class="page-button ${this.currentPage === 'card' ? 'active' : ''}" @click="${() => this.showPage('card')}">Main</button>
         <button class="page-button ${this.currentPage === 'forecast' ? 'active' : ''}" @click="${() => this.showPage('forecast')}">Forecast</button>
+        <button class="page-button ${this.currentPage === 'climate' ? 'active' : ''}" @click="${() => this.showPage('climate')}">Climate</button>
         <button class="page-button ${this.currentPage === 'units' ? 'active' : ''}" @click="${() => this.showPage('units')}">Units</button>
         <button class="page-button ${this.currentPage === 'alternate' ? 'active' : ''}" @click="${() => this.showPage('alternate')}">Alternate entities</button>
       </div>
@@ -1659,6 +1827,15 @@ class WeatherChartCardEditor extends s {
             </div>
             <div class="switch-right checkbox-container" style="${this._config.show_time ? 'display: flex;' : 'display: none;'}">
               <ha-checkbox
+                @change="${(e) => this._valueChanged(e, 'show_hour_leading_zero')}"
+                .checked="${this._config.show_hour_leading_zero !== false}"
+              ></ha-checkbox>
+              <label class="check-label">
+                Leading zero for hour
+              </label>
+            </div>
+            <div class="switch-right checkbox-container" style="${this._config.show_time ? 'display: flex;' : 'display: none;'}">
+              <ha-checkbox
                 @change="${(e) => this._valueChanged(e, 'show_day')}"
                 .checked="${this._config.show_day !== false}"
               ></ha-checkbox>
@@ -1795,6 +1972,50 @@ class WeatherChartCardEditor extends s {
           </div>
         </div>
 
+        <!-- Climate Settings Page -->
+        <div class="page-container ${this.currentPage === 'climate' ? 'active' : ''}">
+	  <div class="textfield-container">
+            <div>
+              <div class="field-label-row">
+                <label>Temperature Gradient Mode</label>
+                <span class="experimental-badge" ?hidden=${(forecastConfig.gradient_mode || 'classic') !== 'adaptive'}>Experimental</span>
+              </div>
+              <select
+                style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
+                .value=${forecastConfig.gradient_mode || 'classic'}
+                @change=${(e) => {
+                  const evt = { target: { value: e.target.value } };
+                  this._valueChanged(evt, 'forecast.gradient_mode');
+                }}
+              >
+                <option value="classic">Classic</option>
+                <option value="climate_preset">Climate Preset</option>
+                <option value="adaptive">Adaptive (experimental)</option>
+              </select>
+            </div>
+            <div ?hidden=${(forecastConfig.gradient_mode || 'classic') === 'classic'}>
+              <label>Climate Preset Range</label>
+              <select
+                style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
+                .value=${forecastConfig.gradient_preset || 'temperate'}
+                @change=${(e) => {
+                  const evt = { target: { value: e.target.value } };
+                  this._valueChanged(evt, 'forecast.gradient_preset');
+                }}
+              >
+                <option value="temperate">Temperate (-10 to 35 C)</option>
+                <option value="continental">Continental (-30 to 35 C)</option>
+                <option value="subarctic">Subarctic (-45 to 20 C)</option>
+                <option value="polar">Polar (-55 to 10 C)</option>
+                <option value="hot_arid">Hot/Arid (0 to 50 C)</option>
+              </select>
+            </div>
+            <div class="adaptive-note" ?hidden=${(forecastConfig.gradient_mode || 'classic') !== 'adaptive'}>
+              Adaptive is experimental. We welcome feedback on color quality across seasons.
+            </div>
+          </div>
+        </div>
+
         <!-- Units Page -->
         <div class="page-container ${this.currentPage === 'units' ? 'active' : ''}">
           <div class="textfield-container">
@@ -1844,6 +2065,25 @@ class WeatherChartCardEditor extends s {
                 <option value="m/s">m/s</option>
                 <option value="Bft">Bft</option>
                 <option value="mph">mph</option>
+                <option value="kn">kn</option>
+              </select>
+            </div>
+            <div>
+              <label>Display precipitation unit</label>
+              <select
+                style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
+                .value=${unitsConfig.precipitation || ''}
+                @change=${(e) => {
+                  const evt = { target: { value: e.target.value } };
+                  this._valueChanged(evt, 'units.precipitation');
+                }}
+              >
+                <option value="">Default</option>
+                <option value="mm">mm</option>
+                <option value="cm">cm</option>
+                <option value="in">in</option>
+                <option value="l/m2">l/m2</option>
+                <option value="kg/m2">kg/m2</option>
               </select>
             </div>
           </div>
@@ -18178,6 +18418,7 @@ static getStubConfig(hass, unusedEntities, allEntities) {
     show_attributes: true,
     show_time: true,
     show_time_seconds: true,
+    show_hour_leading_zero: true,
     show_day: true,
     show_date: true,
     show_humidity: true,
@@ -18213,6 +18454,8 @@ static getStubConfig(hass, unusedEntities, allEntities) {
       disable_animation: false,
       show_date_labels: true,
       use_color_thresholds: true,
+      gradient_mode: 'classic',
+      gradient_preset: 'temperate',
     },
   };
 }
@@ -18252,6 +18495,7 @@ setConfig(config) {
     show_last_changed: false,
     show_description: false,
     show_forecast_toggle: false,
+    show_hour_leading_zero: true,
     ...config,
     forecast: {
       precipitation_type: 'rainfall',
@@ -18271,6 +18515,8 @@ setConfig(config) {
       '12hourformat': false,
       show_date_labels: true,
       use_color_thresholds: true,
+      gradient_mode: 'classic',
+      gradient_preset: 'temperate',
       ...config.forecast,
     },
     units: {
@@ -18481,7 +18727,53 @@ ll(str) {
 }
 
 getTimezone() {
-  return this.config.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  return this.config.timezone || (this._hass && this._hass.config && this._hass.config.time_zone) || Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
+/**
+ * Calculate sunrise and sunset times from coordinates using the standard algorithm.
+ * Returns UTC Date objects for sunrise and sunset on the given date.
+ * @param {Date} date
+ * @param {number} latitude
+ * @param {number} longitude
+ * @returns {{ sunrise: Date|null, sunset: Date|null }}
+ */
+calculateSunriseSunset(date, latitude, longitude) {
+  const toRad = d => d * Math.PI / 180;
+  const toDeg = r => r * 180 / Math.PI;
+
+  const startOfYear = Date.UTC(date.getUTCFullYear(), 0, 0);
+  const dayOfYear = Math.floor(
+    (Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate()) - startOfYear) / 86400000
+  );
+
+  const zenith = 90.833;
+  const lngHour = longitude / 15;
+
+  const compute = (isSunrise) => {
+    const t = dayOfYear + ((isSunrise ? 6 : 18) - lngHour) / 24;
+    const M = (0.9856 * t) - 3.289;
+    let L = M + 1.916 * Math.sin(toRad(M)) + 0.020 * Math.sin(toRad(2 * M)) + 282.634;
+    L = ((L % 360) + 360) % 360;
+    let RA = toDeg(Math.atan(0.91764 * Math.tan(toRad(L))));
+    RA = ((RA % 360) + 360) % 360;
+    const Lq = Math.floor(L / 90) * 90;
+    const RAq = Math.floor(RA / 90) * 90;
+    RA = (RA + Lq - RAq) / 15;
+    const sinDec = 0.39782 * Math.sin(toRad(L));
+    const cosDec = Math.cos(Math.asin(sinDec));
+    const cosH = (Math.cos(toRad(zenith)) - sinDec * Math.sin(toRad(latitude))) /
+                 (cosDec * Math.cos(toRad(latitude)));
+    if (cosH > 1 || cosH < -1) return null; // polar day or night
+    const H = isSunrise ? 360 - toDeg(Math.acos(cosH)) : toDeg(Math.acos(cosH));
+    let UT = (H / 15 + RA - 0.06571 * t - 6.622) - lngHour;
+    UT = ((UT % 24) + 24) % 24;
+    const hours = Math.floor(UT);
+    const minutes = Math.round((UT - hours) * 60);
+    return new Date(Date.UTC(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate(), hours, minutes, 0));
+  };
+
+  return { sunrise: compute(true), sunset: compute(false) };
 }
 
 /**
@@ -18783,18 +19075,19 @@ getWindDir(deg) {
   }
 }
 
-calculateBeaufortScale(windSpeed) {
+calculateBeaufortScale(windSpeed, sourceUnit = this.weather && this.weather.attributes && this.weather.attributes.wind_speed_unit) {
   const unitConversion = {
     'km/h': 1,
     'm/s': 3.6,
     'mph': 1.60934,
+    'kn': 1.852,
   };
 
-  if (!this.weather || !this.weather.attributes.wind_speed_unit) {
+  if (!sourceUnit) {
     throw new Error('wind_speed_unit not available in weather attributes.');
   }
 
-  const wind_speed_unit = this.weather.attributes.wind_speed_unit;
+  const wind_speed_unit = sourceUnit;
   const conversionFactor = unitConversion[wind_speed_unit];
 
   if (typeof conversionFactor !== 'number') {
@@ -18818,6 +19111,45 @@ calculateBeaufortScale(windSpeed) {
   else return 12;
 }
 
+convertWindSpeed(windSpeed, targetUnit = this.unitSpeed, sourceUnit = this.weather && this.weather.attributes && this.weather.attributes.wind_speed_unit) {
+  const numericWindSpeed = Number(windSpeed);
+
+  if (!Number.isFinite(numericWindSpeed)) {
+    return windSpeed;
+  }
+
+  if (!targetUnit || !sourceUnit || targetUnit === sourceUnit) {
+    return Math.round(numericWindSpeed);
+  }
+
+  if (targetUnit === 'Bft') {
+    return this.calculateBeaufortScale(numericWindSpeed, sourceUnit);
+  }
+
+  const sourceToMetersPerSecond = {
+    'm/s': 1,
+    'km/h': 1 / 3.6,
+    'mph': 0.44704,
+    'kn': 0.514444,
+  };
+
+  const metersPerSecondToTarget = {
+    'm/s': 1,
+    'km/h': 3.6,
+    'mph': 2.2369362920544,
+    'kn': 1.9438444924406,
+  };
+
+  const toMetersPerSecond = sourceToMetersPerSecond[sourceUnit];
+  const fromMetersPerSecond = metersPerSecondToTarget[targetUnit];
+
+  if (!toMetersPerSecond || !fromMetersPerSecond) {
+    return Math.round(numericWindSpeed);
+  }
+
+  return Math.round(numericWindSpeed * toMetersPerSecond * fromMetersPerSecond);
+}
+
 convertTemperature(temp, fromUnit, toUnit) {
   if (!toUnit || fromUnit === toUnit) return temp;
   
@@ -18828,6 +19160,89 @@ convertTemperature(temp, fromUnit, toUnit) {
   }
   
   return temp;
+}
+
+normalizePrecipitationUnit(unit) {
+  if (!unit) {
+    return null;
+  }
+
+  const normalized = String(unit).trim().toLowerCase();
+  const aliases = {
+    'mm': 'mm',
+    'millimeter': 'mm',
+    'millimeters': 'mm',
+    'millimetre': 'mm',
+    'millimetres': 'mm',
+    'cm': 'cm',
+    'centimeter': 'cm',
+    'centimeters': 'cm',
+    'centimetre': 'cm',
+    'centimetres': 'cm',
+    'in': 'in',
+    'inch': 'in',
+    'inches': 'in',
+    'l/m2': 'l/m2',
+    'l/m²': 'l/m2',
+    'liter/m2': 'l/m2',
+    'liters/m2': 'l/m2',
+    'litre/m2': 'l/m2',
+    'litres/m2': 'l/m2',
+    'kg/m2': 'kg/m2',
+    'kg/m²': 'kg/m2',
+  };
+
+  return aliases[normalized] || normalized;
+}
+
+getSourcePrecipitationUnit() {
+  const attrUnit = this.weather && this.weather.attributes ? this.weather.attributes.precipitation_unit : null;
+  const normalizedAttrUnit = this.normalizePrecipitationUnit(attrUnit);
+  if (normalizedAttrUnit) {
+    return normalizedAttrUnit;
+  }
+
+  const lengthUnit = this._hass && this._hass.config && this._hass.config.unit_system
+    ? this._hass.config.unit_system.length
+    : null;
+  return lengthUnit === 'km' ? 'mm' : 'in';
+}
+
+getDisplayPrecipitationUnit(sourceUnit = this.getSourcePrecipitationUnit()) {
+  const configuredUnit = this.config && this.config.units ? this.config.units.precipitation : null;
+  const normalizedConfiguredUnit = this.normalizePrecipitationUnit(configuredUnit);
+  return normalizedConfiguredUnit || sourceUnit;
+}
+
+convertPrecipitation(value, fromUnit, toUnit) {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) {
+    return value;
+  }
+
+  const normalizedFrom = this.normalizePrecipitationUnit(fromUnit);
+  const normalizedTo = this.normalizePrecipitationUnit(toUnit);
+
+  if (!normalizedFrom || !normalizedTo || normalizedFrom === normalizedTo) {
+    return numericValue;
+  }
+
+  const toMillimeters = {
+    'mm': 1,
+    'cm': 10,
+    'in': 25.4,
+    'l/m2': 1,
+    'kg/m2': 1,
+  };
+
+  const fromFactor = toMillimeters[normalizedFrom];
+  const toFactor = toMillimeters[normalizedTo];
+
+  if (!fromFactor || !toFactor) {
+    return numericValue;
+  }
+
+  return numericValue * fromFactor / toFactor;
 }
 
 async firstUpdated(changedProperties) {
@@ -18910,10 +19325,39 @@ cancelAutoscroll() {
 }
 
 getTemperatureColor(temp, unit) {
+  return this.getTemperatureColorWithRange(temp, unit, null);
+}
+
+getTemperatureColorWithRange(temp, unit, rangeC) {
   // Convert to Celsius for consistent thresholds
   let tempC = temp;
   if (unit === '°F') {
     tempC = (temp - 32) * 5/9;
+  }
+
+  if (rangeC && Number.isFinite(rangeC.min) && Number.isFinite(rangeC.max) && rangeC.max > rangeC.min) {
+    const palette = [
+      { stop: 0.0, rgb: [30, 136, 229] },
+      { stop: 0.25, rgb: [129, 212, 250] },
+      { stop: 0.5, rgb: [129, 199, 132] },
+      { stop: 0.68, rgb: [255, 241, 118] },
+      { stop: 0.84, rgb: [255, 167, 38] },
+      { stop: 1.0, rgb: [244, 67, 54] },
+    ];
+
+    const normalized = Math.max(0, Math.min(1, (tempC - rangeC.min) / (rangeC.max - rangeC.min)));
+
+    for (let i = 0; i < palette.length - 1; i++) {
+      const start = palette[i];
+      const end = palette[i + 1];
+      if (normalized >= start.stop && normalized <= end.stop) {
+        const localT = (normalized - start.stop) / (end.stop - start.stop || 1);
+        const r = Math.round(start.rgb[0] + (end.rgb[0] - start.rgb[0]) * localT);
+        const g = Math.round(start.rgb[1] + (end.rgb[1] - start.rgb[1]) * localT);
+        const b = Math.round(start.rgb[2] + (end.rgb[2] - start.rgb[2]) * localT);
+        return `rgba(${r}, ${g}, ${b}, 1.0)`;
+      }
+    }
   }
   
   // 6-level color spectrum
@@ -18932,7 +19376,76 @@ getTemperatureColor(temp, unit) {
   }
 }
 
-createTemperatureGradient(data, unit, ctx, chartArea) {
+getGradientPresetRangeC(preset = 'temperate') {
+  const presetRanges = {
+    temperate: { min: -10, max: 35 },
+    continental: { min: -30, max: 35 },
+    subarctic: { min: -45, max: 20 },
+    polar: { min: -55, max: 10 },
+    hot_arid: { min: 0, max: 50 },
+  };
+
+  return presetRanges[preset] || presetRanges.temperate;
+}
+
+getAdaptiveTemperatureRangeC(data, unit) {
+  const values = (data || [])
+    .map((value) => {
+      if (!Number.isFinite(value)) {
+        return null;
+      }
+      return unit === '°F' ? ((value - 32) * 5 / 9) : value;
+    })
+    .filter((value) => value !== null)
+    .sort((a, b) => a - b);
+
+  if (values.length < 4) {
+    return null;
+  }
+
+  const low = values[Math.floor((values.length - 1) * 0.1)];
+  const high = values[Math.ceil((values.length - 1) * 0.9)];
+  let min = low;
+  let max = high;
+
+  if (max - min < 8) {
+    const center = (min + max) / 2;
+    min = center - 4;
+    max = center + 4;
+  }
+
+  const padding = Math.max(1.5, (max - min) * 0.1);
+  min = Math.max(-60, min - padding);
+  max = Math.min(55, max + padding);
+
+  if (max - min < 2) {
+    return null;
+  }
+
+  return { min, max };
+}
+
+getTemperatureRangeC(data, unit) {
+  const forecastConfig = (this.config && this.config.forecast) ? this.config.forecast : {};
+  const gradientMode = forecastConfig.gradient_mode || 'classic';
+  const gradientPreset = forecastConfig.gradient_preset || 'temperate';
+
+  if (gradientMode === 'climate_preset') {
+    return this.getGradientPresetRangeC(gradientPreset);
+  }
+
+  if (gradientMode === 'adaptive') {
+    const adaptiveRange = this.getAdaptiveTemperatureRangeC(data, unit);
+    if (adaptiveRange) {
+      return adaptiveRange;
+    }
+    return this.getGradientPresetRangeC(gradientPreset);
+  }
+
+  return null;
+}
+
+createTemperatureGradient(data, unit, ctx, chartArea, rangeC = null) {
   if (!chartArea) {
     return null;
   }
@@ -18942,7 +19455,7 @@ createTemperatureGradient(data, unit, ctx, chartArea) {
   
   for (let i = 0; i < dataLength; i++) {
     const position = i / (dataLength - 1);
-    const color = this.getTemperatureColor(data[i], unit);
+    const color = this.getTemperatureColorWithRange(data[i], unit, rangeC);
     gradient.addColorStop(position, color);
   }
   
@@ -18967,12 +19480,28 @@ drawChart({ config, language, weather, forecastItems } = this) {
   }
   var tempUnit = this.unitTemperature || this._hass.config.unit_system.temperature;
   var lengthUnit = this._hass.config.unit_system.length;
+  const sourcePrecipUnit = this.getSourcePrecipitationUnit();
+  const displayPrecipUnit = this.getDisplayPrecipitationUnit(sourcePrecipUnit);
   if (config.forecast.precipitation_type === 'probability') {
     var precipUnit = '%';
   } else {
-    var precipUnit = lengthUnit === 'km' ? this.ll('units')['mm'] : this.ll('units')['in'];
+    var precipUnit = this.ll('units')[displayPrecipUnit] || displayPrecipUnit;
   }
+  const formatPrecipitationValue = (rawValue) => {
+    const numericValue = Number(rawValue);
+    if (!Number.isFinite(numericValue)) {
+      return rawValue;
+    }
+
+    if (config.forecast.precipitation_type !== 'rainfall') {
+      return numericValue;
+    }
+
+    const convertedValue = this.convertPrecipitation(numericValue, sourcePrecipUnit, displayPrecipUnit);
+    return Number.isFinite(convertedValue) ? convertedValue : numericValue;
+  };
   const data = this.computeForecastData();
+  const tempColorRange = this.getTemperatureRangeC(data.tempHigh, tempUnit);
 
   var style = getComputedStyle(document.body);
   var backgroundColor = style.getPropertyValue('--card-background-color');
@@ -19015,7 +19544,7 @@ drawChart({ config, language, weather, forecastItems } = this) {
       borderColor: config.forecast.use_color_thresholds 
         ? (context) => {
             if (context.chart.chartArea) {
-              return this.createTemperatureGradient(data.tempHigh, tempUnit, context.chart.ctx, context.chart.chartArea);
+              return this.createTemperatureGradient(data.tempHigh, tempUnit, context.chart.ctx, context.chart.chartArea, tempColorRange);
             }
             return config.forecast.temperature1_color;
           }
@@ -19023,7 +19552,7 @@ drawChart({ config, language, weather, forecastItems } = this) {
       backgroundColor: config.forecast.use_color_thresholds
         ? (context) => {
             if (context.chart.chartArea) {
-              return this.createTemperatureGradient(data.tempHigh, tempUnit, context.chart.ctx, context.chart.chartArea);
+              return this.createTemperatureGradient(data.tempHigh, tempUnit, context.chart.ctx, context.chart.chartArea, tempColorRange);
             }
             return config.forecast.temperature1_color;
           }
@@ -19032,7 +19561,7 @@ drawChart({ config, language, weather, forecastItems } = this) {
         borderColor: config.forecast.use_color_thresholds
           ? (ctx) => {
               const temp = ctx.p1.parsed.y;
-              return this.getTemperatureColor(temp, tempUnit);
+              return this.getTemperatureColorWithRange(temp, tempUnit, tempColorRange);
             }
           : undefined,
       },
@@ -19062,7 +19591,8 @@ drawChart({ config, language, weather, forecastItems } = this) {
       formatter: function (value, context) {
         const precipitationType = config.forecast.precipitation_type;
 
-        const rainfall = context.dataset.data[context.dataIndex];
+        const rainfallRaw = context.dataset.data[context.dataIndex];
+        const rainfall = formatPrecipitationValue(rainfallRaw);
         const probability = data.forecast[context.dataIndex].precipitation_probability;
 
         let formattedValue;
@@ -19104,7 +19634,7 @@ drawChart({ config, language, weather, forecastItems } = this) {
       backgroundColor: 'transparent',
       borderColor: 'transparent',
       color: config.forecast.use_color_thresholds
-        ? (context) => this.getTemperatureColor(context.dataset.data[context.dataIndex], tempUnit)
+        ? (context) => this.getTemperatureColorWithRange(context.dataset.data[context.dataIndex], tempUnit, tempColorRange)
         : (chart_text_color || config.forecast.temperature1_color),
       font: {
         size: parseInt(config.forecast.labels_font_size) + 1,
@@ -19162,7 +19692,7 @@ drawChart({ config, language, weather, forecastItems } = this) {
               callback: function (value, index, values) {
                   var datetime = this.getLabelForValue(value);
                   var dateObj = new Date(datetime);
-                  var timezone = config.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+                  var timezone = config.timezone || (self._hass && self._hass.config && self._hass.config.time_zone) || Intl.DateTimeFormat().resolvedOptions().timeZone;
                   var locale = config.locale || undefined;
         
                   var timeFormatOptions = {
@@ -19258,7 +19788,7 @@ drawChart({ config, language, weather, forecastItems } = this) {
           callbacks: {
             title: function (TooltipItem) {
               var datetime = TooltipItem[0].label;
-              var timezone = config.timezone || Intl.DateTimeFormat().resolvedOptions().timeZone;
+              var timezone = config.timezone || (self._hass && self._hass.config && self._hass.config.time_zone) || Intl.DateTimeFormat().resolvedOptions().timeZone;
               var dateObj = new Date(datetime);
               
               var monthShort = self.getLocalizedMonthNameShort(dateObj, timezone);
@@ -19280,6 +19810,14 @@ drawChart({ config, language, weather, forecastItems } = this) {
       var value = context.formattedValue;
       var probability = data.forecast[context.dataIndex].precipitation_probability;
       var unit = context.datasetIndex === 2 ? precipUnit : tempUnit;
+
+      if (config.forecast.precipitation_type === 'rainfall' && context.datasetIndex === 2) {
+        const rainfallRaw = context.dataset.data[context.dataIndex];
+        const rainfallDisplay = formatPrecipitationValue(rainfallRaw);
+        if (Number.isFinite(rainfallDisplay)) {
+          value = rainfallDisplay > 9 ? Math.round(rainfallDisplay) : rainfallDisplay.toFixed(1);
+        }
+      }
 
       if (config.forecast.precipitation_type === 'rainfall' && context.datasetIndex === 2 && config.forecast.show_probability && probability !== undefined && probability !== null) {
         return label + ': ' + value + ' ' + precipUnit + ' / ' + Math.round(probability) + '%';
@@ -19337,7 +19875,12 @@ computeForecastData({ config, forecastItems } = this) {
     if (config.forecast.precipitation_type === 'probability') {
       precip.push(d.precipitation_probability);
     } else {
-      precip.push(d.precipitation);
+      const numericPrecipitation = Number(d.precipitation);
+      if (Number.isFinite(numericPrecipitation)) {
+        precip.push(Math.round(numericPrecipitation * 100) / 100);
+      } else {
+        precip.push(d.precipitation);
+      }
     }
   }
 
@@ -19666,13 +20209,14 @@ updateClock() {
   const timezone = this.getTimezone();
   const use12HourFormat = this.config.use_12hour_format;
   const showSeconds = this.config.show_time_seconds === true;
+  const showHourLeadingZero = this.config.show_hour_leading_zero !== false;
   const showDay = this.config.show_day;
   const showDate = this.config.show_date;
   const currentDate = new Date();
   
   // Force timezone conversion using explicit formatters
   const timeFormatter = new Intl.DateTimeFormat(this.config.locale || 'en-US', {
-    hour: '2-digit',
+    hour: showHourLeadingZero ? '2-digit' : 'numeric',
     minute: '2-digit',
     second: showSeconds ? '2-digit' : undefined,
     hour12: use12HourFormat,
@@ -19743,34 +20287,23 @@ renderClock({ config } = this) {
 }
 
 renderAttributes({ config, humidity, pressure, windSpeed, windDirection, sun, language, uv_index, dew_point, wind_gust_speed, visibility } = this) {
-  let dWindSpeed = windSpeed;
+  let dWindSpeed = this.convertWindSpeed(windSpeed);
   let dPressure = pressure;
-
-  if (this.unitSpeed !== this.weather.attributes.wind_speed_unit) {
-    if (this.unitSpeed === 'm/s') {
-      if (this.weather.attributes.wind_speed_unit === 'km/h') {
-        dWindSpeed = Math.round(windSpeed * 1000 / 3600);
-      } else if (this.weather.attributes.wind_speed_unit === 'mph') {
-        dWindSpeed = Math.round(windSpeed * 0.44704);
-      }
-    } else if (this.unitSpeed === 'km/h') {
-      if (this.weather.attributes.wind_speed_unit === 'm/s') {
-        dWindSpeed = Math.round(windSpeed * 3.6);
-      } else if (this.weather.attributes.wind_speed_unit === 'mph') {
-        dWindSpeed = Math.round(windSpeed * 1.60934);
-      }
-    } else if (this.unitSpeed === 'mph') {
-      if (this.weather.attributes.wind_speed_unit === 'm/s') {
-        dWindSpeed = Math.round(windSpeed / 0.44704);
-      } else if (this.weather.attributes.wind_speed_unit === 'km/h') {
-        dWindSpeed = Math.round(windSpeed / 1.60934);
-      }
-    } else if (this.unitSpeed === 'Bft') {
-      dWindSpeed = this.calculateBeaufortScale(windSpeed);
+  const dewPointNumber = Number(dew_point);
+  let dDewPoint = dew_point;
+  const dewPointDisplayUnit = this.unitTemperature || this.weather.attributes.temperature_unit;
+  if (Number.isFinite(dewPointNumber)) {
+    dDewPoint = dewPointNumber;
+    if (this.unitTemperature && this.unitTemperature !== this.weather.attributes.temperature_unit) {
+      dDewPoint = this.convertTemperature(
+        dDewPoint,
+        this.weather.attributes.temperature_unit,
+        this.unitTemperature
+      );
     }
-  } else {
-    dWindSpeed = Math.round(dWindSpeed);
+    dDewPoint = Math.round(dDewPoint);
   }
+  const dWindGustSpeed = this.convertWindSpeed(wind_gust_speed);
 
   if (this.unitPressure !== this.weather.attributes.pressure_unit) {
     if (this.unitPressure === 'mmHg') {
@@ -19822,7 +20355,7 @@ return x`
             <ha-icon icon="hass:gauge"></ha-icon> ${dPressure} ${this.ll('units')[this.unitPressure]} <br>
           ` : ''}
           ${showDewpoint && dew_point !== undefined ? x`
-            <ha-icon icon="hass:thermometer-water"></ha-icon> ${dew_point} ${this.weather.attributes.temperature_unit} <br>
+            <ha-icon icon="hass:thermometer-water"></ha-icon> ${dDewPoint} ${dewPointDisplayUnit} <br>
           ` : ''}
           ${showVisibility && visibility !== undefined ? x`
             <ha-icon icon="hass:eye"></ha-icon> ${visibility} ${this.weather.attributes.visibility_unit}
@@ -19850,11 +20383,11 @@ return x`
           ` : ''}
           ${showWindSpeed && dWindSpeed !== undefined ? x`
             <ha-icon icon="hass:weather-windy"></ha-icon>
-            ${dWindSpeed} ${this.ll('units')[this.unitSpeed]} <br>
+            ${dWindSpeed} ${this.ll('units')[this.unitSpeed] || this.unitSpeed} <br>
           ` : ''}
           ${showWindgustspeed && wind_gust_speed !== undefined ? x`
             <ha-icon icon="hass:weather-windy-variant"></ha-icon>
-            ${wind_gust_speed} ${this.ll('units')[this.unitSpeed]}
+            ${dWindGustSpeed} ${this.ll('units')[this.unitSpeed] || this.unitSpeed}
           ` : ''}
         </div>
       ` : ''}
@@ -19868,9 +20401,11 @@ renderSun({ sun, language, config } = this) {
   }
 
   const use12HourFormat = this.config.use_12hour_format;
-  const timezone = this.getTimezone();
+  const timezone = this.config.sun_timezone
+    || (this._hass && this._hass.config && this._hass.config.time_zone)
+    || Intl.DateTimeFormat().resolvedOptions().timeZone;
   const locale = this.config.locale || undefined;
-  
+
   const timeOptions = {
     hour12: use12HourFormat,
     hour: 'numeric',
@@ -19878,11 +20413,25 @@ renderSun({ sun, language, config } = this) {
     timeZone: timezone
   };
 
+  const lat = this.config.sun_latitude != null ? this.config.sun_latitude
+    : (this._hass && this._hass.config && this._hass.config.latitude);
+  const lon = this.config.sun_longitude != null ? this.config.sun_longitude
+    : (this._hass && this._hass.config && this._hass.config.longitude);
+  let sunriseDate, sunsetDate;
+  if (lat != null && lon != null) {
+    const { sunrise, sunset } = this.calculateSunriseSunset(new Date(), lat, lon);
+    sunriseDate = sunrise;
+    sunsetDate = sunset;
+  } else {
+    sunriseDate = new Date(sun.attributes.next_rising);
+    sunsetDate = new Date(sun.attributes.next_setting);
+  }
+
   return x`
     <ha-icon icon="mdi:weather-sunset-up"></ha-icon>
-      ${new Date(sun.attributes.next_rising).toLocaleTimeString(locale, timeOptions)}<br>
+      ${sunriseDate ? sunriseDate.toLocaleTimeString(locale, timeOptions) : '--'}<br>
     <ha-icon icon="mdi:weather-sunset-down"></ha-icon>
-      ${new Date(sun.attributes.next_setting).toLocaleTimeString(locale, timeOptions)}
+      ${sunsetDate ? sunsetDate.toLocaleTimeString(locale, timeOptions) : '--'}
   `;
 }
 
@@ -19895,30 +20444,31 @@ renderForecastConditionIcons({ config, forecastItems, sun } = this) {
 
   return x`
     <div class="conditions" @click="${(e) => this.showMoreInfo(config.entity)}">
-      ${forecast.map((item) => {
+      ${(() => {
+        const lat = this.config.sun_latitude != null ? this.config.sun_latitude
+          : (this._hass && this._hass.config && this._hass.config.latitude);
+        const lon = this.config.sun_longitude != null ? this.config.sun_longitude
+          : (this._hass && this._hass.config && this._hass.config.longitude);
+        return forecast.map((item) => {
         const forecastTime = new Date(item.datetime);
-        const sunriseTime = new Date(sun.attributes.next_rising);
-        const sunsetTime = new Date(sun.attributes.next_setting);
 
-        // Adjust sunrise and sunset times to match the date of forecastTime
-        const adjustedSunriseTime = new Date(forecastTime);
-        adjustedSunriseTime.setHours(sunriseTime.getHours());
-        adjustedSunriseTime.setMinutes(sunriseTime.getMinutes());
-        adjustedSunriseTime.setSeconds(sunriseTime.getSeconds());
-
-        const adjustedSunsetTime = new Date(forecastTime);
-        adjustedSunsetTime.setHours(sunsetTime.getHours());
-        adjustedSunsetTime.setMinutes(sunsetTime.getMinutes());
-        adjustedSunsetTime.setSeconds(sunsetTime.getSeconds());
+        let sunriseTime, sunsetTime;
+        if (lat != null && lon != null) {
+          const { sunrise, sunset } = this.calculateSunriseSunset(forecastTime, lat, lon);
+          sunriseTime = sunrise;
+          sunsetTime = sunset;
+        } else {
+          sunriseTime = new Date(sun.attributes.next_rising);
+          sunsetTime = new Date(sun.attributes.next_setting);
+        }
 
         let isDayTime;
-
         if (config.forecast.type === 'daily') {
-          // For daily forecast, assume it's day time
           isDayTime = true;
         } else {
-          // For other forecast types, determine based on sunrise and sunset times
-          isDayTime = forecastTime >= adjustedSunriseTime && forecastTime <= adjustedSunsetTime;
+          isDayTime = sunriseTime && sunsetTime
+            ? forecastTime >= sunriseTime && forecastTime <= sunsetTime
+            : true;
         }
 
         const weatherIcons = isDayTime ? weatherIconsDay : weatherIconsNight;
@@ -19944,7 +20494,8 @@ renderForecastConditionIcons({ config, forecastItems, sun } = this) {
             ${iconHtml}
           </div>
         `;
-      })}
+      });
+      })()}
     </div>
   `;
 }
@@ -19962,39 +20513,13 @@ renderWind({ config, weather, windSpeed, windDirection, forecastItems } = this) 
     <div class="wind-details">
       ${showWindForecast ? x`
         ${forecast.map((item) => {
-          let dWindSpeed = item.wind_speed;
-
-          if (this.unitSpeed !== this.weather.attributes.wind_speed_unit) {
-            if (this.unitSpeed === 'm/s') {
-              if (this.weather.attributes.wind_speed_unit === 'km/h') {
-                dWindSpeed = Math.round(item.wind_speed * 1000 / 3600);
-              } else if (this.weather.attributes.wind_speed_unit === 'mph') {
-                dWindSpeed = Math.round(item.wind_speed * 0.44704);
-              }
-            } else if (this.unitSpeed === 'km/h') {
-              if (this.weather.attributes.wind_speed_unit === 'm/s') {
-                dWindSpeed = Math.round(item.wind_speed * 3.6);
-              } else if (this.weather.attributes.wind_speed_unit === 'mph') {
-                dWindSpeed = Math.round(item.wind_speed * 1.60934);
-              }
-            } else if (this.unitSpeed === 'mph') {
-              if (this.weather.attributes.wind_speed_unit === 'm/s') {
-                dWindSpeed = Math.round(item.wind_speed / 0.44704);
-              } else if (this.weather.attributes.wind_speed_unit === 'km/h') {
-                dWindSpeed = Math.round(item.wind_speed / 1.60934);
-              }
-            } else if (this.unitSpeed === 'Bft') {
-              dWindSpeed = this.calculateBeaufortScale(item.wind_speed);
-            }
-          } else {
-            dWindSpeed = Math.round(dWindSpeed);
-          }
+          const dWindSpeed = this.convertWindSpeed(item.wind_speed);
 
           return x`
             <div class="wind-detail">
               <ha-icon class="wind-icon" icon="hass:${this.getWindDirIcon(item.wind_bearing)}"></ha-icon>
               <span class="wind-speed">${dWindSpeed}</span>
-              <span class="wind-unit">${this.ll('units')[this.unitSpeed]}</span>
+              <span class="wind-unit">${this.ll('units')[this.unitSpeed] || this.unitSpeed}</span>
             </div>
           `;
         })}
@@ -20071,3 +20596,5 @@ window.customCards.push({
   preview: true,
   documentationURL: "https://github.com/w4mhi/weather-chart-card-ha",
 });
+
+module.exports = WeatherChartCard;

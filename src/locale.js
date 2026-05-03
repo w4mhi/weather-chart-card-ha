@@ -10,11 +10,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'S', 'S-SV', 'SV', 'V-SV', 'V', 'V-JV', 'JV', 'J-JV',
@@ -47,11 +51,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'S', 'S-SV', 'SV', 'V-SV', 'V', 'V-JV', 'JV', 'J-JV',
@@ -84,11 +92,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NO', 'NO', 'O-NO', 'O', 'O-SO', 'SO', 'S-SO',
@@ -121,11 +133,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NO', 'NO', 'O-NO', 'O', 'O-ZO', 'ZO', 'Z-ZO',
@@ -158,11 +174,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -195,11 +215,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -232,11 +256,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -269,11 +297,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'É', 'É-ÉK', 'ÉK', 'K-ÉK', 'K', 'K-DK', 'DK', 'D-DK',
@@ -306,11 +338,15 @@ const locale = {
       'km/h': 'км/ч',
       'm/s': 'м/с',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'гПа',
       'mmHg': 'мм рт.ст.',
       'mm': 'мм',
-      'in': 'in'
+      'cm': 'см',
+      'in': 'in',
+      'l/m2': 'л/м2',
+      'kg/m2': 'кг/м2'
     },
     'cardinalDirections': [
       'С', 'С-СВ', 'СВ', 'В-СВ', 'В', 'В-ЮВ', 'ЮВ', 'Ю-ЮВ',
@@ -340,14 +376,18 @@ const locale = {
     'days': ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'],
     'months': ['januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli', 'augusti', 'september', 'oktober', 'november', 'december'],
     'units': {
-        'km/h': 'km/h',
-        'm/s': 'm/s',
+      'km/h': 'km/h',
+      'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
-        'hPa': 'hPa',
-        'mmHg': 'mm Hg',
-        'mm': 'mm',
-        'in': 'in'
+      'hPa': 'hPa',
+      'mmHg': 'mmHg',
+      'mm': 'mm',
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
         'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -380,11 +420,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'po'
+      'cm': 'cm',
+      'in': 'po',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -417,11 +461,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -454,11 +502,15 @@ const locale = {
       'km/h': 'km/t',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
         'N', 'N-NE', 'NE', 'Ø-NØ', 'Ø', 'Ø-SØ', 'SØ', 'S-SØ',
@@ -491,11 +543,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NØ', 'NO', 'Ø-NØ', 'Ø', 'Ø-SØ', 'SØ', 'S-SØ',
@@ -528,11 +584,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -565,11 +625,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -602,11 +666,15 @@ const locale = {
       'km/h': 'χλμ/ώρα',
       'm/s': 'μ/δ',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
       'mmHg': 'χιλ. υδράργυρου',
       'mm': 'χιλ.',
-      'in': 'ίντσες'
+      'cm': 'cm',
+      'in': 'ίντσες',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'Β', 'Β-ΒΔ', 'ΒΔ', 'Δ-ΒΔ', 'Δ', 'Δ-ΝΔ', 'ΝΔ', 'Ν-ΝΔ',
@@ -639,11 +707,15 @@ const locale = {
       'km/h': 'км/ч',
       'm/s': 'м/с',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
       'mmHg': 'mmHg',
       'mm': 'мм',
-      'in': 'in'
+      'cm': 'см',
+      'in': 'in',
+      'l/m2': 'л/м2',
+      'kg/m2': 'кг/м2'
     },
     'cardinalDirections': [
       'С', 'С-СИ', 'СИ', 'И-СИ', 'И', 'И-ЮИ', 'ЮИ', 'Ю-ЮИ',
@@ -676,11 +748,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'Š', 'Š-ŠR', 'ŠR', 'R-ŠR', 'R', 'R-PR', 'PR', 'P-PR',
@@ -713,11 +789,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -750,11 +830,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
       'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       'N', 'N-NE', 'NE', 'E-NE', 'E', 'E-SE', 'SE', 'S-SE',
@@ -787,11 +871,15 @@ const locale = {
       'km/h': 'км/год',
       'm/s': 'м/с',
       'mph': 'миль/год',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'гПа',
       'mmHg': 'мм рт. ст.',
       'mm': 'мм',
-      'in': 'in'
+      'cm': 'см',
+      'in': 'in',
+      'l/m2': 'л/м2',
+      'kg/m2': 'кг/м2'
     },
     'cardinalDirections': [
       'Пн', 'Пн-ПнСх', 'ПнСх', 'Сх-ПнСх', 'Сх', 'Сх-ПдСх', 'ПдСх', 'Пд-ПдСх',
@@ -824,11 +912,15 @@ const locale = {
       'km/h': 'km/h',
       'm/s': 'm/s',
       'mph': 'mph',
+      'kn': 'kn',
       'Bft': 'Bft',
       'hPa': 'hPa',
-      'mmHg': 'mm Hg',
+      'mmHg': 'mmHg',
       'mm': 'mm',
-      'in': 'in'
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
     },
     'cardinalDirections': [
       '북', '북북동', '북동', '동북동', '동', '동남동', '남동', '남남동',
