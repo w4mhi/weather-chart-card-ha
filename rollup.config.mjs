@@ -18,7 +18,7 @@ export default {
   input: 'src/main.js',
   output: {
     file: 'dist/weather-chart-card-ha.js',
-    format: 'cjs',
+    format: 'iife',
     name: 'WeatherChartCard',
     sourcemap: dev ? true : false,
   },

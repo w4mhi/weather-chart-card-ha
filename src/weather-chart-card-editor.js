@@ -108,9 +108,10 @@ class WeatherChartCardEditor extends LitElement {
     if (!this._config) {
       return;
     }
+    const value = event.detail ? event.detail.value : event.target.value;
     const newConfig = { ...this._config };
-    newConfig.entity = event.target.value;
-    this._entity = event.target.value;
+    newConfig.entity = value;
+    this._entity = value;
     this.configChanged(newConfig);
   }
 
@@ -240,6 +241,7 @@ class WeatherChartCardEditor extends LitElement {
         sun_latitude: lat,
         sun_longitude: lon,
         sun_timezone: sunTimezone,
+        timezone: sunTimezone || this._config.timezone,
       };
       this._geoStatus = `ok:${displayName}${sunTimezone ? ` (${sunTimezone})` : ''}`;
       this.configChanged(newConfig);
@@ -257,6 +259,7 @@ class WeatherChartCardEditor extends LitElement {
     delete newConfig.sun_latitude;
     delete newConfig.sun_longitude;
     delete newConfig.sun_timezone;
+    delete newConfig.timezone;
     this._cityInput = '';
     this._geoStatus = '';
     this.configChanged(newConfig);
@@ -392,16 +395,15 @@ class WeatherChartCardEditor extends LitElement {
       </style>
       <div>
       <div class="textfield-container">
-<ha-select
-  naturalMenuWidth
-  fixedMenuPosition
-  label="Entity"
-  .configValue=${'entity'}
+<label class="switch-label">Entity</label>
+<select
+  style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid var(--divider-color, #ccc); border-radius: 4px; background: var(--card-background-color, #fff); color: var(--primary-text-color, #000); font-size: 14px;"
   .value=${this._entity}
-  @value-changed=${(e) => this._EntityChanged(e, 'entity')}
+  @change=${(e) => this._EntityChanged(e, 'entity')}
 >
-  ${this.entities.map((entity) => html`<ha-list-item .value=${entity}>${entity}</ha-list-item>`)}
-</ha-select>
+  <option value="">-- Select entity --</option>
+  ${this.entities.map((entity) => html`<option value=${entity} ?selected=${entity === this._entity}>${entity}</option>`)}
+</select>
       <ha-textfield
         label="Title"
         .value="${this._config.title || ''}"
@@ -525,6 +527,31 @@ class WeatherChartCardEditor extends LitElement {
             Show Daily/Hourly toggle button
           </label>
         </div>
+      </div>
+
+      <div class="input-container">
+        <label class="switch-label">
+          Auto-rotate interval (minutes, 0 = off, 1-60)
+        </label>
+        <input
+          type="number"
+          min="0"
+          max="60"
+          step="1"
+          .value="${forecastConfig.auto_rotate || 0}"
+          @change="${(e) => {
+            let val = parseInt(e.target.value, 10);
+            if (isNaN(val) || val < 0) val = 0;
+            if (val > 60) val = 60;
+            const newConfig = JSON.parse(JSON.stringify(this._config));
+            newConfig.forecast = newConfig.forecast || {};
+            newConfig.forecast.auto_rotate = val;
+            this.configChanged(newConfig);
+            this._config = newConfig;
+            this.requestUpdate();
+          }}"
+          style="width: 60px; margin-left: 8px;"
+        />
       </div>
 
       <h5>Chart style:</h5>
@@ -1072,4 +1099,6 @@ class WeatherChartCardEditor extends LitElement {
     `;
   }
 }
-customElements.define("weather-chart-card-ha-editor", WeatherChartCardEditor);
+if (!customElements.get('weather-chart-card-ha-editor')) {
+  customElements.define('weather-chart-card-ha-editor', WeatherChartCardEditor);
+}

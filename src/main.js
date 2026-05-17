@@ -95,7 +95,7 @@ static getStubConfig(hass, unusedEntities, allEntities) {
 
 setConfig(config) {
   const cardConfig = {
-    title: 'Enhanced Weather Chart Card',
+    title: 'Weather',
     icons_size: 30,
     animated_icons: true,
     icon_style: 'style1',
@@ -126,6 +126,7 @@ setConfig(config) {
       show_wind_forecast: true,
       round_temp: false,
       type: 'daily',
+      auto_rotate: 0,
       number_of_forecasts: '0',
       '12hourformat': false,
       show_date_labels: true,
@@ -155,9 +156,16 @@ setConfig(config) {
       : 'https://cdn.jsdelivr.net/gh/w4mhi/weather-chart-card-ha@latest/dist/icons/';
   }
 
+  if (!cardConfig.title || !cardConfig.title.trim()) {
+    cardConfig.title = 'Weather';
+  }
+
   this.config = cardConfig;
   if (!config.entity) {
     throw new Error('Please, define entity in the card config');
+  }
+  if (this.isConnected) {
+    this.startAutoRotate();
   }
 }
 
@@ -255,6 +263,16 @@ handleForecastTypeToggle() {
   
   // Request update to re-render
   this.requestUpdate();
+
+  // Restart animated icon SVG animations after re-render
+  this.updateComplete.then(() => {
+    const icons = this.shadowRoot.querySelectorAll('img[src$=".svg"]');
+    icons.forEach((img) => {
+      const src = img.src;
+      img.src = '';
+      img.src = src;
+    });
+  });
 }
 
   supportsFeature(feature) {
@@ -272,6 +290,33 @@ handleForecastTypeToggle() {
     if (!this.resizeInitialized) {
       this.delayedAttachResizeObserver();
     }
+    this.startAutoRotate();
+  }
+
+  startAutoRotate() {
+    this.stopAutoRotate();
+    const interval = this.config && this.config.forecast ? parseInt(this.config.forecast.auto_rotate, 10) : 0;
+    if (!interval || interval < 1 || interval > 60) return;
+    // Align to the next whole minute, then start the interval
+    const now = new Date();
+    const msUntilNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
+    this.autoRotateTimeout = setTimeout(() => {
+      this.handleForecastTypeToggle();
+      this.autoRotateInterval = setInterval(() => {
+        this.handleForecastTypeToggle();
+      }, interval * 60 * 1000);
+    }, msUntilNextMinute);
+  }
+
+  stopAutoRotate() {
+    if (this.autoRotateTimeout) {
+      clearTimeout(this.autoRotateTimeout);
+      this.autoRotateTimeout = null;
+    }
+    if (this.autoRotateInterval) {
+      clearInterval(this.autoRotateInterval);
+      this.autoRotateInterval = null;
+    }
   }
 
   delayedAttachResizeObserver() {
@@ -284,6 +329,7 @@ handleForecastTypeToggle() {
   disconnectedCallback() {
     super.disconnectedCallback();
     this.detachResizeObserver();
+    this.stopAutoRotate();
     if (this.forecastSubscriber) {
       this.forecastSubscriber.then((unsub) => unsub());
     }
@@ -1718,6 +1764,10 @@ updateChart({ forecasts, forecastChart } = this) {
         .forecast-toggle:hover {
           opacity: 1;
         }
+        .forecast-toggle:disabled {
+          cursor: default;
+          opacity: 0.7;
+        }
       </style>
 
       <ha-card header="${config.title}">
@@ -1893,8 +1943,10 @@ renderClock({ config } = this) {
       ${showDay && showDate ? html` ` : ''}
       ${showDate ? html`<div class="date-text date"></div>` : ''}
       ${config.show_forecast_toggle ? html`
-        <button class="forecast-toggle" @click="${this.handleForecastTypeToggle.bind(this)}">
-          ${this.config.forecast.type === 'daily' ? 'Daily' : 'Hourly'}
+        <button class="forecast-toggle"
+          @click="${this.handleForecastTypeToggle.bind(this)}"
+          ?disabled="${parseInt(config.forecast.auto_rotate, 10) > 0}">
+          ${parseInt(config.forecast.auto_rotate, 10) > 0 ? `Auto [${parseInt(config.forecast.auto_rotate, 10)}]` : (this.config.forecast.type === 'daily' ? 'Hourly' : 'Daily')}
         </button>
       ` : ''}
     </div>
@@ -2010,11 +2062,12 @@ return html`
 `;
 }
 
-renderSun({ sun, language, config } = this) {
+renderSun({ sun, language } = this) {
   if (sun == undefined) {
     return html``;
   }
 
+  const config = this.config;
   const use12HourFormat = this.config.use_12hour_format;
   const timezone = config.sun_timezone
     || config.timezone
@@ -2225,7 +2278,9 @@ WeatherChartCard.LATIN_SCRIPT_REGEX = /^[A-Za-z]+$/;
 
 export default WeatherChartCard;
 
-customElements.define('weather-chart-card-ha', WeatherChartCard);
+if (!customElements.get('weather-chart-card-ha')) {
+  customElements.define('weather-chart-card-ha', WeatherChartCard);
+}
 
 window.customCards = window.customCards || [];
 window.customCards.push({
