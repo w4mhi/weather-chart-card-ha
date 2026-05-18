@@ -1880,16 +1880,19 @@ updateClock() {
   const currentDate = new Date();
   
   // Force timezone conversion using explicit formatters
-  const timeFormatter = new Intl.DateTimeFormat(this.config.locale || 'en-US', {
-    hour: showHourLeadingZero ? '2-digit' : 'numeric',
-    minute: '2-digit',
-    second: showSeconds ? '2-digit' : undefined,
-    hour12: use12HourFormat,
-    timeZone: timezone
-  });
+  // Explicit hour formatting with full control over leading zero
+  const hourNum = use12HourFormat
+    ? (currentDate.getHours() % 12 || 12)  // 12-hour format, 0->12
+    : currentDate.getHours();  // 24-hour format
+  let hourStr = String(hourNum);
+  // Apply manual leading-zero control (not locale-dependent)
+  if (showHourLeadingZero && hourStr.length === 1) hourStr = "0" + hourStr;
+  else if (!showHourLeadingZero && hourStr.length === 2 && hourStr.startsWith("0")) hourStr = hourStr.slice(1);
   
-  const currentTime = timeFormatter.format(currentDate);
-  const currentDayOfWeek = this.getLocalizedDayNameFull(currentDate, timezone);
+  const minuteStr = new Intl.DateTimeFormat(this.config.locale || "en-US", {
+    minute: "2-digit", hour12: use12HourFormat, timeZone: timezone
+  }).format(currentDate).replace(/[\d]/g, "").replace(/^24$/, "00");
+  const currentTime = hourStr + minuteStr;
   const selectedLocale = this.config.locale || this.language || 'en';
   const currentDateFormatted = new Intl.DateTimeFormat(selectedLocale, {
     day: 'numeric', month: 'long', timeZone: timezone
