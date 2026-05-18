@@ -1879,16 +1879,16 @@ updateClock() {
   const showDate = this.config.show_date;
   const currentDate = new Date();
   
-  // Force timezone conversion using explicit formatters
-  const timeFormatter = new Intl.DateTimeFormat(this.config.locale || 'en-US', {
-    hour: showHourLeadingZero ? '2-digit' : 'numeric',
-    minute: '2-digit',
-    second: showSeconds ? '2-digit' : undefined,
-    hour12: use12HourFormat,
-    timeZone: timezone
-  });
-  
-  const currentTime = timeFormatter.format(currentDate);
+  // Format hour with explicit leading-zero control (not locale-dependent)
+  const tzParts = new Intl.DateTimeFormat('en-US', {
+    hour: 'numeric', minute: 'numeric', hour12: use12HourFormat, timeZone: timezone
+  }).formatToParts(currentDate);
+  const tzHour = tzParts.find(p => p.type === 'hour')?.value || '0';
+  const tzMinute = tzParts.find(p => p.type === 'minute')?.value || '00';
+  let hourStr = tzHour;
+  if (showHourLeadingZero && hourStr.length === 1) hourStr = '0' + hourStr;
+  const secondStr = showSeconds ? ':' + String(currentDate.getSeconds()).padStart(2, '0') : '';
+  const currentTime = hourStr + ':' + tzMinute + secondStr;
   const currentDayOfWeek = this.getLocalizedDayNameFull(currentDate, timezone);
   const selectedLocale = this.config.locale || this.language || 'en';
   const currentDateFormatted = new Intl.DateTimeFormat(selectedLocale, {
