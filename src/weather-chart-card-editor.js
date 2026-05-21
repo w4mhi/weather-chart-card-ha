@@ -259,7 +259,6 @@ class WeatherChartCardEditor extends LitElement {
     delete newConfig.sun_latitude;
     delete newConfig.sun_longitude;
     delete newConfig.sun_timezone;
-    delete newConfig.timezone;
     this._cityInput = '';
     this._geoStatus = '';
     this.configChanged(newConfig);
@@ -397,6 +396,7 @@ class WeatherChartCardEditor extends LitElement {
       <div class="textfield-container">
 <label class="switch-label">Entity</label>
 <select
+  aria-label="Entity"
   style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid var(--divider-color, #ccc); border-radius: 4px; background: var(--card-background-color, #fff); color: var(--primary-text-color, #000); font-size: 14px;"
   .value=${this._entity}
   @change=${(e) => this._EntityChanged(e, 'entity')}
@@ -413,6 +413,7 @@ class WeatherChartCardEditor extends LitElement {
       <div>
         <label>Select custom language</label>
         <select
+          aria-label="Select custom language"
           style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
           .value=${this._config.locale || ''}
           @change=${(e) => {
@@ -914,6 +915,7 @@ class WeatherChartCardEditor extends LitElement {
           <div>
             <label>Precipitation Type (Probability if supported by the weather entity)</label>
             <select
+              aria-label="Precipitation Type"
               style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
               .value=${forecastConfig.precipitation_type || 'rainfall'}
               @change=${(e) => {
@@ -978,6 +980,7 @@ class WeatherChartCardEditor extends LitElement {
                 <span class="experimental-badge" ?hidden=${(forecastConfig.gradient_mode || 'classic') !== 'adaptive'}>Experimental</span>
               </div>
               <select
+                aria-label="Temperature Gradient Mode"
                 style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
                 .value=${forecastConfig.gradient_mode || 'classic'}
                 @change=${(e) => {
@@ -993,6 +996,7 @@ class WeatherChartCardEditor extends LitElement {
             <div ?hidden=${(forecastConfig.gradient_mode || 'classic') === 'classic'}>
               <label>Climate Preset Range</label>
               <select
+                aria-label="Climate Preset Range"
                 style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
                 .value=${forecastConfig.gradient_preset || 'temperate'}
                 @change=${(e) => {
@@ -1019,6 +1023,7 @@ class WeatherChartCardEditor extends LitElement {
             <div>
               <label>Convert temperature to</label>
               <select
+                aria-label="Convert temperature to"
                 style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
                 .value=${unitsConfig.temperature || ''}
                 @change=${(e) => {
@@ -1034,6 +1039,7 @@ class WeatherChartCardEditor extends LitElement {
             <div>
               <label>Convert pressure to</label>
               <select
+                aria-label="Convert pressure to"
                 style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
                 .value=${unitsConfig.pressure || ''}
                 @change=${(e) => {
@@ -1050,6 +1056,7 @@ class WeatherChartCardEditor extends LitElement {
             <div>
               <label>Convert wind speed to</label>
               <select
+                aria-label="Convert wind speed to"
                 style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
                 .value=${unitsConfig.speed || ''}
                 @change=${(e) => {
@@ -1068,6 +1075,7 @@ class WeatherChartCardEditor extends LitElement {
             <div>
               <label>Display precipitation unit</label>
               <select
+                aria-label="Display precipitation unit"
                 style="width: 100%; padding: 8px; margin: 10px 0; font-size: 14px; border: 1px solid var(--divider-color); border-radius: 4px; background: var(--card-background-color); color: var(--primary-text-color);"
                 .value=${unitsConfig.precipitation || ''}
                 @change=${(e) => {

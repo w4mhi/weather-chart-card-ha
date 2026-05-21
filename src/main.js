@@ -285,6 +285,13 @@ handleForecastTypeToggle() {
     return (this.weather.attributes.supported_features & feature) !== 0;
   }
 
+  get _canAutoRotate() {
+    const interval = this.config && this.config.forecast ? parseInt(this.config.forecast.auto_rotate, 10) : 0;
+    return interval > 0 && this.weather
+      && this.supportsFeature(WeatherEntityFeature.FORECAST_DAILY)
+      && this.supportsFeature(WeatherEntityFeature.FORECAST_HOURLY);
+  }
+
   constructor() {
     super();
     this.resizeObserver = null;
@@ -303,6 +310,8 @@ handleForecastTypeToggle() {
     this.stopAutoRotate();
     const interval = this.config && this.config.forecast ? parseInt(this.config.forecast.auto_rotate, 10) : 0;
     if (!interval || interval < 1 || interval > 60) return;
+    // Only rotate if the entity supports both daily and hourly forecasts
+    if (!this.weather || !this.supportsFeature(WeatherEntityFeature.FORECAST_DAILY) || !this.supportsFeature(WeatherEntityFeature.FORECAST_HOURLY)) return;
     // Align to the next whole minute, then start the interval
     const now = new Date();
     const msUntilNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
@@ -1918,15 +1927,18 @@ updateClock() {
     timeZone: timezone
   });
   const parts = minuteFormatter.formatToParts(currentDate);
-  const minuteStr = (parts.find(p => p.type === 'minute')?.value || '').padStart(2, '0');
-  const secondStr = showSeconds ? (parts.find(p => p.type === 'second')?.value || '').padStart(2, '0') : '';
+  const minutePart = parts.find(p => p.type === 'minute');
+  const minuteStr = (minutePart ? minutePart.value : '').padStart(2, '0');
+  const secondPart = showSeconds ? parts.find(p => p.type === 'second') : null;
+  const secondStr = secondPart ? secondPart.value.padStart(2, '0') : '';
 
   // Get the time separator from the user's locale
   const localeFormatter = new Intl.DateTimeFormat(this.config.locale || 'en-US', {
     hour: 'numeric', minute: 'numeric', hour12: false, timeZone: timezone
   });
   const localeParts = localeFormatter.formatToParts(currentDate);
-  const separator = localeParts.find(p => p.type === 'literal')?.value || ':';
+  const separatorPart = localeParts.find(p => p.type === 'literal');
+  const separator = separatorPart ? separatorPart.value : ':';
 
   // Get AM/PM period if using 12-hour format
   let period = '';
@@ -1996,8 +2008,8 @@ renderClock({ config } = this) {
       ${config.show_forecast_toggle ? html`
         <button class="forecast-toggle"
           @click="${this.handleForecastTypeToggle.bind(this)}"
-          ?disabled="${parseInt(config.forecast.auto_rotate, 10) > 0}">
-          ${parseInt(config.forecast.auto_rotate, 10) > 0 ? `Auto [${parseInt(config.forecast.auto_rotate, 10)}]` : (this.config.forecast.type === 'daily' ? 'Hourly' : 'Daily')}
+          ?disabled="${this._canAutoRotate}">
+          ${this._canAutoRotate ? `Auto [${parseInt(config.forecast.auto_rotate, 10)}]` : (this.config.forecast.type === 'daily' ? 'Hourly' : 'Daily')}
         </button>
       ` : ''}
     </div>
