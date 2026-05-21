@@ -191,7 +191,13 @@ set hass(hass) {
     this.windSpeed = this.config.windspeed ? hass.states[this.config.windspeed].state : this.weather.attributes.wind_speed;
     this.dew_point = this.config.dew_point ? hass.states[this.config.dew_point].state : this.weather.attributes.dew_point;
     this.wind_gust_speed = this.config.wind_gust_speed ? hass.states[this.config.wind_gust_speed].state : this.weather.attributes.wind_gust_speed;
-    this.visibility = this.config.visibility ? hass.states[this.config.visibility].state : this.weather.attributes.visibility;
+    if (this.config.visibility && hass.states[this.config.visibility]) {
+      this.visibility = hass.states[this.config.visibility].state;
+      this.visibilitySourceUnit = hass.states[this.config.visibility].attributes.unit_of_measurement || this.weather.attributes.visibility_unit;
+    } else {
+      this.visibility = this.weather.attributes.visibility;
+      this.visibilitySourceUnit = this.weather.attributes.visibility_unit;
+    }
 
     if (this.config.winddir && hass.states[this.config.winddir] && hass.states[this.config.winddir].state !== undefined) {
       this.windDirection = parseFloat(hass.states[this.config.winddir].state);
@@ -904,6 +910,26 @@ convertPrecipitation(value, fromUnit, toUnit) {
   }
 
   return numericValue * fromFactor / toFactor;
+}
+
+convertVisibility(value, fromUnit, toUnit) {
+  const numericValue = Number(value);
+  if (!Number.isFinite(numericValue)) {
+    return value;
+  }
+  if (!fromUnit || !toUnit || fromUnit === toUnit) {
+    return numericValue;
+  }
+  // Normalize to meters first
+  const toMeters = { 'm': 1, 'km': 1000, 'mi': 1609.344, 'yd': 0.9144, 'ft': 0.3048 };
+  const fromFactor = toMeters[fromUnit];
+  const toFactor = toMeters[toUnit];
+  if (!fromFactor || !toFactor) {
+    return numericValue;
+  }
+  const result = numericValue * fromFactor / toFactor;
+  // Round to 1 decimal if needed, whole number if >= 10
+  return result >= 10 ? Math.round(result) : Math.round(result * 10) / 10;
 }
 
 async firstUpdated(changedProperties) {
@@ -1879,16 +1905,41 @@ updateClock() {
   const showDate = this.config.show_date;
   const currentDate = new Date();
   
-  // Force timezone conversion using explicit formatters
-  const timeFormatter = new Intl.DateTimeFormat(this.config.locale || 'en-US', {
-    hour: showHourLeadingZero ? '2-digit' : 'numeric',
+  // Get hour in the correct timezone
+  const hourIn24 = parseInt(new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: false, timeZone: timezone }).format(currentDate));
+  const hourNum = use12HourFormat ? (hourIn24 % 12 || 12) : hourIn24;
+  let hourStr = String(hourNum);
+  if (showHourLeadingZero && hourStr.length === 1) hourStr = '0' + hourStr;
+
+  // Get minute (and optionally second) using Intl for timezone correctness
+  const minuteFormatter = new Intl.DateTimeFormat('en-US', {
     minute: '2-digit',
     second: showSeconds ? '2-digit' : undefined,
-    hour12: use12HourFormat,
     timeZone: timezone
   });
-  
-  const currentTime = timeFormatter.format(currentDate);
+  const parts = minuteFormatter.formatToParts(currentDate);
+  const minuteStr = (parts.find(p => p.type === 'minute')?.value || '').padStart(2, '0');
+  const secondStr = showSeconds ? (parts.find(p => p.type === 'second')?.value || '').padStart(2, '0') : '';
+
+  // Get the time separator from the user's locale
+  const localeFormatter = new Intl.DateTimeFormat(this.config.locale || 'en-US', {
+    hour: 'numeric', minute: 'numeric', hour12: false, timeZone: timezone
+  });
+  const localeParts = localeFormatter.formatToParts(currentDate);
+  const separator = localeParts.find(p => p.type === 'literal')?.value || ':';
+
+  // Get AM/PM period if using 12-hour format
+  let period = '';
+  if (use12HourFormat) {
+    const periodFormatter = new Intl.DateTimeFormat(this.config.locale || 'en-US', {
+      hour: 'numeric', hour12: true, timeZone: timezone
+    });
+    const periodParts = periodFormatter.formatToParts(currentDate);
+    const dayPeriod = periodParts.find(p => p.type === 'dayPeriod');
+    if (dayPeriod) period = '\u202F' + dayPeriod.value;
+  }
+
+  const currentTime = hourStr + separator + minuteStr + (showSeconds ? separator + secondStr : '') + period;
   const currentDayOfWeek = this.getLocalizedDayNameFull(currentDate, timezone);
   const selectedLocale = this.config.locale || this.language || 'en';
   const currentDateFormatted = new Intl.DateTimeFormat(selectedLocale, {
@@ -2010,10 +2061,15 @@ renderAttributes({ config, humidity, pressure, windSpeed, windDirection, sun, la
   const showDewpoint = config.show_dew_point == true;
   const showWindgustspeed = config.show_wind_gust_speed == true;
   const showVisibility = config.show_visibility == true;
+  const visibilityDisplayUnit = this.unitVisibility || this.visibilitySourceUnit || (this.weather && this.weather.attributes.visibility_unit);
+  let dVisibility = visibility;
+  if (showVisibility && visibility !== undefined) {
+    dVisibility = this.convertVisibility(visibility, this.visibilitySourceUnit, visibilityDisplayUnit);
+  }
 
 return html`
     <div class="attributes">
-      ${((showHumidity && humidity !== undefined) || (showPressure && dPressure !== undefined) || (showDewpoint && dew_point !== undefined) || (showVisibility && visibility !== undefined)) ? html`
+      ${((showHumidity && humidity !== undefined) || (showPressure && dPressure !== undefined) || (showDewpoint && dew_point !== undefined) || (showVisibility && dVisibility !== undefined)) ? html`
         <div>
           ${showHumidity && humidity !== undefined ? html`
             <ha-icon icon="hass:water-percent"></ha-icon> ${humidity} %<br>
@@ -2024,8 +2080,8 @@ return html`
           ${showDewpoint && dew_point !== undefined ? html`
             <ha-icon icon="hass:thermometer-water"></ha-icon> ${dDewPoint} ${dewPointDisplayUnit} <br>
           ` : ''}
-          ${showVisibility && visibility !== undefined ? html`
-            <ha-icon icon="hass:eye"></ha-icon> ${visibility} ${this.weather.attributes.visibility_unit}
+          ${showVisibility && dVisibility !== undefined ? html`
+            <ha-icon icon="hass:eye"></ha-icon> ${dVisibility} ${visibilityDisplayUnit}
           ` : ''}
         </div>
       ` : ''}
