@@ -937,8 +937,8 @@ convertVisibility(value, fromUnit, toUnit) {
     return numericValue;
   }
   const result = numericValue * fromFactor / toFactor;
-  // Round to 1 decimal if needed, whole number if >= 10
-  return result >= 10 ? Math.round(result) : Math.round(result * 10) / 10;
+  // Round to 1 decimal place; drop the decimal if the result is a whole number
+  return Math.round(result * 10) / 10;
 }
 
 async firstUpdated(changedProperties) {
@@ -1914,44 +1914,34 @@ updateClock() {
   const showDate = this.config.show_date;
   const currentDate = new Date();
   
-  // Get hour in the correct timezone
-  const hourIn24 = parseInt(new Intl.DateTimeFormat('en-US', { hour: 'numeric', hour12: false, timeZone: timezone }).format(currentDate));
-  const hourNum = use12HourFormat ? (hourIn24 % 12 || 12) : hourIn24;
-  let hourStr = String(hourNum);
-  if (showHourLeadingZero && hourStr.length === 1) hourStr = '0' + hourStr;
-
-  // Get minute (and optionally second) using Intl for timezone correctness
-  const minuteFormatter = new Intl.DateTimeFormat('en-US', {
+  // Build the full time string using Intl.DateTimeFormat, then fix the hour for leading zero control
+  const locale = this.config.locale || 'en-US';
+  const timeFormatter = new Intl.DateTimeFormat(locale, {
+    hour: '2-digit',
     minute: '2-digit',
     second: showSeconds ? '2-digit' : undefined,
+    hour12: use12HourFormat,
     timeZone: timezone
   });
-  const parts = minuteFormatter.formatToParts(currentDate);
-  const minutePart = parts.find(p => p.type === 'minute');
-  const minuteStr = (minutePart ? minutePart.value : '').padStart(2, '0');
-  const secondPart = showSeconds ? parts.find(p => p.type === 'second') : null;
-  const secondStr = secondPart ? secondPart.value.padStart(2, '0') : '';
+  const parts = timeFormatter.formatToParts(currentDate);
 
-  // Get the time separator from the user's locale
-  const localeFormatter = new Intl.DateTimeFormat(this.config.locale || 'en-US', {
-    hour: 'numeric', minute: 'numeric', hour12: false, timeZone: timezone
-  });
-  const localeParts = localeFormatter.formatToParts(currentDate);
-  const separatorPart = localeParts.find(p => p.type === 'literal');
-  const separator = separatorPart ? separatorPart.value : ':';
-
-  // Get AM/PM period if using 12-hour format
-  let period = '';
-  if (use12HourFormat) {
-    const periodFormatter = new Intl.DateTimeFormat(this.config.locale || 'en-US', {
-      hour: 'numeric', hour12: true, timeZone: timezone
-    });
-    const periodParts = periodFormatter.formatToParts(currentDate);
-    const dayPeriod = periodParts.find(p => p.type === 'dayPeriod');
-    if (dayPeriod) period = '\u202F' + dayPeriod.value;
+  // Rebuild the time string, adjusting the hour part for leading zero preference
+  var currentTime = '';
+  for (var i = 0; i < parts.length; i++) {
+    var part = parts[i];
+    if (part.type === 'hour') {
+      var h = part.value;
+      if (showHourLeadingZero && h.length === 1) {
+        h = '0' + h;
+      } else if (!showHourLeadingZero && h.length === 2 && h[0] === '0') {
+        h = h.slice(1);
+      }
+      currentTime += h;
+    } else {
+      currentTime += part.value;
+    }
   }
 
-  const currentTime = hourStr + separator + minuteStr + (showSeconds ? separator + secondStr : '') + period;
   const currentDayOfWeek = this.getLocalizedDayNameFull(currentDate, timezone);
   const selectedLocale = this.config.locale || this.language || 'en';
   const currentDateFormatted = new Intl.DateTimeFormat(selectedLocale, {
