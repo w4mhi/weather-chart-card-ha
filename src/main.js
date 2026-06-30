@@ -156,8 +156,10 @@ setConfig(config) {
       : 'https://cdn.jsdelivr.net/gh/w4mhi/weather-chart-card-ha@latest/dist/icons/';
   }
 
-  if (!cardConfig.title || !cardConfig.title.trim()) {
-    cardConfig.title = 'Weather';
+  // An empty title disables the card header. The default 'Weather' is applied
+  // above only when no title key is present in the user config.
+  if (typeof cardConfig.title === 'string' && !cardConfig.title.trim()) {
+    cardConfig.title = '';
   }
 
   this.config = cardConfig;
@@ -1620,7 +1622,7 @@ updateChart({ forecasts, forecastChart } = this) {
       return html`
         <style>
           .card {
-            padding-top: ${config.title? '0px' : '16px'};
+            padding-top: ${config.title ? '0px' : '16px'};
             padding-right: 16px;
             padding-bottom: 16px;
             padding-left: 16px;
@@ -1637,6 +1639,7 @@ updateChart({ forecasts, forecastChart } = this) {
       <style>
         ha-card {
           ${config.title ? 'padding-bottom: 8px;' : ''}
+          position: relative;
           overflow: hidden;
         }
         ha-icon {
@@ -1654,16 +1657,17 @@ updateChart({ forecasts, forecastChart } = this) {
         }
         .main {
           display: flex;
-          align-items: center;
+          align-items: ${config.title ? 'center' : 'flex-start'};
           justify-content: space-between;
           font-size: ${config.current_temp_size}px;
           margin-bottom: 10px;
-          position: relative;
+          position: ${config.title ? 'relative' : 'static'};
+          ${config.title ? '' : `min-height: ${59 + (parseInt(config.main_icon_size, 10) || 150) / 2}px;`}
         }
         .main .weather-icon {
           position: absolute;
           left: 50%;
-          top: 10px;
+          top: ${config.title ? '10px' : '75px'};
           transform: translate(-50%, -50%);
           z-index: 1;
         }
@@ -1692,7 +1696,7 @@ updateChart({ forecasts, forecastChart } = this) {
         }
         .current-time {
           position: absolute;
-          top: ${config.title ? '24px' : '20px'};
+          top: 24px;
           right: 16px;
           inset-inline-start: initial;
           inset-inline-end: 16px;
@@ -1980,29 +1984,34 @@ renderClock({ config } = this) {
   const showTime = config.show_time;
   const showDay = config.show_day;
   const showDate = config.show_date;
-
-  if (!showTime) {
-    if (this.clockInterval) {
-      clearInterval(this.clockInterval);
-      this.clockInterval = null;
-    }
-    return html``;
-  }
+  const showForecastToggle = config.show_forecast_toggle;
 
   // Clock update logic
-  if (!this.clockInterval) {
-    this.clockInterval = setInterval(() => this.updateClock(), 1000);
-    // Initial update
-    setTimeout(() => this.updateClock(), 0);
+  if (showTime) {
+    if (!this.clockInterval) {
+      this.clockInterval = setInterval(() => this.updateClock(), 1000);
+      // Initial update
+      setTimeout(() => this.updateClock(), 0);
+    }
+  } else if (this.clockInterval) {
+    clearInterval(this.clockInterval);
+    this.clockInterval = null;
+  }
+
+  // Nothing to render in this container if neither the clock nor the toggle is enabled
+  if (!showTime && !showForecastToggle) {
+    return html``;
   }
 
   return html`
     <div class="current-time">
-      <div id="digital-clock"></div>
-      ${showDay ? html`<div class="date-text day"></div>` : ''}
-      ${showDay && showDate ? html` ` : ''}
-      ${showDate ? html`<div class="date-text date"></div>` : ''}
-      ${config.show_forecast_toggle ? html`
+      ${showTime ? html`
+        <div id="digital-clock"></div>
+        ${showDay ? html`<div class="date-text day"></div>` : ''}
+        ${showDay && showDate ? html` ` : ''}
+        ${showDate ? html`<div class="date-text date"></div>` : ''}
+      ` : ''}
+      ${showForecastToggle ? html`
         <button class="forecast-toggle"
           @click="${this.handleForecastTypeToggle.bind(this)}"
           ?disabled="${this._canAutoRotate}">

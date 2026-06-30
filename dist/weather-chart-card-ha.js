@@ -1443,11 +1443,16 @@ var WeatherChartCard = (function () {
   <option value="">-- Select entity --</option>
   ${this.entities.map((entity) => x`<option value=${entity} ?selected=${entity === this._entity}>${entity}</option>`)}
 </select>
-      <ha-textfield
-        label="Title"
+      <label class="switch-label">Title</label>
+      <input
+        type="text"
+        aria-label="Title"
+        placeholder="Weather (leave empty to hide the title)"
+        style="width: 100%; padding: 8px; margin-bottom: 4px; border: 1px solid var(--divider-color, #ccc); border-radius: 4px; background: var(--card-background-color, #fff); color: var(--primary-text-color, #000); font-size: 14px; box-sizing: border-box;"
         .value="${this._config.title || ''}"
-        @change="${(e) => this._valueChanged(e, 'title')}"
-      ></ha-textfield>
+        @input="${(e) => this._valueChanged(e, 'title')}"
+      />
+      <div class="adaptive-note">Leave empty to hide the card title.</div>
       
       <div>
         <label>Select custom language</label>
@@ -18587,8 +18592,10 @@ var WeatherChartCard = (function () {
         : 'https://cdn.jsdelivr.net/gh/w4mhi/weather-chart-card-ha@latest/dist/icons/';
     }
 
-    if (!cardConfig.title || !cardConfig.title.trim()) {
-      cardConfig.title = 'Weather';
+    // An empty title disables the card header. The default 'Weather' is applied
+    // above only when no title key is present in the user config.
+    if (typeof cardConfig.title === 'string' && !cardConfig.title.trim()) {
+      cardConfig.title = '';
     }
 
     this.config = cardConfig;
@@ -18913,9 +18920,12 @@ var WeatherChartCard = (function () {
 
   formatLocalizedShortDateLabel(label, locale) {
     const normalizedLabel = label.replace(/[.\s]+$/u, '');
-    return WeatherChartCard.LATIN_SCRIPT_REGEX.test(normalizedLabel)
-      ? normalizedLabel.toLocaleUpperCase(locale)
-      : normalizedLabel;
+    if (!WeatherChartCard.LATIN_SCRIPT_REGEX.test(normalizedLabel)) return normalizedLabel;
+    try {
+      return normalizedLabel.toLocaleUpperCase(locale);
+    } catch (e) {
+      return normalizedLabel.toUpperCase();
+    }
   }
 
   getLocalizedDayName(date, timezone) {
@@ -20048,7 +20058,7 @@ var WeatherChartCard = (function () {
         return x`
         <style>
           .card {
-            padding-top: ${config.title? '0px' : '16px'};
+            padding-top: ${config.title ? '0px' : '16px'};
             padding-right: 16px;
             padding-bottom: 16px;
             padding-left: 16px;
@@ -20065,6 +20075,7 @@ var WeatherChartCard = (function () {
       <style>
         ha-card {
           ${config.title ? 'padding-bottom: 8px;' : ''}
+          position: relative;
           overflow: hidden;
         }
         ha-icon {
@@ -20082,16 +20093,17 @@ var WeatherChartCard = (function () {
         }
         .main {
           display: flex;
-          align-items: center;
+          align-items: ${config.title ? 'center' : 'flex-start'};
           justify-content: space-between;
           font-size: ${config.current_temp_size}px;
           margin-bottom: 10px;
-          position: relative;
+          position: ${config.title ? 'relative' : 'static'};
+          ${config.title ? '' : `min-height: ${59 + (parseInt(config.main_icon_size, 10) || 150) / 2}px;`}
         }
         .main .weather-icon {
           position: absolute;
           left: 50%;
-          top: 10px;
+          top: ${config.title ? '10px' : '75px'};
           transform: translate(-50%, -50%);
           z-index: 1;
         }
@@ -20120,7 +20132,7 @@ var WeatherChartCard = (function () {
         }
         .current-time {
           position: absolute;
-          top: ${config.title ? '24px' : '20px'};
+          top: 24px;
           right: 16px;
           inset-inline-start: initial;
           inset-inline-end: 16px;
@@ -20408,29 +20420,34 @@ var WeatherChartCard = (function () {
     const showTime = config.show_time;
     const showDay = config.show_day;
     const showDate = config.show_date;
-
-    if (!showTime) {
-      if (this.clockInterval) {
-        clearInterval(this.clockInterval);
-        this.clockInterval = null;
-      }
-      return x``;
-    }
+    const showForecastToggle = config.show_forecast_toggle;
 
     // Clock update logic
-    if (!this.clockInterval) {
-      this.clockInterval = setInterval(() => this.updateClock(), 1000);
-      // Initial update
-      setTimeout(() => this.updateClock(), 0);
+    if (showTime) {
+      if (!this.clockInterval) {
+        this.clockInterval = setInterval(() => this.updateClock(), 1000);
+        // Initial update
+        setTimeout(() => this.updateClock(), 0);
+      }
+    } else if (this.clockInterval) {
+      clearInterval(this.clockInterval);
+      this.clockInterval = null;
+    }
+
+    // Nothing to render in this container if neither the clock nor the toggle is enabled
+    if (!showTime && !showForecastToggle) {
+      return x``;
     }
 
     return x`
     <div class="current-time">
-      <div id="digital-clock"></div>
-      ${showDay ? x`<div class="date-text day"></div>` : ''}
-      ${showDay && showDate ? x` ` : ''}
-      ${showDate ? x`<div class="date-text date"></div>` : ''}
-      ${config.show_forecast_toggle ? x`
+      ${showTime ? x`
+        <div id="digital-clock"></div>
+        ${showDay ? x`<div class="date-text day"></div>` : ''}
+        ${showDay && showDate ? x` ` : ''}
+        ${showDate ? x`<div class="date-text date"></div>` : ''}
+      ` : ''}
+      ${showForecastToggle ? x`
         <button class="forecast-toggle"
           @click="${this.handleForecastTypeToggle.bind(this)}"
           ?disabled="${this._canAutoRotate}">
