@@ -455,6 +455,85 @@ calculateSunriseSunset(date, latitude, longitude) {
 }
 
 /**
+ * Timezone used for sun/day-night calculations. Mirrors renderSun's resolution
+ * so every day/night decision shares one source of truth.
+ */
+getSunTimezone() {
+  return this.config.sun_timezone
+    || this.config.timezone
+    || (this._hass && this._hass.config && this._hass.config.time_zone)
+    || Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
+/**
+ * Latitude/longitude used for sun calculations: explicit card config first,
+ * otherwise the Home Assistant home coordinates.
+ */
+getSunLocation() {
+  const lat = this.config.sun_latitude != null ? this.config.sun_latitude
+    : (this._hass && this._hass.config && this._hass.config.latitude);
+  const lon = this.config.sun_longitude != null ? this.config.sun_longitude
+    : (this._hass && this._hass.config && this._hass.config.longitude);
+  return { lat, lon };
+}
+
+/**
+ * Minutes-since-midnight of an instant, evaluated as wall-clock time in the
+ * given IANA timezone. Comparing wall-clock minutes is immune to the UTC-day
+ * that calculateSunriseSunset pins its results to, so it works correctly for
+ * both eastern and western longitudes.
+ */
+getWallClockMinutes(instant, timeZone) {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).formatToParts(instant);
+  const hour = Number(parts.find((p) => p.type === 'hour').value);
+  const minute = Number(parts.find((p) => p.type === 'minute').value);
+  return hour * 60 + minute;
+}
+
+/**
+ * Determine whether a given instant is daytime at the card's sun location.
+ * The forecast slot's calendar date is derived in the card's own timezone
+ * (not the Home Assistant home timezone), then compared against that date's
+ * sunrise/sunset by local wall-clock time.
+ *
+ * @param {Date} instant
+ * @param {{ lat?: number, lon?: number, timeZone?: string }} [options]
+ * @returns {boolean|null} true=day, false=night, null when it cannot be computed
+ *   (missing coordinates or polar day/night) so the caller can fall back.
+ */
+isDaytimeAt(instant, options = {}) {
+  const lat = options.lat != null ? options.lat : this.getSunLocation().lat;
+  const lon = options.lon != null ? options.lon : this.getSunLocation().lon;
+  if (lat == null || lon == null) return null;
+  const timeZone = options.timeZone || this.getSunTimezone();
+
+  const dateParts = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(instant);
+  const year = Number(dateParts.find((p) => p.type === 'year').value);
+  const month = Number(dateParts.find((p) => p.type === 'month').value);
+  const day = Number(dateParts.find((p) => p.type === 'day').value);
+
+  const { sunrise, sunset } = this.calculateSunriseSunset(
+    new Date(Date.UTC(year, month - 1, day)), lat, lon
+  );
+  if (!sunrise || !sunset) return null; // polar day/night → let caller fall back
+
+  const nowMinutes = this.getWallClockMinutes(instant, timeZone);
+  const sunriseMinutes = this.getWallClockMinutes(sunrise, timeZone);
+  const sunsetMinutes = this.getWallClockMinutes(sunset, timeZone);
+  return nowMinutes >= sunriseMinutes && nowMinutes < sunsetMinutes;
+}
+
+/**
  * Get locale data with fallback logic
  * @param {string} key - 'days' or 'months'
  * @returns {Array|null} - locale array or null if not found
@@ -1876,11 +1955,36 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
     roundedFeelsLike = Math.round(roundedFeelsLike * 10) / 10;
   }
 
+  // Day/night for the current-conditions icon and condition text. When the card
+  // explicitly targets a sun location (multi-location dashboards), compute it
+  // there instead of using the single home `sun.sun` entity, which only reflects
+  // the HA server location.
+  let currentSunState = sun ? sun.state : 'above_horizon';
+  let currentCondition = weather.state;
+  if (config.sun_latitude != null && config.sun_longitude != null) {
+    const isDay = this.isDaytimeAt(new Date(), {
+      lat: config.sun_latitude,
+      lon: config.sun_longitude
+    });
+    if (isDay != null) {
+      currentSunState = isDay ? 'above_horizon' : 'below_horizon';
+      // The weather entity's day/night follows its own integration location, so
+      // it can report `clear-night` while it is daytime at the card's location
+      // (or `sunny` while it is night). `sunny`⇄`clear-night` is the only HA
+      // condition with a night-specific state, so normalise it to match.
+      if (isDay && currentCondition === 'clear-night') {
+        currentCondition = 'sunny';
+      } else if (!isDay && currentCondition === 'sunny') {
+        currentCondition = 'clear-night';
+      }
+    }
+  }
+
   const iconHtml = config.animated_icons || config.icons
-    ? html`<img src="${this.getWeatherIcon(weather.state, sun.state)}" 
-                 @error="${(e) => this.handleIconError(e, weather.state, sun.state)}" 
+    ? html`<img src="${this.getWeatherIcon(currentCondition, currentSunState)}"
+                 @error="${(e) => this.handleIconError(e, currentCondition, currentSunState)}"
                  alt="">`
-    : html`<ha-icon icon="${this.getWeatherIcon(weather.state, sun.state)}"></ha-icon>`;
+    : html`<ha-icon icon="${this.getWeatherIcon(currentCondition, currentSunState)}"></ha-icon>`;
 
   return html`
     <div class="main">
@@ -1891,7 +1995,7 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
         </div>
         ${showCurrentCondition ? html`
           <div class="current-condition">
-            ${this.ll(weather.state)}
+            ${this.ll(currentCondition)}
           </div>
         ` : ''}
         ${showFeelsLike && roundedFeelsLike ? html`
@@ -2192,51 +2296,33 @@ renderForecastConditionIcons({ config, forecastItems, sun } = this) {
   return html`
     <div class="conditions" @click="${(e) => this.showMoreInfo(config.entity)}">
       ${(() => {
-        const lat = this.config.sun_latitude != null ? this.config.sun_latitude
-          : (this._hass && this._hass.config && this._hass.config.latitude);
-        const lon = this.config.sun_longitude != null ? this.config.sun_longitude
-          : (this._hass && this._hass.config && this._hass.config.longitude);
+        const { lat, lon } = this.getSunLocation();
+        const timeZone = this.getSunTimezone();
         return forecast.map((item) => {
         const forecastTime = new Date(item.datetime);
-
-        let sunriseTime, sunsetTime;
-        if (lat != null && lon != null) {
-          const configuredTimeZone = this.config.time_zone
-            || (this._hass && this._hass.config && this._hass.config.time_zone);
-          let sunriseSunsetDate = forecastTime;
-
-          if (configuredTimeZone) {
-            const parts = new Intl.DateTimeFormat('en-CA', {
-              timeZone: configuredTimeZone,
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit'
-            }).formatToParts(forecastTime);
-            const year = Number(parts.find((part) => part.type === 'year').value);
-            const month = Number(parts.find((part) => part.type === 'month').value);
-            const day = Number(parts.find((part) => part.type === 'day').value);
-            sunriseSunsetDate = new Date(Date.UTC(year, month - 1, day));
-          }
-
-          const { sunrise, sunset } = this.calculateSunriseSunset(sunriseSunsetDate, lat, lon);
-          sunriseTime = sunrise;
-          sunsetTime = sunset;
-        } else {
-          sunriseTime = new Date(sun.attributes.next_rising);
-          sunsetTime = new Date(sun.attributes.next_setting);
-        }
 
         let isDayTime;
         if (config.forecast.type === 'daily') {
           isDayTime = true;
         } else {
-          isDayTime = sunriseTime && sunsetTime
-            ? forecastTime >= sunriseTime && forecastTime <= sunsetTime
-            : true;
+          const isDay = this.isDaytimeAt(forecastTime, { lat, lon, timeZone });
+          if (isDay != null) {
+            isDayTime = isDay;
+          } else if (sun && sun.attributes) {
+            // No coordinates / polar case: fall back to the sun entity.
+            const sunriseTime = new Date(sun.attributes.next_rising);
+            const sunsetTime = new Date(sun.attributes.next_setting);
+            isDayTime = sunriseTime && sunsetTime
+              ? forecastTime >= sunriseTime && forecastTime <= sunsetTime
+              : true;
+          } else {
+            isDayTime = true;
+          }
         }
 
         const weatherIcons = isDayTime ? weatherIconsDay : weatherIconsNight;
         const condition = item.condition;
+        const sunState = isDayTime ? 'above_horizon' : 'below_horizon';
 
         let iconHtml;
 
@@ -2244,13 +2330,12 @@ renderForecastConditionIcons({ config, forecastItems, sun } = this) {
           const iconSrc = config.animated_icons ?
             `${this.baseIconPath}${weatherIcons[condition]}.svg` :
             `${this.config.icons}${weatherIcons[condition]}.svg`;
-          const sunState = isDayTime ? 'above_horizon' : 'below_horizon';
-          iconHtml = html`<img class="icon" 
-                               src="${iconSrc}" 
-                               @error="${(e) => this.handleIconError(e, condition, sunState)}" 
+          iconHtml = html`<img class="icon"
+                               src="${iconSrc}"
+                               @error="${(e) => this.handleIconError(e, condition, sunState)}"
                                alt="">`;
         } else {
-          iconHtml = html`<ha-icon icon="${this.getWeatherIcon(condition, sun.state)}"></ha-icon>`;
+          iconHtml = html`<ha-icon icon="${this.getWeatherIcon(condition, sunState)}"></ha-icon>`;
         }
 
         return html`
