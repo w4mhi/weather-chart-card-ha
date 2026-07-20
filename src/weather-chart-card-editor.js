@@ -404,11 +404,36 @@ class WeatherChartCardEditor extends LitElement {
   <option value="">-- Select entity --</option>
   ${this.entities.map((entity) => html`<option value=${entity} ?selected=${entity === this._entity}>${entity}</option>`)}
 </select>
-      <ha-textfield
-        label="Title"
+      <label class="switch-label">Daily forecast entity (optional)</label>
+<select
+  aria-label="Daily forecast entity"
+  style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid var(--divider-color, #ccc); border-radius: 4px; background: var(--card-background-color, #fff); color: var(--primary-text-color, #000); font-size: 14px;"
+  .value=${(this._config.forecast && this._config.forecast.daily_entity) || ''}
+  @change=${(e) => this._valueChanged(e, 'forecast.daily_entity')}
+>
+  <option value="">-- Use main entity --</option>
+  ${this.entities.map((entity) => html`<option value=${entity} ?selected=${entity === ((this._config.forecast && this._config.forecast.daily_entity) || '')}>${entity}</option>`)}
+</select>
+      <label class="switch-label">Hourly forecast entity (optional)</label>
+<select
+  aria-label="Hourly forecast entity"
+  style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid var(--divider-color, #ccc); border-radius: 4px; background: var(--card-background-color, #fff); color: var(--primary-text-color, #000); font-size: 14px;"
+  .value=${(this._config.forecast && this._config.forecast.hourly_entity) || ''}
+  @change=${(e) => this._valueChanged(e, 'forecast.hourly_entity')}
+>
+  <option value="">-- Use main entity --</option>
+  ${this.entities.map((entity) => html`<option value=${entity} ?selected=${entity === ((this._config.forecast && this._config.forecast.hourly_entity) || '')}>${entity}</option>`)}
+</select>
+      <label class="switch-label">Title</label>
+      <input
+        type="text"
+        aria-label="Title"
+        placeholder="Weather (leave empty to hide the title)"
+        style="width: 100%; padding: 8px; margin-bottom: 4px; border: 1px solid var(--divider-color, #ccc); border-radius: 4px; background: var(--card-background-color, #fff); color: var(--primary-text-color, #000); font-size: 14px; box-sizing: border-box;"
         .value="${this._config.title || ''}"
-        @change="${(e) => this._valueChanged(e, 'title')}"
-      ></ha-textfield>
+        @input="${(e) => this._valueChanged(e, 'title')}"
+      />
+      <div class="adaptive-note">Leave empty to hide the card title.</div>
       
       <div>
         <label>Select custom language</label>

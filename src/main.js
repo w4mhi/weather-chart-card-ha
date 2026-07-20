@@ -156,8 +156,10 @@ setConfig(config) {
       : 'https://cdn.jsdelivr.net/gh/w4mhi/weather-chart-card-ha@latest/dist/icons/';
   }
 
-  if (!cardConfig.title || !cardConfig.title.trim()) {
-    cardConfig.title = 'Weather';
+  // An empty title disables the card header. The default 'Weather' is applied
+  // above only when no title key is present in the user config.
+  if (typeof cardConfig.title === 'string' && !cardConfig.title.trim()) {
+    cardConfig.title = '';
   }
 
   this.config = cardConfig;
@@ -214,41 +216,71 @@ set hass(hass) {
   }
 }
 
+unsubscribeForecastEvents() {
+  if (this.forecastSubscriber) {
+    Promise.resolve(this.forecastSubscriber)
+      .then((unsub) => { if (typeof unsub === 'function') unsub(); })
+      .catch(() => {});
+    this.forecastSubscriber = null;
+  }
+  this._forecastSubscriptionKey = null;
+}
+
 subscribeForecastEvents() {
   const forecastType = this.config.forecast.type || 'daily';
   const isHourly = forecastType === 'hourly';
+  const entityId = this.getForecastEntityId(forecastType);
 
-  const feature = isHourly ? WeatherEntityFeature.FORECAST_HOURLY : WeatherEntityFeature.FORECAST_DAILY;
-  if (!this.supportsFeature(feature)) {
-    console.error(`Weather entity "${this.config.entity}" does not support ${isHourly ? 'hourly' : 'daily'} forecasts.`);
+  if (!this.forecastEntitySupports(forecastType)) {
+    console.error(`Weather entity "${entityId}" does not support ${isHourly ? 'hourly' : 'daily'} forecasts.`);
     return;
   }
 
   const callback = (event) => {
-    this.forecasts = event.forecast;
+    const forecast = event.forecast || [];
+    // Weather integrations frequently re-push an identical forecast on every
+    // entity state write. Skip the redundant redraw so low-power clients don't
+    // fall behind the websocket stream — Home Assistant drops the connection
+    // once its outbound queue reaches 4096 pending messages.
+    const signature = JSON.stringify(forecast);
+    if (signature === this._lastForecastSignature) {
+      return;
+    }
+    this._lastForecastSignature = signature;
+    this.forecasts = forecast;
     this.requestUpdate();
-    this.drawChart();
+    // Update the existing chart in place when possible; a full destroy+rebuild
+    // (drawChart) is only needed when there is no chart yet.
+    if (this.forecastChart) {
+      this.updateChart();
+    } else {
+      this.drawChart();
+    }
   };
+
+  // Fresh subscription: clear the dedupe cache so the first payload always renders,
+  // including right after a daily/hourly switch.
+  this._lastForecastSignature = null;
 
   this.forecastSubscriber = this._hass.connection.subscribeMessage(callback, {
     type: "weather/subscribe_forecast",
     forecast_type: isHourly ? 'hourly' : 'daily',
-    entity_id: this.config.entity,
+    entity_id: entityId,
   });
+  this._forecastSubscriptionKey = `${entityId}|${forecastType}`;
 }
 
 handleForecastTypeToggle() {
   // Toggle between daily and hourly
   const currentType = this.config.forecast.type || 'daily';
   const newType = currentType === 'daily' ? 'hourly' : 'daily';
-  
-  // Check if the new type is supported
-  const feature = newType === 'hourly' ? WeatherEntityFeature.FORECAST_HOURLY : WeatherEntityFeature.FORECAST_DAILY;
-  if (!this.supportsFeature(feature)) {
-    console.warn(`Weather entity "${this.config.entity}" does not support ${newType} forecasts.`);
+
+  // Check if the new type is supported by its resolved forecast entity
+  if (!this.forecastEntitySupports(newType)) {
+    console.warn(`Weather entity "${this.getForecastEntityId(newType)}" does not support ${newType} forecasts.`);
     return;
   }
-  
+
   // Update config
   this.config = {
     ...this.config,
@@ -257,16 +289,11 @@ handleForecastTypeToggle() {
       type: newType
     }
   };
-  
-  // Unsubscribe from old forecast
-  if (this.forecastSubscriber) {
-    this.forecastSubscriber.then((unsub) => unsub());
-    this.forecastSubscriber = null;
-  }
-  
-  // Subscribe to new forecast type
+
+  // Resubscribe to the new forecast type's entity
+  this.unsubscribeForecastEvents();
   this.subscribeForecastEvents();
-  
+
   // Request update to re-render
   this.requestUpdate();
 
@@ -285,11 +312,41 @@ handleForecastTypeToggle() {
     return (this.weather.attributes.supported_features & feature) !== 0;
   }
 
+  getForecastEntityId(type) {
+    const forecastConfig = this.config && this.config.forecast ? this.config.forecast : {};
+    const override = type === 'hourly' ? forecastConfig.hourly_entity : forecastConfig.daily_entity;
+    return override || this.config.entity;
+  }
+
+  getForecastEntityState(type) {
+    const id = this.getForecastEntityId(type);
+    return this._hass && this._hass.states ? (this._hass.states[id] || null) : null;
+  }
+
+  getForecastEntityAttributes(type) {
+    const state = this.getForecastEntityState(type);
+    if (state && state.attributes) {
+      return state.attributes;
+    }
+    return (this.weather && this.weather.attributes) || {};
+  }
+
+  forecastEntitySupports(type) {
+    const state = this.getForecastEntityState(type);
+    if (!state || !state.attributes) {
+      return false;
+    }
+    const feature = type === 'hourly'
+      ? WeatherEntityFeature.FORECAST_HOURLY
+      : WeatherEntityFeature.FORECAST_DAILY;
+    return (state.attributes.supported_features & feature) !== 0;
+  }
+
   get _canAutoRotate() {
     const interval = this.config && this.config.forecast ? parseInt(this.config.forecast.auto_rotate, 10) : 0;
-    return interval > 0 && this.weather
-      && this.supportsFeature(WeatherEntityFeature.FORECAST_DAILY)
-      && this.supportsFeature(WeatherEntityFeature.FORECAST_HOURLY);
+    return interval > 0
+      && this.forecastEntitySupports('daily')
+      && this.forecastEntitySupports('hourly');
   }
 
   constructor() {
@@ -310,8 +367,8 @@ handleForecastTypeToggle() {
     this.stopAutoRotate();
     const interval = this.config && this.config.forecast ? parseInt(this.config.forecast.auto_rotate, 10) : 0;
     if (!interval || interval < 1 || interval > 60) return;
-    // Only rotate if the entity supports both daily and hourly forecasts
-    if (!this.weather || !this.supportsFeature(WeatherEntityFeature.FORECAST_DAILY) || !this.supportsFeature(WeatherEntityFeature.FORECAST_HOURLY)) return;
+    // Only rotate if both a daily and an hourly forecast source are available
+    if (!this.forecastEntitySupports('daily') || !this.forecastEntitySupports('hourly')) return;
     // Align to the next whole minute, then start the interval
     const now = new Date();
     const msUntilNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
@@ -345,9 +402,7 @@ handleForecastTypeToggle() {
     super.disconnectedCallback();
     this.detachResizeObserver();
     this.stopAutoRotate();
-    if (this.forecastSubscriber) {
-      this.forecastSubscriber.then((unsub) => unsub());
-    }
+    this.unsubscribeForecastEvents();
     if (this.clockInterval) {
       clearInterval(this.clockInterval);
       this.clockInterval = null;
@@ -450,6 +505,85 @@ calculateSunriseSunset(date, latitude, longitude) {
   };
 
   return { sunrise: compute(true), sunset: compute(false) };
+}
+
+/**
+ * Timezone used for sun/day-night calculations. Mirrors renderSun's resolution
+ * so every day/night decision shares one source of truth.
+ */
+getSunTimezone() {
+  return this.config.sun_timezone
+    || this.config.timezone
+    || (this._hass && this._hass.config && this._hass.config.time_zone)
+    || Intl.DateTimeFormat().resolvedOptions().timeZone;
+}
+
+/**
+ * Latitude/longitude used for sun calculations: explicit card config first,
+ * otherwise the Home Assistant home coordinates.
+ */
+getSunLocation() {
+  const lat = this.config.sun_latitude != null ? this.config.sun_latitude
+    : (this._hass && this._hass.config && this._hass.config.latitude);
+  const lon = this.config.sun_longitude != null ? this.config.sun_longitude
+    : (this._hass && this._hass.config && this._hass.config.longitude);
+  return { lat, lon };
+}
+
+/**
+ * Minutes-since-midnight of an instant, evaluated as wall-clock time in the
+ * given IANA timezone. Comparing wall-clock minutes is immune to the UTC-day
+ * that calculateSunriseSunset pins its results to, so it works correctly for
+ * both eastern and western longitudes.
+ */
+getWallClockMinutes(instant, timeZone) {
+  const parts = new Intl.DateTimeFormat('en-GB', {
+    timeZone,
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false
+  }).formatToParts(instant);
+  const hour = Number(parts.find((p) => p.type === 'hour').value);
+  const minute = Number(parts.find((p) => p.type === 'minute').value);
+  return hour * 60 + minute;
+}
+
+/**
+ * Determine whether a given instant is daytime at the card's sun location.
+ * The forecast slot's calendar date is derived in the card's own timezone
+ * (not the Home Assistant home timezone), then compared against that date's
+ * sunrise/sunset by local wall-clock time.
+ *
+ * @param {Date} instant
+ * @param {{ lat?: number, lon?: number, timeZone?: string }} [options]
+ * @returns {boolean|null} true=day, false=night, null when it cannot be computed
+ *   (missing coordinates or polar day/night) so the caller can fall back.
+ */
+isDaytimeAt(instant, options = {}) {
+  const lat = options.lat != null ? options.lat : this.getSunLocation().lat;
+  const lon = options.lon != null ? options.lon : this.getSunLocation().lon;
+  if (lat == null || lon == null) return null;
+  const timeZone = options.timeZone || this.getSunTimezone();
+
+  const dateParts = new Intl.DateTimeFormat('en-CA', {
+    timeZone,
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit'
+  }).formatToParts(instant);
+  const year = Number(dateParts.find((p) => p.type === 'year').value);
+  const month = Number(dateParts.find((p) => p.type === 'month').value);
+  const day = Number(dateParts.find((p) => p.type === 'day').value);
+
+  const { sunrise, sunset } = this.calculateSunriseSunset(
+    new Date(Date.UTC(year, month - 1, day)), lat, lon
+  );
+  if (!sunrise || !sunset) return null; // polar day/night → let caller fall back
+
+  const nowMinutes = this.getWallClockMinutes(instant, timeZone);
+  const sunriseMinutes = this.getWallClockMinutes(sunrise, timeZone);
+  const sunsetMinutes = this.getWallClockMinutes(sunset, timeZone);
+  return nowMinutes >= sunriseMinutes && nowMinutes < sunsetMinutes;
 }
 
 /**
@@ -759,6 +893,18 @@ getWindDir(deg) {
 }
 
 calculateBeaufortScale(windSpeed, sourceUnit = this.weather && this.weather.attributes && this.weather.attributes.wind_speed_unit) {
+  const numericWindSpeed = Number(windSpeed);
+  if (!Number.isFinite(numericWindSpeed)) {
+    return windSpeed;
+  }
+
+  // The source is already on the Beaufort scale. Home Assistant reports this
+  // unit as 'Beaufort'; some setups/sensors use the short 'Bft'. Either way the
+  // value is already a Beaufort number, so return it unchanged (rounded).
+  if (sourceUnit === 'Bft' || sourceUnit === 'Beaufort') {
+    return Math.round(numericWindSpeed);
+  }
+
   const unitConversion = {
     'km/h': 1,
     'm/s': 3.6,
@@ -766,18 +912,17 @@ calculateBeaufortScale(windSpeed, sourceUnit = this.weather && this.weather.attr
     'kn': 1.852,
   };
 
-  if (!sourceUnit) {
-    throw new Error('wind_speed_unit not available in weather attributes.');
-  }
+  const conversionFactor = sourceUnit ? unitConversion[sourceUnit] : undefined;
 
-  const wind_speed_unit = sourceUnit;
-  const conversionFactor = unitConversion[wind_speed_unit];
-
+  // Unknown/missing source unit: we can't compute Beaufort, but throwing here
+  // would bubble out of render() and blank the whole card. Degrade gracefully
+  // by returning the value unchanged instead.
   if (typeof conversionFactor !== 'number') {
-    throw new Error(`Unknown wind_speed_unit: ${wind_speed_unit}`);
+    console.warn(`weather-chart-card-ha: cannot convert wind speed from "${sourceUnit}" to Beaufort; showing the value unchanged.`);
+    return Math.round(numericWindSpeed);
   }
 
-  const windSpeedInKmPerHour = windSpeed * conversionFactor;
+  const windSpeedInKmPerHour = numericWindSpeed * conversionFactor;
 
   if (windSpeedInKmPerHour < 1) return 0;
   else if (windSpeedInKmPerHour < 6) return 1;
@@ -794,6 +939,20 @@ calculateBeaufortScale(windSpeed, sourceUnit = this.weather && this.weather.attr
   else return 12;
 }
 
+/**
+ * Representative wind speed (m/s) for a Beaufort force number, using the
+ * accepted empirical relationship v = 0.836 * B^1.5. Beaufort is a range-based
+ * scale, so this returns a typical mid-range speed for the force rather than an
+ * exact value.
+ */
+beaufortToMetersPerSecond(beaufort) {
+  const b = Number(beaufort);
+  if (!Number.isFinite(b) || b <= 0) {
+    return 0;
+  }
+  return 0.836 * Math.pow(b, 1.5);
+}
+
 convertWindSpeed(windSpeed, targetUnit = this.unitSpeed, sourceUnit = this.weather && this.weather.attributes && this.weather.attributes.wind_speed_unit) {
   const numericWindSpeed = Number(windSpeed);
 
@@ -805,8 +964,31 @@ convertWindSpeed(windSpeed, targetUnit = this.unitSpeed, sourceUnit = this.weath
     return Math.round(numericWindSpeed);
   }
 
-  if (targetUnit === 'Bft') {
+  // Home Assistant reports Beaufort-scale wind as 'Beaufort'; some sensors use
+  // the short 'Bft'. Treat both as the same scale.
+  const sourceIsBeaufort = sourceUnit === 'Bft' || sourceUnit === 'Beaufort';
+
+  if (targetUnit === 'Bft' || targetUnit === 'Beaufort') {
     return this.calculateBeaufortScale(numericWindSpeed, sourceUnit);
+  }
+
+  const metersPerSecondToTarget = {
+    'm/s': 1,
+    'km/h': 3.6,
+    'mph': 2.2369362920544,
+    'kn': 1.9438444924406,
+  };
+
+  const fromMetersPerSecond = metersPerSecondToTarget[targetUnit];
+
+  // Beaufort is a scale, not an exact speed, so map each force to a
+  // representative wind speed (m/s) before converting to the target unit.
+  if (sourceIsBeaufort) {
+    if (!fromMetersPerSecond) {
+      return Math.round(numericWindSpeed);
+    }
+    const metersPerSecond = this.beaufortToMetersPerSecond(numericWindSpeed);
+    return Math.round(metersPerSecond * fromMetersPerSecond);
   }
 
   const sourceToMetersPerSecond = {
@@ -816,15 +998,7 @@ convertWindSpeed(windSpeed, targetUnit = this.unitSpeed, sourceUnit = this.weath
     'kn': 0.514444,
   };
 
-  const metersPerSecondToTarget = {
-    'm/s': 1,
-    'km/h': 3.6,
-    'mph': 2.2369362920544,
-    'kn': 1.9438444924406,
-  };
-
   const toMetersPerSecond = sourceToMetersPerSecond[sourceUnit];
-  const fromMetersPerSecond = metersPerSecondToTarget[targetUnit];
 
   if (!toMetersPerSecond || !fromMetersPerSecond) {
     return Math.round(numericWindSpeed);
@@ -879,7 +1053,9 @@ normalizePrecipitationUnit(unit) {
 }
 
 getSourcePrecipitationUnit() {
-  const attrUnit = this.weather && this.weather.attributes ? this.weather.attributes.precipitation_unit : null;
+  const forecastType = this.config && this.config.forecast ? (this.config.forecast.type || 'daily') : 'daily';
+  const forecastAttrs = this.getForecastEntityAttributes(forecastType);
+  const attrUnit = forecastAttrs ? forecastAttrs.precipitation_unit : null;
   const normalizedAttrUnit = this.normalizePrecipitationUnit(attrUnit);
   if (normalizedAttrUnit) {
     return normalizedAttrUnit;
@@ -966,15 +1142,13 @@ async updated(changedProperties) {
   if (changedProperties.has('config')) {
     const oldConfig = changedProperties.get('config');
 
-    const entityChanged = oldConfig && this.config.entity !== oldConfig.entity;
-    const forecastTypeChanged = oldConfig && this.config.forecast.type !== oldConfig.forecast.type;
+    const forecastType = this.config.forecast.type || 'daily';
+    const resolvedKey = `${this.getForecastEntityId(forecastType)}|${forecastType}`;
+    const subscriptionChanged = oldConfig && resolvedKey !== this._forecastSubscriptionKey;
     const autoscrollChanged = oldConfig && this.config.autoscroll !== oldConfig.autoscroll;
 
-    if (entityChanged || forecastTypeChanged) {
-      if (this.forecastSubscriber && typeof this.forecastSubscriber === 'function') {
-        this.forecastSubscriber();
-      }
-
+    if (subscriptionChanged) {
+      this.unsubscribeForecastEvents();
       this.subscribeForecastEvents();
     }
 
@@ -1543,6 +1717,10 @@ computeForecastData({ config, forecastItems } = this) {
   var tempLow = [];
   var precip = [];
 
+  const forecastType = config.forecast.type || 'daily';
+  const forecastSourceTempUnit = this.getForecastEntityAttributes(forecastType).temperature_unit
+    || (this.weather && this.weather.attributes.temperature_unit);
+
   for (var i = 0; i < forecast.length; i++) {
     var d = forecast[i];
     if (config.autoscroll) {
@@ -1557,10 +1735,10 @@ computeForecastData({ config, forecastItems } = this) {
     let lowTemp = d.templow;
     
     // Convert temperatures if needed
-    if (this.unitTemperature && this.unitTemperature !== this.weather.attributes.temperature_unit) {
-      highTemp = this.convertTemperature(highTemp, this.weather.attributes.temperature_unit, this.unitTemperature);
+    if (this.unitTemperature && this.unitTemperature !== forecastSourceTempUnit) {
+      highTemp = this.convertTemperature(highTemp, forecastSourceTempUnit, this.unitTemperature);
       if (typeof lowTemp !== 'undefined') {
-        lowTemp = this.convertTemperature(lowTemp, this.weather.attributes.temperature_unit, this.unitTemperature);
+        lowTemp = this.convertTemperature(lowTemp, forecastSourceTempUnit, this.unitTemperature);
       }
     }
     
@@ -1620,7 +1798,7 @@ updateChart({ forecasts, forecastChart } = this) {
       return html`
         <style>
           .card {
-            padding-top: ${config.title? '0px' : '16px'};
+            padding-top: ${config.title ? '0px' : '16px'};
             padding-right: 16px;
             padding-bottom: 16px;
             padding-left: 16px;
@@ -1637,6 +1815,7 @@ updateChart({ forecasts, forecastChart } = this) {
       <style>
         ha-card {
           ${config.title ? 'padding-bottom: 8px;' : ''}
+          position: relative;
           overflow: hidden;
         }
         ha-icon {
@@ -1654,16 +1833,17 @@ updateChart({ forecasts, forecastChart } = this) {
         }
         .main {
           display: flex;
-          align-items: center;
+          align-items: ${config.title ? 'center' : 'flex-start'};
           justify-content: space-between;
           font-size: ${config.current_temp_size}px;
           margin-bottom: 10px;
-          position: relative;
+          position: ${config.title ? 'relative' : 'static'};
+          ${config.title ? '' : `min-height: ${59 + (parseInt(config.main_icon_size, 10) || 150) / 2}px;`}
         }
         .main .weather-icon {
           position: absolute;
           left: 50%;
-          top: 10px;
+          top: ${config.title ? '10px' : '75px'};
           transform: translate(-50%, -50%);
           z-index: 1;
         }
@@ -1692,7 +1872,7 @@ updateChart({ forecasts, forecastChart } = this) {
         }
         .current-time {
           position: absolute;
-          top: ${config.title ? '24px' : '20px'};
+          top: 24px;
           right: 16px;
           inset-inline-start: initial;
           inset-inline-end: 16px;
@@ -1872,11 +2052,36 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
     roundedFeelsLike = Math.round(roundedFeelsLike * 10) / 10;
   }
 
+  // Day/night for the current-conditions icon and condition text. When the card
+  // explicitly targets a sun location (multi-location dashboards), compute it
+  // there instead of using the single home `sun.sun` entity, which only reflects
+  // the HA server location.
+  let currentSunState = sun ? sun.state : 'above_horizon';
+  let currentCondition = weather.state;
+  if (config.sun_latitude != null && config.sun_longitude != null) {
+    const isDay = this.isDaytimeAt(new Date(), {
+      lat: config.sun_latitude,
+      lon: config.sun_longitude
+    });
+    if (isDay != null) {
+      currentSunState = isDay ? 'above_horizon' : 'below_horizon';
+      // The weather entity's day/night follows its own integration location, so
+      // it can report `clear-night` while it is daytime at the card's location
+      // (or `sunny` while it is night). `sunny`⇄`clear-night` is the only HA
+      // condition with a night-specific state, so normalise it to match.
+      if (isDay && currentCondition === 'clear-night') {
+        currentCondition = 'sunny';
+      } else if (!isDay && currentCondition === 'sunny') {
+        currentCondition = 'clear-night';
+      }
+    }
+  }
+
   const iconHtml = config.animated_icons || config.icons
-    ? html`<img src="${this.getWeatherIcon(weather.state, sun.state)}" 
-                 @error="${(e) => this.handleIconError(e, weather.state, sun.state)}" 
+    ? html`<img src="${this.getWeatherIcon(currentCondition, currentSunState)}"
+                 @error="${(e) => this.handleIconError(e, currentCondition, currentSunState)}"
                  alt="">`
-    : html`<ha-icon icon="${this.getWeatherIcon(weather.state, sun.state)}"></ha-icon>`;
+    : html`<ha-icon icon="${this.getWeatherIcon(currentCondition, currentSunState)}"></ha-icon>`;
 
   return html`
     <div class="main">
@@ -1887,7 +2092,7 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
         </div>
         ${showCurrentCondition ? html`
           <div class="current-condition">
-            ${this.ll(weather.state)}
+            ${this.ll(currentCondition)}
           </div>
         ` : ''}
         ${showFeelsLike && roundedFeelsLike ? html`
@@ -1980,29 +2185,34 @@ renderClock({ config } = this) {
   const showTime = config.show_time;
   const showDay = config.show_day;
   const showDate = config.show_date;
-
-  if (!showTime) {
-    if (this.clockInterval) {
-      clearInterval(this.clockInterval);
-      this.clockInterval = null;
-    }
-    return html``;
-  }
+  const showForecastToggle = config.show_forecast_toggle;
 
   // Clock update logic
-  if (!this.clockInterval) {
-    this.clockInterval = setInterval(() => this.updateClock(), 1000);
-    // Initial update
-    setTimeout(() => this.updateClock(), 0);
+  if (showTime) {
+    if (!this.clockInterval) {
+      this.clockInterval = setInterval(() => this.updateClock(), 1000);
+      // Initial update
+      setTimeout(() => this.updateClock(), 0);
+    }
+  } else if (this.clockInterval) {
+    clearInterval(this.clockInterval);
+    this.clockInterval = null;
+  }
+
+  // Nothing to render in this container if neither the clock nor the toggle is enabled
+  if (!showTime && !showForecastToggle) {
+    return html``;
   }
 
   return html`
     <div class="current-time">
-      <div id="digital-clock"></div>
-      ${showDay ? html`<div class="date-text day"></div>` : ''}
-      ${showDay && showDate ? html` ` : ''}
-      ${showDate ? html`<div class="date-text date"></div>` : ''}
-      ${config.show_forecast_toggle ? html`
+      ${showTime ? html`
+        <div id="digital-clock"></div>
+        ${showDay ? html`<div class="date-text day"></div>` : ''}
+        ${showDay && showDate ? html` ` : ''}
+        ${showDate ? html`<div class="date-text date"></div>` : ''}
+      ` : ''}
+      ${showForecastToggle ? html`
         <button class="forecast-toggle"
           @click="${this.handleForecastTypeToggle.bind(this)}"
           ?disabled="${this._canAutoRotate}">
@@ -2183,51 +2393,33 @@ renderForecastConditionIcons({ config, forecastItems, sun } = this) {
   return html`
     <div class="conditions" @click="${(e) => this.showMoreInfo(config.entity)}">
       ${(() => {
-        const lat = this.config.sun_latitude != null ? this.config.sun_latitude
-          : (this._hass && this._hass.config && this._hass.config.latitude);
-        const lon = this.config.sun_longitude != null ? this.config.sun_longitude
-          : (this._hass && this._hass.config && this._hass.config.longitude);
+        const { lat, lon } = this.getSunLocation();
+        const timeZone = this.getSunTimezone();
         return forecast.map((item) => {
         const forecastTime = new Date(item.datetime);
-
-        let sunriseTime, sunsetTime;
-        if (lat != null && lon != null) {
-          const configuredTimeZone = this.config.time_zone
-            || (this._hass && this._hass.config && this._hass.config.time_zone);
-          let sunriseSunsetDate = forecastTime;
-
-          if (configuredTimeZone) {
-            const parts = new Intl.DateTimeFormat('en-CA', {
-              timeZone: configuredTimeZone,
-              year: 'numeric',
-              month: '2-digit',
-              day: '2-digit'
-            }).formatToParts(forecastTime);
-            const year = Number(parts.find((part) => part.type === 'year').value);
-            const month = Number(parts.find((part) => part.type === 'month').value);
-            const day = Number(parts.find((part) => part.type === 'day').value);
-            sunriseSunsetDate = new Date(Date.UTC(year, month - 1, day));
-          }
-
-          const { sunrise, sunset } = this.calculateSunriseSunset(sunriseSunsetDate, lat, lon);
-          sunriseTime = sunrise;
-          sunsetTime = sunset;
-        } else {
-          sunriseTime = new Date(sun.attributes.next_rising);
-          sunsetTime = new Date(sun.attributes.next_setting);
-        }
 
         let isDayTime;
         if (config.forecast.type === 'daily') {
           isDayTime = true;
         } else {
-          isDayTime = sunriseTime && sunsetTime
-            ? forecastTime >= sunriseTime && forecastTime <= sunsetTime
-            : true;
+          const isDay = this.isDaytimeAt(forecastTime, { lat, lon, timeZone });
+          if (isDay != null) {
+            isDayTime = isDay;
+          } else if (sun && sun.attributes) {
+            // No coordinates / polar case: fall back to the sun entity.
+            const sunriseTime = new Date(sun.attributes.next_rising);
+            const sunsetTime = new Date(sun.attributes.next_setting);
+            isDayTime = sunriseTime && sunsetTime
+              ? forecastTime >= sunriseTime && forecastTime <= sunsetTime
+              : true;
+          } else {
+            isDayTime = true;
+          }
         }
 
         const weatherIcons = isDayTime ? weatherIconsDay : weatherIconsNight;
         const condition = item.condition;
+        const sunState = isDayTime ? 'above_horizon' : 'below_horizon';
 
         let iconHtml;
 
@@ -2235,13 +2427,12 @@ renderForecastConditionIcons({ config, forecastItems, sun } = this) {
           const iconSrc = config.animated_icons ?
             `${this.baseIconPath}${weatherIcons[condition]}.svg` :
             `${this.config.icons}${weatherIcons[condition]}.svg`;
-          const sunState = isDayTime ? 'above_horizon' : 'below_horizon';
-          iconHtml = html`<img class="icon" 
-                               src="${iconSrc}" 
-                               @error="${(e) => this.handleIconError(e, condition, sunState)}" 
+          iconHtml = html`<img class="icon"
+                               src="${iconSrc}"
+                               @error="${(e) => this.handleIconError(e, condition, sunState)}"
                                alt="">`;
         } else {
-          iconHtml = html`<ha-icon icon="${this.getWeatherIcon(condition, sun.state)}"></ha-icon>`;
+          iconHtml = html`<ha-icon icon="${this.getWeatherIcon(condition, sunState)}"></ha-icon>`;
         }
 
         return html`
@@ -2264,11 +2455,15 @@ renderWind({ config, weather, windSpeed, windDirection, forecastItems } = this) 
 
   const forecast = this.forecasts ? this.forecasts.slice(0, forecastItems) : [];
 
+  const forecastType = config.forecast.type || 'daily';
+  const forecastWindUnit = this.getForecastEntityAttributes(forecastType).wind_speed_unit
+    || (this.weather && this.weather.attributes.wind_speed_unit);
+
   return html`
     <div class="wind-details">
       ${showWindForecast ? html`
         ${forecast.map((item) => {
-          const dWindSpeed = this.convertWindSpeed(item.wind_speed);
+          const dWindSpeed = this.convertWindSpeed(item.wind_speed, this.unitSpeed, forecastWindUnit);
 
           return html`
             <div class="wind-detail">
