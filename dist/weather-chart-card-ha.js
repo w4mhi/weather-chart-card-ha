@@ -18693,10 +18693,30 @@ var WeatherChartCard = (function () {
     }
 
     const callback = (event) => {
-      this.forecasts = event.forecast;
+      const forecast = event.forecast || [];
+      // Weather integrations frequently re-push an identical forecast on every
+      // entity state write. Skip the redundant redraw so low-power clients don't
+      // fall behind the websocket stream — Home Assistant drops the connection
+      // once its outbound queue reaches 4096 pending messages.
+      const signature = JSON.stringify(forecast);
+      if (signature === this._lastForecastSignature) {
+        return;
+      }
+      this._lastForecastSignature = signature;
+      this.forecasts = forecast;
       this.requestUpdate();
-      this.drawChart();
+      // Update the existing chart in place when possible; a full destroy+rebuild
+      // (drawChart) is only needed when there is no chart yet.
+      if (this.forecastChart) {
+        this.updateChart();
+      } else {
+        this.drawChart();
+      }
     };
+
+    // Fresh subscription: clear the dedupe cache so the first payload always renders,
+    // including right after a daily/hourly switch.
+    this._lastForecastSignature = null;
 
     this.forecastSubscriber = this._hass.connection.subscribeMessage(callback, {
       type: "weather/subscribe_forecast",
