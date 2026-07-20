@@ -1443,6 +1443,26 @@ var WeatherChartCard = (function () {
   <option value="">-- Select entity --</option>
   ${this.entities.map((entity) => x`<option value=${entity} ?selected=${entity === this._entity}>${entity}</option>`)}
 </select>
+      <label class="switch-label">Daily forecast entity (optional)</label>
+<select
+  aria-label="Daily forecast entity"
+  style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid var(--divider-color, #ccc); border-radius: 4px; background: var(--card-background-color, #fff); color: var(--primary-text-color, #000); font-size: 14px;"
+  .value=${(this._config.forecast && this._config.forecast.daily_entity) || ''}
+  @change=${(e) => this._valueChanged(e, 'forecast.daily_entity')}
+>
+  <option value="">-- Use main entity --</option>
+  ${this.entities.map((entity) => x`<option value=${entity} ?selected=${entity === ((this._config.forecast && this._config.forecast.daily_entity) || '')}>${entity}</option>`)}
+</select>
+      <label class="switch-label">Hourly forecast entity (optional)</label>
+<select
+  aria-label="Hourly forecast entity"
+  style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid var(--divider-color, #ccc); border-radius: 4px; background: var(--card-background-color, #fff); color: var(--primary-text-color, #000); font-size: 14px;"
+  .value=${(this._config.forecast && this._config.forecast.hourly_entity) || ''}
+  @change=${(e) => this._valueChanged(e, 'forecast.hourly_entity')}
+>
+  <option value="">-- Use main entity --</option>
+  ${this.entities.map((entity) => x`<option value=${entity} ?selected=${entity === ((this._config.forecast && this._config.forecast.hourly_entity) || '')}>${entity}</option>`)}
+</select>
       <label class="switch-label">Title</label>
       <input
         type="text"
@@ -18652,13 +18672,23 @@ var WeatherChartCard = (function () {
     }
   }
 
+  unsubscribeForecastEvents() {
+    if (this.forecastSubscriber) {
+      Promise.resolve(this.forecastSubscriber)
+        .then((unsub) => { if (typeof unsub === 'function') unsub(); })
+        .catch(() => {});
+      this.forecastSubscriber = null;
+    }
+    this._forecastSubscriptionKey = null;
+  }
+
   subscribeForecastEvents() {
     const forecastType = this.config.forecast.type || 'daily';
     const isHourly = forecastType === 'hourly';
+    const entityId = this.getForecastEntityId(forecastType);
 
-    const feature = isHourly ? WeatherEntityFeature.FORECAST_HOURLY : WeatherEntityFeature.FORECAST_DAILY;
-    if (!this.supportsFeature(feature)) {
-      console.error(`Weather entity "${this.config.entity}" does not support ${isHourly ? 'hourly' : 'daily'} forecasts.`);
+    if (!this.forecastEntitySupports(forecastType)) {
+      console.error(`Weather entity "${entityId}" does not support ${isHourly ? 'hourly' : 'daily'} forecasts.`);
       return;
     }
 
@@ -18671,22 +18701,22 @@ var WeatherChartCard = (function () {
     this.forecastSubscriber = this._hass.connection.subscribeMessage(callback, {
       type: "weather/subscribe_forecast",
       forecast_type: isHourly ? 'hourly' : 'daily',
-      entity_id: this.config.entity,
+      entity_id: entityId,
     });
+    this._forecastSubscriptionKey = `${entityId}|${forecastType}`;
   }
 
   handleForecastTypeToggle() {
     // Toggle between daily and hourly
     const currentType = this.config.forecast.type || 'daily';
     const newType = currentType === 'daily' ? 'hourly' : 'daily';
-    
-    // Check if the new type is supported
-    const feature = newType === 'hourly' ? WeatherEntityFeature.FORECAST_HOURLY : WeatherEntityFeature.FORECAST_DAILY;
-    if (!this.supportsFeature(feature)) {
-      console.warn(`Weather entity "${this.config.entity}" does not support ${newType} forecasts.`);
+
+    // Check if the new type is supported by its resolved forecast entity
+    if (!this.forecastEntitySupports(newType)) {
+      console.warn(`Weather entity "${this.getForecastEntityId(newType)}" does not support ${newType} forecasts.`);
       return;
     }
-    
+
     // Update config
     this.config = {
       ...this.config,
@@ -18695,16 +18725,11 @@ var WeatherChartCard = (function () {
         type: newType
       }
     };
-    
-    // Unsubscribe from old forecast
-    if (this.forecastSubscriber) {
-      this.forecastSubscriber.then((unsub) => unsub());
-      this.forecastSubscriber = null;
-    }
-    
-    // Subscribe to new forecast type
+
+    // Resubscribe to the new forecast type's entity
+    this.unsubscribeForecastEvents();
     this.subscribeForecastEvents();
-    
+
     // Request update to re-render
     this.requestUpdate();
 
@@ -18723,11 +18748,41 @@ var WeatherChartCard = (function () {
       return (this.weather.attributes.supported_features & feature) !== 0;
     }
 
+    getForecastEntityId(type) {
+      const forecastConfig = this.config && this.config.forecast ? this.config.forecast : {};
+      const override = type === 'hourly' ? forecastConfig.hourly_entity : forecastConfig.daily_entity;
+      return override || this.config.entity;
+    }
+
+    getForecastEntityState(type) {
+      const id = this.getForecastEntityId(type);
+      return this._hass && this._hass.states ? (this._hass.states[id] || null) : null;
+    }
+
+    getForecastEntityAttributes(type) {
+      const state = this.getForecastEntityState(type);
+      if (state && state.attributes) {
+        return state.attributes;
+      }
+      return (this.weather && this.weather.attributes) || {};
+    }
+
+    forecastEntitySupports(type) {
+      const state = this.getForecastEntityState(type);
+      if (!state || !state.attributes) {
+        return false;
+      }
+      const feature = type === 'hourly'
+        ? WeatherEntityFeature.FORECAST_HOURLY
+        : WeatherEntityFeature.FORECAST_DAILY;
+      return (state.attributes.supported_features & feature) !== 0;
+    }
+
     get _canAutoRotate() {
       const interval = this.config && this.config.forecast ? parseInt(this.config.forecast.auto_rotate, 10) : 0;
-      return interval > 0 && this.weather
-        && this.supportsFeature(WeatherEntityFeature.FORECAST_DAILY)
-        && this.supportsFeature(WeatherEntityFeature.FORECAST_HOURLY);
+      return interval > 0
+        && this.forecastEntitySupports('daily')
+        && this.forecastEntitySupports('hourly');
     }
 
     constructor() {
@@ -18748,8 +18803,8 @@ var WeatherChartCard = (function () {
       this.stopAutoRotate();
       const interval = this.config && this.config.forecast ? parseInt(this.config.forecast.auto_rotate, 10) : 0;
       if (!interval || interval < 1 || interval > 60) return;
-      // Only rotate if the entity supports both daily and hourly forecasts
-      if (!this.weather || !this.supportsFeature(WeatherEntityFeature.FORECAST_DAILY) || !this.supportsFeature(WeatherEntityFeature.FORECAST_HOURLY)) return;
+      // Only rotate if both a daily and an hourly forecast source are available
+      if (!this.forecastEntitySupports('daily') || !this.forecastEntitySupports('hourly')) return;
       // Align to the next whole minute, then start the interval
       const now = new Date();
       const msUntilNextMinute = (60 - now.getSeconds()) * 1000 - now.getMilliseconds();
@@ -18783,9 +18838,7 @@ var WeatherChartCard = (function () {
       super.disconnectedCallback();
       this.detachResizeObserver();
       this.stopAutoRotate();
-      if (this.forecastSubscriber) {
-        this.forecastSubscriber.then((unsub) => unsub());
-      }
+      this.unsubscribeForecastEvents();
       if (this.clockInterval) {
         clearInterval(this.clockInterval);
         this.clockInterval = null;
@@ -19436,7 +19489,9 @@ var WeatherChartCard = (function () {
   }
 
   getSourcePrecipitationUnit() {
-    const attrUnit = this.weather && this.weather.attributes ? this.weather.attributes.precipitation_unit : null;
+    const forecastType = this.config && this.config.forecast ? (this.config.forecast.type || 'daily') : 'daily';
+    const forecastAttrs = this.getForecastEntityAttributes(forecastType);
+    const attrUnit = forecastAttrs ? forecastAttrs.precipitation_unit : null;
     const normalizedAttrUnit = this.normalizePrecipitationUnit(attrUnit);
     if (normalizedAttrUnit) {
       return normalizedAttrUnit;
@@ -19523,15 +19578,13 @@ var WeatherChartCard = (function () {
     if (changedProperties.has('config')) {
       const oldConfig = changedProperties.get('config');
 
-      const entityChanged = oldConfig && this.config.entity !== oldConfig.entity;
-      const forecastTypeChanged = oldConfig && this.config.forecast.type !== oldConfig.forecast.type;
+      const forecastType = this.config.forecast.type || 'daily';
+      const resolvedKey = `${this.getForecastEntityId(forecastType)}|${forecastType}`;
+      const subscriptionChanged = oldConfig && resolvedKey !== this._forecastSubscriptionKey;
       const autoscrollChanged = oldConfig && this.config.autoscroll !== oldConfig.autoscroll;
 
-      if (entityChanged || forecastTypeChanged) {
-        if (this.forecastSubscriber && typeof this.forecastSubscriber === 'function') {
-          this.forecastSubscriber();
-        }
-
+      if (subscriptionChanged) {
+        this.unsubscribeForecastEvents();
         this.subscribeForecastEvents();
       }
 
@@ -20100,6 +20153,10 @@ var WeatherChartCard = (function () {
     var tempLow = [];
     var precip = [];
 
+    const forecastType = config.forecast.type || 'daily';
+    const forecastSourceTempUnit = this.getForecastEntityAttributes(forecastType).temperature_unit
+      || (this.weather && this.weather.attributes.temperature_unit);
+
     for (var i = 0; i < forecast.length; i++) {
       var d = forecast[i];
       if (config.autoscroll) {
@@ -20114,10 +20171,10 @@ var WeatherChartCard = (function () {
       let lowTemp = d.templow;
       
       // Convert temperatures if needed
-      if (this.unitTemperature && this.unitTemperature !== this.weather.attributes.temperature_unit) {
-        highTemp = this.convertTemperature(highTemp, this.weather.attributes.temperature_unit, this.unitTemperature);
+      if (this.unitTemperature && this.unitTemperature !== forecastSourceTempUnit) {
+        highTemp = this.convertTemperature(highTemp, forecastSourceTempUnit, this.unitTemperature);
         if (typeof lowTemp !== 'undefined') {
-          lowTemp = this.convertTemperature(lowTemp, this.weather.attributes.temperature_unit, this.unitTemperature);
+          lowTemp = this.convertTemperature(lowTemp, forecastSourceTempUnit, this.unitTemperature);
         }
       }
       
@@ -20834,11 +20891,15 @@ var WeatherChartCard = (function () {
 
     const forecast = this.forecasts ? this.forecasts.slice(0, forecastItems) : [];
 
+    const forecastType = config.forecast.type || 'daily';
+    const forecastWindUnit = this.getForecastEntityAttributes(forecastType).wind_speed_unit
+      || (this.weather && this.weather.attributes.wind_speed_unit);
+
     return x`
     <div class="wind-details">
       ${showWindForecast ? x`
         ${forecast.map((item) => {
-          const dWindSpeed = this.convertWindSpeed(item.wind_speed);
+          const dWindSpeed = this.convertWindSpeed(item.wind_speed, this.unitSpeed, forecastWindUnit);
 
           return x`
             <div class="wind-detail">

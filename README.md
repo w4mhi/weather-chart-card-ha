@@ -197,6 +197,8 @@ units:
 | round_temp                     | boolean | false                    | Option for rounding the forecast temperatures                                                      |
 | style                          | string  | style1                   | Change chart style, options: 'style1' or 'style2'                                                  |
 | type                           | string  | daily                    | Show daily or hourly forecast if available, options: 'daily' or 'hourly'                           |
+| daily_entity                   | string  | (main entity)            | Optional `weather.*` entity to source the **daily** forecast from. Falls back to the main `entity`. |
+| hourly_entity                  | string  | (main entity)            | Optional `weather.*` entity to source the **hourly** forecast from. Falls back to the main `entity`.|
 | number_of_forecasts            | number  | 0                        | Overrides the number of forecasts to display. Set to "0" for automatic mode.                       |
 | disable_animation              | boolean | false                    | Disable the chart animation.                                                                       |
 | show_date_labels               | boolean | true                     | Show date numbers below weekday labels in daily forecast view.                                     |

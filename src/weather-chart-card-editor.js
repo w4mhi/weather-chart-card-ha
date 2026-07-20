@@ -404,6 +404,26 @@ class WeatherChartCardEditor extends LitElement {
   <option value="">-- Select entity --</option>
   ${this.entities.map((entity) => html`<option value=${entity} ?selected=${entity === this._entity}>${entity}</option>`)}
 </select>
+      <label class="switch-label">Daily forecast entity (optional)</label>
+<select
+  aria-label="Daily forecast entity"
+  style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid var(--divider-color, #ccc); border-radius: 4px; background: var(--card-background-color, #fff); color: var(--primary-text-color, #000); font-size: 14px;"
+  .value=${(this._config.forecast && this._config.forecast.daily_entity) || ''}
+  @change=${(e) => this._valueChanged(e, 'forecast.daily_entity')}
+>
+  <option value="">-- Use main entity --</option>
+  ${this.entities.map((entity) => html`<option value=${entity} ?selected=${entity === ((this._config.forecast && this._config.forecast.daily_entity) || '')}>${entity}</option>`)}
+</select>
+      <label class="switch-label">Hourly forecast entity (optional)</label>
+<select
+  aria-label="Hourly forecast entity"
+  style="width: 100%; padding: 8px; margin-bottom: 8px; border: 1px solid var(--divider-color, #ccc); border-radius: 4px; background: var(--card-background-color, #fff); color: var(--primary-text-color, #000); font-size: 14px;"
+  .value=${(this._config.forecast && this._config.forecast.hourly_entity) || ''}
+  @change=${(e) => this._valueChanged(e, 'forecast.hourly_entity')}
+>
+  <option value="">-- Use main entity --</option>
+  ${this.entities.map((entity) => html`<option value=${entity} ?selected=${entity === ((this._config.forecast && this._config.forecast.hourly_entity) || '')}>${entity}</option>`)}
+</select>
       <label class="switch-label">Title</label>
       <input
         type="text"
