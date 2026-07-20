@@ -840,6 +840,18 @@ getWindDir(deg) {
 }
 
 calculateBeaufortScale(windSpeed, sourceUnit = this.weather && this.weather.attributes && this.weather.attributes.wind_speed_unit) {
+  const numericWindSpeed = Number(windSpeed);
+  if (!Number.isFinite(numericWindSpeed)) {
+    return windSpeed;
+  }
+
+  // The source is already on the Beaufort scale. Home Assistant reports this
+  // unit as 'Beaufort'; some setups/sensors use the short 'Bft'. Either way the
+  // value is already a Beaufort number, so return it unchanged (rounded).
+  if (sourceUnit === 'Bft' || sourceUnit === 'Beaufort') {
+    return Math.round(numericWindSpeed);
+  }
+
   const unitConversion = {
     'km/h': 1,
     'm/s': 3.6,
@@ -847,18 +859,17 @@ calculateBeaufortScale(windSpeed, sourceUnit = this.weather && this.weather.attr
     'kn': 1.852,
   };
 
-  if (!sourceUnit) {
-    throw new Error('wind_speed_unit not available in weather attributes.');
-  }
+  const conversionFactor = sourceUnit ? unitConversion[sourceUnit] : undefined;
 
-  const wind_speed_unit = sourceUnit;
-  const conversionFactor = unitConversion[wind_speed_unit];
-
+  // Unknown/missing source unit: we can't compute Beaufort, but throwing here
+  // would bubble out of render() and blank the whole card. Degrade gracefully
+  // by returning the value unchanged instead.
   if (typeof conversionFactor !== 'number') {
-    throw new Error(`Unknown wind_speed_unit: ${wind_speed_unit}`);
+    console.warn(`weather-chart-card-ha: cannot convert wind speed from "${sourceUnit}" to Beaufort; showing the value unchanged.`);
+    return Math.round(numericWindSpeed);
   }
 
-  const windSpeedInKmPerHour = windSpeed * conversionFactor;
+  const windSpeedInKmPerHour = numericWindSpeed * conversionFactor;
 
   if (windSpeedInKmPerHour < 1) return 0;
   else if (windSpeedInKmPerHour < 6) return 1;
@@ -875,6 +886,20 @@ calculateBeaufortScale(windSpeed, sourceUnit = this.weather && this.weather.attr
   else return 12;
 }
 
+/**
+ * Representative wind speed (m/s) for a Beaufort force number, using the
+ * accepted empirical relationship v = 0.836 * B^1.5. Beaufort is a range-based
+ * scale, so this returns a typical mid-range speed for the force rather than an
+ * exact value.
+ */
+beaufortToMetersPerSecond(beaufort) {
+  const b = Number(beaufort);
+  if (!Number.isFinite(b) || b <= 0) {
+    return 0;
+  }
+  return 0.836 * Math.pow(b, 1.5);
+}
+
 convertWindSpeed(windSpeed, targetUnit = this.unitSpeed, sourceUnit = this.weather && this.weather.attributes && this.weather.attributes.wind_speed_unit) {
   const numericWindSpeed = Number(windSpeed);
 
@@ -886,8 +911,31 @@ convertWindSpeed(windSpeed, targetUnit = this.unitSpeed, sourceUnit = this.weath
     return Math.round(numericWindSpeed);
   }
 
-  if (targetUnit === 'Bft') {
+  // Home Assistant reports Beaufort-scale wind as 'Beaufort'; some sensors use
+  // the short 'Bft'. Treat both as the same scale.
+  const sourceIsBeaufort = sourceUnit === 'Bft' || sourceUnit === 'Beaufort';
+
+  if (targetUnit === 'Bft' || targetUnit === 'Beaufort') {
     return this.calculateBeaufortScale(numericWindSpeed, sourceUnit);
+  }
+
+  const metersPerSecondToTarget = {
+    'm/s': 1,
+    'km/h': 3.6,
+    'mph': 2.2369362920544,
+    'kn': 1.9438444924406,
+  };
+
+  const fromMetersPerSecond = metersPerSecondToTarget[targetUnit];
+
+  // Beaufort is a scale, not an exact speed, so map each force to a
+  // representative wind speed (m/s) before converting to the target unit.
+  if (sourceIsBeaufort) {
+    if (!fromMetersPerSecond) {
+      return Math.round(numericWindSpeed);
+    }
+    const metersPerSecond = this.beaufortToMetersPerSecond(numericWindSpeed);
+    return Math.round(metersPerSecond * fromMetersPerSecond);
   }
 
   const sourceToMetersPerSecond = {
@@ -897,15 +945,7 @@ convertWindSpeed(windSpeed, targetUnit = this.unitSpeed, sourceUnit = this.weath
     'kn': 0.514444,
   };
 
-  const metersPerSecondToTarget = {
-    'm/s': 1,
-    'km/h': 3.6,
-    'mph': 2.2369362920544,
-    'kn': 1.9438444924406,
-  };
-
   const toMetersPerSecond = sourceToMetersPerSecond[sourceUnit];
-  const fromMetersPerSecond = metersPerSecondToTarget[targetUnit];
 
   if (!toMetersPerSecond || !fromMetersPerSecond) {
     return Math.round(numericWindSpeed);
