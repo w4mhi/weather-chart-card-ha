@@ -2216,7 +2216,7 @@ renderClock({ config } = this) {
         <button class="forecast-toggle"
           @click="${this.handleForecastTypeToggle.bind(this)}"
           ?disabled="${this._canAutoRotate}">
-          ${this._canAutoRotate ? `Auto [${parseInt(config.forecast.auto_rotate, 10)}]` : (this.config.forecast.type === 'daily' ? 'Hourly' : 'Daily')}
+          ${this._canAutoRotate ? `${this.ll('auto')} [${parseInt(config.forecast.auto_rotate, 10)}]` : (this.config.forecast.type === 'daily' ? this.ll('hourly') : this.ll('daily'))}
         </button>
       ` : ''}
     </div>
