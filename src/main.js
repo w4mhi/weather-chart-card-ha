@@ -28,6 +28,7 @@ static getStubConfig(hass, unusedEntities, allEntities) {
     entity,
     title: 'Enhanced Weather Chart Card',
     show_main: true,
+    show_forecast: true,
     show_temperature: true,
     show_current_condition: true,
     show_attributes: true,
@@ -38,6 +39,7 @@ static getStubConfig(hass, unusedEntities, allEntities) {
     show_date: true,
     show_humidity: true,
     show_pressure: true,
+    show_uv: true,
     show_wind_direction: true,
     show_wind_speed: true,
     show_sun: true,
@@ -58,6 +60,7 @@ static getStubConfig(hass, unusedEntities, allEntities) {
     forecast: {
       precipitation_type: 'rainfall',
       show_probability: false,
+      show_precipitation_labels: true,
       labels_font_size: '11',
       precip_bar_size: '100',
       style: 'style2',
@@ -115,6 +118,7 @@ setConfig(config) {
     forecast: {
       precipitation_type: 'rainfall',
       show_probability: false,
+      show_precipitation_labels: true,
       labels_font_size: 11,
       chart_height: 180,
       precip_bar_size: 100,
@@ -157,9 +161,25 @@ setConfig(config) {
   }
 
   // An empty title disables the card header. The default 'Weather' is applied
-  // above only when no title key is present in the user config.
-  if (typeof cardConfig.title === 'string' && !cardConfig.title.trim()) {
+  // above only when no title key is present in the user config. A config saved
+  // by an older editor build can carry a non-string title (it wrote the input's
+  // `checked` property instead of its value); treat that as no header.
+  if (typeof cardConfig.title === 'number') {
+    cardConfig.title = String(cardConfig.title);
+  } else if (typeof cardConfig.title !== 'string') {
     cardConfig.title = '';
+  }
+  if (!cardConfig.title.trim()) {
+    cardConfig.title = '';
+  }
+
+  // `show_main` and `show_forecast` each hide one half of the card, so turning
+  // both off would leave nothing behind. The editor disables one switch once the
+  // other is off; a hand-written YAML config can still ask for it, so fall back
+  // to the forecast rather than rendering an empty card.
+  if (cardConfig.show_main === false && cardConfig.show_forecast === false) {
+    console.warn('weather-chart-card-ha: show_main and show_forecast cannot both be false; keeping the forecast visible.');
+    cardConfig.show_forecast = true;
   }
 
   this.config = cardConfig;
@@ -187,9 +207,7 @@ set hass(hass) {
     this.temperature = this.config.temp ? hass.states[this.config.temp].state : this.weather.attributes.temperature;
     this.humidity = this.config.humid ? hass.states[this.config.humid].state : this.weather.attributes.humidity;
     this.pressure = this.config.press ? hass.states[this.config.press].state : this.weather.attributes.pressure;
-    this.uv_index = this.config.show_uv === false
-      ? undefined
-      : (this.config.uv ? hass.states[this.config.uv].state : this.weather.attributes.uv_index);
+    this.uv_index = this.config.uv ? hass.states[this.config.uv].state : this.weather.attributes.uv_index;
     this.windSpeed = this.config.windspeed ? hass.states[this.config.windspeed].state : this.weather.attributes.wind_speed;
     this.dew_point = this.config.dew_point ? hass.states[this.config.dew_point].state : this.weather.attributes.dew_point;
     this.wind_gust_speed = this.config.wind_gust_speed ? hass.states[this.config.wind_gust_speed].state : this.weather.attributes.wind_gust_speed;
@@ -365,6 +383,7 @@ handleForecastTypeToggle() {
 
   startAutoRotate() {
     this.stopAutoRotate();
+    if (this.config && this.config.show_forecast === false) return;
     const interval = this.config && this.config.forecast ? parseInt(this.config.forecast.auto_rotate, 10) : 0;
     if (!interval || interval < 1 || interval > 60) return;
     // Only rotate if both a daily and an hourly forecast source are available
@@ -877,8 +896,8 @@ getWindDirIcon(deg) {
         i = 8;
         break;
       default:
-        i = 9;
-        break;
+        // Unknown or missing bearing: there is no arrow to point.
+        return null;
     }
     return cardinalDirectionsIcon[i];
   }
@@ -1341,7 +1360,17 @@ createTemperatureGradient(data, unit, ctx, chartArea, rangeC = null) {
 
 drawChart({ config, language, weather, forecastItems } = this) {
   const self = this; // Capture component instance for use in Chart.js callbacks
-  
+
+  // No canvas is rendered when the forecast is hidden, so bail out before the
+  // lookup below reports a missing element.
+  if (config.show_forecast === false) {
+    if (this.forecastChart) {
+      this.forecastChart.destroy();
+      this.forecastChart = null;
+    }
+    return;
+  }
+
   if (!this.forecasts || !this.forecasts.length) {
     return [];
   }
@@ -1463,6 +1492,10 @@ drawChart({ config, language, weather, forecastItems } = this) {
       categoryPercentage: 1.0,
       datalabels: {
         display: function (context) {
+          // Hides the value printed on each bar; the bars themselves stay.
+          if (config.forecast.show_precipitation_labels === false) {
+            return false;
+          }
           return context.dataset.data[context.dataIndex] > 0 ? 'true' : false;
         },
       formatter: function (value, context) {
@@ -1794,6 +1827,12 @@ updateChart({ forecasts, forecastChart } = this) {
     if (!config || !_hass) {
       return html``;
     }
+    // Forecast-only mode: with the main section, clock and attributes gone, the
+    // absolutely positioned daily/hourly button would land on top of the chart,
+    // so the chart needs to be pushed clear of it.
+    const forecastOnly = config.show_main === false;
+    const showForecast = config.show_forecast !== false;
+
     if (!weather || !weather.attributes) {
       return html`
         <style>
@@ -1903,6 +1942,7 @@ updateChart({ forecasts, forecastChart } = this) {
           height: ${config.forecast.chart_height}px;
           width: 100%;
           direction: ltr;
+          margin-top: ${forecastOnly && config.show_forecast_toggle ? '40px' : '0px'};
         }
         .conditions {
           display: flex;
@@ -1997,9 +2037,11 @@ updateChart({ forecasts, forecastChart } = this) {
           ${this.renderClock()}
           ${this.renderMain()}
           ${this.renderAttributes()}
-          <div class="chart-container">
-            <canvas id="forecastChart"></canvas>
-          </div>
+          ${showForecast ? html`
+            <div class="chart-container">
+              <canvas id="forecastChart"></canvas>
+            </div>
+          ` : ''}
           ${this.renderForecastConditionIcons()}
           ${this.renderWind()}
           ${this.renderLastUpdated()}
@@ -2182,10 +2224,14 @@ updateClock() {
 }
 
 renderClock({ config } = this) {
-  const showTime = config.show_time;
+  // `show_main: false` is the card's forecast-only mode. The clock, day and date
+  // belong to the main section and go with it; the daily/hourly button stays,
+  // since it drives the forecast that is still on screen.
+  const showMain = config.show_main !== false;
+  const showTime = showMain && config.show_time;
   const showDay = config.show_day;
   const showDate = config.show_date;
-  const showForecastToggle = config.show_forecast_toggle;
+  const showForecastToggle = config.show_forecast_toggle && config.show_forecast !== false;
 
   // Clock update logic
   if (showTime) {
@@ -2224,6 +2270,11 @@ renderClock({ config } = this) {
 }
 
 renderAttributes({ config, humidity, pressure, windSpeed, windDirection, sun, language, uv_index, dew_point, wind_gust_speed, visibility } = this) {
+  // The attributes row describes current conditions, so it is part of the main
+  // section and is hidden in forecast-only mode (`show_main: false`).
+  if (config.show_main === false || config.show_attributes == false)
+    return html``;
+
   let dWindSpeed = this.convertWindSpeed(windSpeed);
   let dPressure = pressure;
   const dewPointNumber = Number(dew_point);
@@ -2269,14 +2320,12 @@ renderAttributes({ config, humidity, pressure, windSpeed, windDirection, sun, la
     }
   }
 
-  if (config.show_attributes == false)
-    return html``;
-
   const showHumidity = config.show_humidity !== false;
   const showPressure = config.show_pressure !== false;
   const showWindDirection = config.show_wind_direction !== false;
   const showWindSpeed = config.show_wind_speed !== false;
   const showSun = config.show_sun !== false;
+  const showUv = config.show_uv !== false;
   const showDewpoint = config.show_dew_point == true;
   const showWindgustspeed = config.show_wind_gust_speed == true;
   const showVisibility = config.show_visibility == true;
@@ -2304,9 +2353,9 @@ return html`
           ` : ''}
         </div>
       ` : ''}
-      ${((showSun && sun !== undefined) || (typeof uv_index !== 'undefined' && uv_index !== undefined)) ? html`
+      ${((showSun && sun !== undefined) || (showUv && uv_index !== undefined)) ? html`
         <div>
-          ${typeof uv_index !== 'undefined' && uv_index !== undefined ? html`
+          ${showUv && uv_index !== undefined ? html`
             <div>
               <ha-icon icon="hass:white-balance-sunny"></ha-icon> UV: ${Math.round(uv_index * 10) / 10}
             </div>
@@ -2320,8 +2369,8 @@ return html`
       ` : ''}
       ${((showWindDirection && windDirection !== undefined) || (showWindSpeed && dWindSpeed !== undefined)) ? html`
         <div>
-          ${showWindDirection && windDirection !== undefined ? html`
-            <ha-icon icon="hass:${this.getWindDirIcon(windDirection)}"></ha-icon> ${this.getWindDir(windDirection)} <br>
+          ${showWindDirection && windDirection !== undefined && windDirection !== null ? html`
+            ${this.getWindDirIcon(windDirection) ? html`<ha-icon icon="hass:${this.getWindDirIcon(windDirection)}"></ha-icon> ` : ''}${this.getWindDir(windDirection)} <br>
           ` : ''}
           ${showWindSpeed && dWindSpeed !== undefined ? html`
             <ha-icon icon="hass:weather-windy"></ha-icon>
@@ -2384,11 +2433,11 @@ renderSun({ sun, language } = this) {
 }
 
 renderForecastConditionIcons({ config, forecastItems, sun } = this) {
-  const forecast = this.forecasts ? this.forecasts.slice(0, forecastItems) : [];
-
-  if (config.forecast.condition_icons === false) {
+  if (config.show_forecast === false || config.forecast.condition_icons === false) {
     return html``;
   }
+
+  const forecast = this.forecasts ? this.forecasts.slice(0, forecastItems) : [];
 
   return html`
     <div class="conditions" @click="${(e) => this.showMoreInfo(config.entity)}">
@@ -2447,7 +2496,7 @@ renderForecastConditionIcons({ config, forecastItems, sun } = this) {
 }
 
 renderWind({ config, weather, windSpeed, windDirection, forecastItems } = this) {
-  const showWindForecast = config.forecast.show_wind_forecast !== false;
+  const showWindForecast = config.show_forecast !== false && config.forecast.show_wind_forecast !== false;
 
   if (!showWindForecast) {
     return html``;
@@ -2455,25 +2504,47 @@ renderWind({ config, weather, windSpeed, windDirection, forecastItems } = this) 
 
   const forecast = this.forecasts ? this.forecasts.slice(0, forecastItems) : [];
 
+  const hasWindData = (item) => Number.isFinite(Number(item.wind_speed))
+    || (item.wind_bearing !== undefined && item.wind_bearing !== null);
+
+  // Not every forecast provider reports wind. Rendering the row regardless left
+  // a strip of bare unit labels under the chart, so drop it entirely when no
+  // forecast item carries wind.
+  if (!forecast.some(hasWindData)) {
+    return html``;
+  }
+
   const forecastType = config.forecast.type || 'daily';
   const forecastWindUnit = this.getForecastEntityAttributes(forecastType).wind_speed_unit
     || (this.weather && this.weather.attributes.wind_speed_unit);
 
   return html`
     <div class="wind-details">
-      ${showWindForecast ? html`
-        ${forecast.map((item) => {
-          const dWindSpeed = this.convertWindSpeed(item.wind_speed, this.unitSpeed, forecastWindUnit);
+      ${forecast.map((item) => {
+        const numericWindSpeed = Number(item.wind_speed);
+        const hasSpeed = Number.isFinite(numericWindSpeed);
+        const bearingIcon = item.wind_bearing !== undefined && item.wind_bearing !== null
+          ? this.getWindDirIcon(item.wind_bearing)
+          : null;
 
-          return html`
-            <div class="wind-detail">
-              <ha-icon class="wind-icon" icon="hass:${this.getWindDirIcon(item.wind_bearing)}"></ha-icon>
+        // An individual gap still needs its column, or the row stops lining up
+        // with the chart and the condition icons above it.
+        if (!hasSpeed && !bearingIcon) {
+          return html`<div class="wind-detail"></div>`;
+        }
+
+        const dWindSpeed = this.convertWindSpeed(item.wind_speed, this.unitSpeed, forecastWindUnit);
+
+        return html`
+          <div class="wind-detail">
+            ${bearingIcon ? html`<ha-icon class="wind-icon" icon="hass:${bearingIcon}"></ha-icon>` : ''}
+            ${hasSpeed ? html`
               <span class="wind-speed">${dWindSpeed}</span>
               <span class="wind-unit">${this.ll('units')[this.unitSpeed] || this.unitSpeed}</span>
-            </div>
-          `;
-        })}
-      ` : ''}
+            ` : ''}
+          </div>
+        `;
+      })}
     </div>
   `;
 }

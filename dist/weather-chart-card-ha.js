@@ -7,6 +7,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Teplota v noci',
       'precip': 'Srážky',
       'feelsLike': 'Pocitová teplota',
+      'daily': 'Denní',
+      'hourly': 'Hodinová',
+      'auto': 'Auto',
       'days': ['Neděle', 'Pondělí', 'Úterý', 'Středa', 'Čtvrtek', 'Pátek', 'Sobota'],
       'months': ['leden', 'únor', 'březen', 'duben', 'květen', 'červen', 'červenec', 'srpen', 'září', 'říjen', 'listopad', 'prosinec'],
       'units': {
@@ -48,6 +51,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Teplota v noci',
       'precip': 'Zrážky',
       'feelsLike': 'Pocitová teplota',
+      'daily': 'Denná',
+      'hourly': 'Hodinová',
+      'auto': 'Auto',
       'days': ['Nedeľa', 'Pondelok', 'Utorok', 'Streda', 'Štvrtok', 'Piatok', 'Sobota'],
       'months': ['január', 'február', 'marec', 'apríl', 'máj', 'jún', 'júl', 'august', 'september', 'október', 'november', 'december'],
       'units': {
@@ -89,6 +95,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Nachttemperatur',
       'precip': 'Niederschlag',
       'feelsLike': 'Gefühlt',
+      'daily': 'Täglich',
+      'hourly': 'Stündlich',
+      'auto': 'Auto',
       'days': ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
       'months': ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni', 'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
       'units': {
@@ -130,6 +139,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Nachttemperatuur',
       'precip': 'Neerslag',
       'feelsLike': 'Voelt als',
+      'daily': 'Dagelijks',
+      'hourly': 'Per uur',
+      'auto': 'Auto',
       'days': ['Zondag', 'Maandag', 'Dinsdag', 'Woensdag', 'Donderdag', 'Vrijdag', 'Zaterdag'],
       'months': ['januari', 'februari', 'maart', 'april', 'mei', 'juni', 'juli', 'augustus', 'september', 'oktober', 'november', 'december'],
       'units': {
@@ -171,6 +183,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Temperature night',
       'precip': 'Precipitations',
       'feelsLike': 'Feels like',
+      'daily': 'Daily',
+      'hourly': 'Hourly',
+      'auto': 'Auto',
       'days': ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
       'months': ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
       'units': {
@@ -212,6 +227,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Temperatura mínima',
       'precip': 'Precipitación',
       'feelsLike': 'Sensación térmica',
+      'daily': 'Diario',
+      'hourly': 'Por horas',
+      'auto': 'Auto',
       'days': ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'],
       'months': ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'],
       'units': {
@@ -253,6 +271,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Lämpötila alin',
       'precip': 'Sademäärä',
       'feelsLike': 'Tuntuu kuin',
+      'daily': 'Päivittäin',
+      'hourly': 'Tunneittain',
+      'auto': 'Auto',
       'days': ['Sunnuntai', 'Maanantai', 'Tiistai', 'Keskiviikko', 'Torstai', 'Perjantai', 'Lauantai'],
       'months': ['tammikuu', 'helmikuu', 'maaliskuu', 'huhtikuu', 'toukokuu', 'kesäkuu', 'heinäkuu', 'elokuu', 'syyskuu', 'lokakuu', 'marraskuu', 'joulukuu'],
       'units': {
@@ -294,6 +315,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Min. hőmérséklet',
       'precip': 'Csapadék',
       'feelsLike': 'Hőérzet',
+      'daily': 'Napi',
+      'hourly': 'Óránkénti',
+      'auto': 'Auto',
       'days': ['Vasárnap', 'Hétfő', 'Kedd', 'Szerda', 'Csütörtök', 'Péntek', 'Szombat'],
       'months': ['január', 'február', 'március', 'április', 'május', 'június', 'július', 'augusztus', 'szeptember', 'október', 'november', 'december'],
       'units': {
@@ -335,6 +359,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Температура ночью',
       'precip': 'Осадки',
       'feelsLike': 'Ощущается как',
+      'daily': 'По дням',
+      'hourly': 'По часам',
+      'auto': 'Авто',
       'days': ['Воскресенье', 'Понедельник', 'Вторник', 'Среда', 'Четверг', 'Пятница', 'Суббота'],
       'months': ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
       'units': {
@@ -376,6 +403,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Temperatur min',
       'precip': 'Nederbörd',
       'feelsLike': 'Känns som',
+      'daily': 'Daglig',
+      'hourly': 'Per timme',
+      'auto': 'Auto',
       'days': ['Söndag', 'Måndag', 'Tisdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lördag'],
       'months': ['januari', 'februari', 'mars', 'april', 'maj', 'juni', 'juli', 'augusti', 'september', 'oktober', 'november', 'december'],
       'units': {
@@ -417,6 +447,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Température min',
       'precip': 'Précipitations',
       'feelsLike': 'Ressenti',
+      'daily': 'Quotidien',
+      'hourly': 'Horaire',
+      'auto': 'Auto',
       'days': ['Dimanche', 'Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi'],
       'months': ['janvier', 'février', 'mars', 'avril', 'mai', 'juin', 'juillet', 'août', 'septembre', 'octobre', 'novembre', 'décembre'],
       'units': {
@@ -458,6 +491,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Temperatura w nocy',
       'precip': 'Opady',
       'feelsLike': 'Odczuwalna',
+      'daily': 'Dzienna',
+      'hourly': 'Godzinowa',
+      'auto': 'Auto',
       'days': ['Niedziela', 'Poniedziałek', 'Wtorek', 'Środa', 'Czwartek', 'Piątek', 'Sobota'],
       'months': ['styczeń', 'luty', 'marzec', 'kwiecień', 'maj', 'czerwiec', 'lipiec', 'sierpień', 'wrzesień', 'październik', 'listopad', 'grudzień'],
       'units': {
@@ -499,6 +535,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Minimumstemperatur',
       'precip': 'Nedbør',
       'feelsLike': 'Føles som',
+      'daily': 'Daglig',
+      'hourly': 'Per time',
+      'auto': 'Auto',
       'days': ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'],
       'months': ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'],
       'units': {
@@ -540,6 +579,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Nattemperatur',
       'precip': 'Nedbør',
       'feelsLike': 'Føles som',
+      'daily': 'Daglig',
+      'hourly': 'Time for time',
+      'auto': 'Auto',
       'days': ['Søndag', 'Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag'],
       'months': ['januar', 'februar', 'marts', 'april', 'maj', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'december'],
       'units': {
@@ -581,6 +623,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Temperatura notte',
       'precip': 'Precipitazioni',
       'feelsLike': 'Percepito come',
+      'daily': 'Giornaliero',
+      'hourly': 'Orario',
+      'auto': 'Auto',
       'days': ['Domenica', 'Lunedì', 'Martedì', 'Mercoledì', 'Giovedì', 'Venerdì', 'Sabato'],
       'months': ['gennaio', 'febbraio', 'marzo', 'aprile', 'maggio', 'giugno', 'luglio', 'agosto', 'settembre', 'ottobre', 'novembre', 'dicembre'],
       'units': {
@@ -622,6 +667,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Temperatura noite',
       'precip': 'Precipitação',
       'feelsLike': 'Sensação Térmica',
+      'daily': 'Diária',
+      'hourly': 'Horária',
+      'auto': 'Auto',
       'days': ['Domingo', 'Segunda-feira', 'Terça-feira', 'Quarta-feira', 'Quinta-feira', 'Sexta-feira', 'Sábado'],
       'months': ['janeiro', 'fevereiro', 'março', 'abril', 'maio', 'junho', 'julho', 'agosto', 'setembro', 'outubro', 'novembro', 'dezembro'],
       'units': {
@@ -663,6 +711,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Ελάχιστη θερμοκρασία νύχτας',
       'precip': 'Υετός',
       'feelsLike': 'Αίσθηση σαν',
+      'daily': 'Ημερήσια',
+      'hourly': 'Ωριαία',
+      'auto': 'Αυτόματο',
       'days': ['Κυριακή', 'Δευτέρα', 'Τρίτη', 'Τετάρτη', 'Πέμπτη', 'Παρασκευή', 'Σάββατο'],
       'months': ['Ιανουάριος', 'Φεβρουάριος', 'Μάρτιος', 'Απρίλιος', 'Μάιος', 'Ιούνιος', 'Ιούλιος', 'Αύγουστος', 'Σεπτέμβριος', 'Οκτώβριος', 'Νοέμβριος', 'Δεκέμβριος'],
       'units': {
@@ -704,6 +755,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Минимална температура',
       'precip': 'Валежи',
       'feelsLike': 'Усеща се като',
+      'daily': 'Дневна',
+      'hourly': 'Часова',
+      'auto': 'Авто',
       'days': ['Неделя', 'Понеделник', 'Вторник', 'Сряда', 'Четвъртък', 'Петък', 'Събота'],
       'months': ['януари', 'февруари', 'март', 'април', 'май', 'юни', 'юли', 'август', 'септември', 'октомври', 'ноември', 'декември'],
       'units': {
@@ -745,6 +799,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Naktį',
       'precip': 'Krituliai',
       'feelsLike': 'Jaučiama',
+      'daily': 'Dienos',
+      'hourly': 'Valandos',
+      'auto': 'Auto',
       'days': ['Sekmadienis', 'Pirmadienis', 'Antradienis', 'Trečiadienis', 'Ketvirtadienis', 'Penktadienis', 'Šeštadienis'],
       'months': ['sausis', 'vasaris', 'kovas', 'balandis', 'gegužė', 'birželis', 'liepa', 'rugpjūtis', 'rugsėjis', 'spalis', 'lapkritis', 'gruodis'],
       'units': {
@@ -786,6 +843,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Temperatura mínima',
       'precip': 'Precipitació',
       'feelsLike': 'Sensació tèrmica',
+      'daily': 'Diària',
+      'hourly': 'Horària',
+      'auto': 'Auto',
       'days': ['Diumenge', 'Dilluns', 'Dimarts', 'Dimecres', 'Dijous', 'Divendres', 'Dissabte'],
       'months': ['gener', 'febrer', 'març', 'abril', 'maig', 'juny', 'juliol', 'agost', 'setembre', 'octubre', 'novembre', 'desembre'],
       'units': {
@@ -827,6 +887,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Temperatură noaptea',
       'precip': 'Precipitații',
       'feelsLike': 'Se simte ca',
+      'daily': 'Zilnică',
+      'hourly': 'Orară',
+      'auto': 'Auto',
       'days': ['Duminică', 'Luni', 'Marți', 'Miercuri', 'Joi', 'Vineri', 'Sâmbătă'],
       'months': ['Ianuarie', 'Februarie', 'Martie', 'Aprilie', 'Mai', 'Iunie', 'Iulie', 'August', 'Septembrie', 'Octombrie', 'Noiembrie', 'Decembrie'],
       'units': {
@@ -868,6 +931,9 @@ var WeatherChartCard = (function () {
       'tempLo': 'Температура вночі',
       'precip': 'Опади',
       'feelsLike': 'Відчувається як',
+      'daily': 'Щодня',
+      'hourly': 'Погодинно',
+      'auto': 'Авто',
       'days': ['Неділя', 'Понеділок', 'Вівторок', 'Середа', 'Четвер', 'П\'ятниця', 'Субота'],
       'months': ['січень', 'лютий', 'березень', 'квітень', 'травень', 'червень', 'липень', 'серпень', 'вересень', 'жовтень', 'листопад', 'грудень'],
       'units': {
@@ -909,6 +975,9 @@ var WeatherChartCard = (function () {
       'tempLo': '최저 기온',
       'precip': '강수',
       'feelsLike': '체감',
+      'daily': '일별',
+      'hourly': '시간별',
+      'auto': '자동',
       'days': ['일요일', '월요일', '화요일', '수요일', '목요일', '금요일', '토요일'],
       'months': ['1월', '2월', '3월', '4월', '5월', '6월', '7월', '8월', '9월', '10월', '11월', '12월'],
       'units': {
@@ -1163,6 +1232,17 @@ var WeatherChartCard = (function () {
       this.dispatchEvent(event);
     }
 
+    // Native `<input>` elements always expose a `checked` property, `false` for a
+    // text or number field, so testing `checked !== undefined` reads a boolean out
+    // of every text box. Only ask a real toggle for its checked state.
+    _readTargetValue(target) {
+      const toggleTags = ['ha-switch', 'ha-checkbox', 'ha-radio', 'mwc-switch'];
+      const isToggle = toggleTags.includes(target.localName)
+        || target.type === 'checkbox'
+        || target.type === 'radio';
+      return isToggle ? target.checked : target.value;
+    }
+
     _valueChanged(event, key) {
       if (!this._config) {
         return;
@@ -1183,17 +1263,9 @@ var WeatherChartCard = (function () {
         }
 
         const finalKey = parts[parts.length - 1];
-        if (event.target.checked !== undefined) {
-          currentLevel[finalKey] = event.target.checked;
-        } else {
-          currentLevel[finalKey] = event.target.value;
-        }
+        currentLevel[finalKey] = this._readTargetValue(event.target);
       } else {
-        if (event.target.checked !== undefined) {
-          newConfig[key] = event.target.checked;
-        } else {
-          newConfig[key] = event.target.value;
-        }
+        newConfig[key] = this._readTargetValue(event.target);
       }
 
       this.configChanged(newConfig);
@@ -1324,6 +1396,9 @@ var WeatherChartCard = (function () {
         .switch-label {
           padding-left: 14px;
         }
+        .switch-container.locked .switch-label {
+          opacity: 0.5;
+        }
         .switch-container {
           margin-bottom: 12px;
         }
@@ -1363,6 +1438,9 @@ var WeatherChartCard = (function () {
           display: flex;
           align-items: center;
           gap: 5px;
+        }
+        .radio-container.group-spacing {
+          margin-top: 16px;
         }
         .radio-group {
           display: flex;
@@ -1555,8 +1633,7 @@ var WeatherChartCard = (function () {
       </div>
        </div>
 
-      <h5>Forecast type:</h5>
-      <div class="radio-container">
+      <div class="radio-container group-spacing">
         <div class="switch-right">
           <ha-radio
             name="type"
@@ -1619,8 +1696,7 @@ var WeatherChartCard = (function () {
         />
       </div>
 
-      <h5>Chart style:</h5>
-      <div class="radio-container">
+      <div class="radio-container group-spacing">
         <div class="switch-right">
           <ha-radio
             name="style"
@@ -1705,13 +1781,24 @@ var WeatherChartCard = (function () {
 
         <!-- Card Settings Page -->
         <div class="page-container ${this.currentPage === 'card' ? 'active' : ''}">
-          <div class="switch-container">
+          <div class="switch-container ${this._config.show_forecast === false ? 'locked' : ''}">
             <ha-switch
               @change="${(e) => this._valueChanged(e, 'show_main')}"
               .checked="${this._config.show_main !== false}"
+              .disabled="${this._config.show_forecast === false}"
             ></ha-switch>
             <label class="switch-label">
               Show Main
+            </label>
+          </div>
+          <div class="switch-container ${this._config.show_main === false ? 'locked' : ''}">
+            <ha-switch
+              @change="${(e) => this._valueChanged(e, 'show_forecast')}"
+              .checked="${this._config.show_forecast !== false}"
+              .disabled="${this._config.show_main === false}"
+            ></ha-switch>
+            <label class="switch-label">
+              Show Forecast
             </label>
           </div>
       <div class="switch-container">
@@ -1783,11 +1870,20 @@ var WeatherChartCard = (function () {
           </div>
           <div class="switch-container">
             <ha-switch
+              @change="${(e) => this._valueChanged(e, 'show_uv')}"
+              .checked="${this._config.show_uv !== false}"
+            ></ha-switch>
+            <label class="switch-label">
+              Show UV
+            </label>
+          </div>
+          <div class="switch-container">
+            <ha-switch
               @change="${(e) => this._valueChanged(e, 'show_sun')}"
               .checked="${this._config.show_sun !== false}"
             ></ha-switch>
             <label class="switch-label">
-              Show Sun
+              Show Sun Dawn/Dusk
             </label>
           </div>
           <div class="switch-container">
@@ -1998,6 +2094,15 @@ var WeatherChartCard = (function () {
              ></ha-switch>
              <label class="switch-label">
                Show precipitation probability
+             </label>
+         </div>
+         <div class="switch-container">
+             <ha-switch
+               @change="${(e) => this._valueChanged(e, 'forecast.show_precipitation_labels')}"
+               .checked="${forecastConfig.show_precipitation_labels !== false}"
+             ></ha-switch>
+             <label class="switch-label">
+               Show precipitation values on the chart
              </label>
          </div>
           <div class="textfield-container">
@@ -18484,6 +18589,7 @@ var WeatherChartCard = (function () {
       entity,
       title: 'Enhanced Weather Chart Card',
       show_main: true,
+      show_forecast: true,
       show_temperature: true,
       show_current_condition: true,
       show_attributes: true,
@@ -18494,6 +18600,7 @@ var WeatherChartCard = (function () {
       show_date: true,
       show_humidity: true,
       show_pressure: true,
+      show_uv: true,
       show_wind_direction: true,
       show_wind_speed: true,
       show_sun: true,
@@ -18514,6 +18621,7 @@ var WeatherChartCard = (function () {
       forecast: {
         precipitation_type: 'rainfall',
         show_probability: false,
+        show_precipitation_labels: true,
         labels_font_size: '11',
         precip_bar_size: '100',
         style: 'style2',
@@ -18571,6 +18679,7 @@ var WeatherChartCard = (function () {
       forecast: {
         precipitation_type: 'rainfall',
         show_probability: false,
+        show_precipitation_labels: true,
         labels_font_size: 11,
         chart_height: 180,
         precip_bar_size: 100,
@@ -18613,9 +18722,25 @@ var WeatherChartCard = (function () {
     }
 
     // An empty title disables the card header. The default 'Weather' is applied
-    // above only when no title key is present in the user config.
-    if (typeof cardConfig.title === 'string' && !cardConfig.title.trim()) {
+    // above only when no title key is present in the user config. A config saved
+    // by an older editor build can carry a non-string title (it wrote the input's
+    // `checked` property instead of its value); treat that as no header.
+    if (typeof cardConfig.title === 'number') {
+      cardConfig.title = String(cardConfig.title);
+    } else if (typeof cardConfig.title !== 'string') {
       cardConfig.title = '';
+    }
+    if (!cardConfig.title.trim()) {
+      cardConfig.title = '';
+    }
+
+    // `show_main` and `show_forecast` each hide one half of the card, so turning
+    // both off would leave nothing behind. The editor disables one switch once the
+    // other is off; a hand-written YAML config can still ask for it, so fall back
+    // to the forecast rather than rendering an empty card.
+    if (cardConfig.show_main === false && cardConfig.show_forecast === false) {
+      console.warn('weather-chart-card-ha: show_main and show_forecast cannot both be false; keeping the forecast visible.');
+      cardConfig.show_forecast = true;
     }
 
     this.config = cardConfig;
@@ -18643,9 +18768,7 @@ var WeatherChartCard = (function () {
       this.temperature = this.config.temp ? hass.states[this.config.temp].state : this.weather.attributes.temperature;
       this.humidity = this.config.humid ? hass.states[this.config.humid].state : this.weather.attributes.humidity;
       this.pressure = this.config.press ? hass.states[this.config.press].state : this.weather.attributes.pressure;
-      this.uv_index = this.config.show_uv === false
-        ? undefined
-        : (this.config.uv ? hass.states[this.config.uv].state : this.weather.attributes.uv_index);
+      this.uv_index = this.config.uv ? hass.states[this.config.uv].state : this.weather.attributes.uv_index;
       this.windSpeed = this.config.windspeed ? hass.states[this.config.windspeed].state : this.weather.attributes.wind_speed;
       this.dew_point = this.config.dew_point ? hass.states[this.config.dew_point].state : this.weather.attributes.dew_point;
       this.wind_gust_speed = this.config.wind_gust_speed ? hass.states[this.config.wind_gust_speed].state : this.weather.attributes.wind_gust_speed;
@@ -18821,6 +18944,7 @@ var WeatherChartCard = (function () {
 
     startAutoRotate() {
       this.stopAutoRotate();
+      if (this.config && this.config.show_forecast === false) return;
       const interval = this.config && this.config.forecast ? parseInt(this.config.forecast.auto_rotate, 10) : 0;
       if (!interval || interval < 1 || interval > 60) return;
       // Only rotate if both a daily and an hourly forecast source are available
@@ -19333,8 +19457,8 @@ var WeatherChartCard = (function () {
           i = 8;
           break;
         default:
-          i = 9;
-          break;
+          // Unknown or missing bearing: there is no arrow to point.
+          return null;
       }
       return cardinalDirectionsIcon[i];
     }
@@ -19797,7 +19921,17 @@ var WeatherChartCard = (function () {
 
   drawChart({ config, language, weather, forecastItems } = this) {
     const self = this; // Capture component instance for use in Chart.js callbacks
-    
+
+    // No canvas is rendered when the forecast is hidden, so bail out before the
+    // lookup below reports a missing element.
+    if (config.show_forecast === false) {
+      if (this.forecastChart) {
+        this.forecastChart.destroy();
+        this.forecastChart = null;
+      }
+      return;
+    }
+
     if (!this.forecasts || !this.forecasts.length) {
       return [];
     }
@@ -19919,6 +20053,10 @@ var WeatherChartCard = (function () {
         categoryPercentage: 1.0,
         datalabels: {
           display: function (context) {
+            // Hides the value printed on each bar; the bars themselves stay.
+            if (config.forecast.show_precipitation_labels === false) {
+              return false;
+            }
             return context.dataset.data[context.dataIndex] > 0 ? 'true' : false;
           },
         formatter: function (value, context) {
@@ -20250,6 +20388,12 @@ var WeatherChartCard = (function () {
       if (!config || !_hass) {
         return x``;
       }
+      // Forecast-only mode: with the main section, clock and attributes gone, the
+      // absolutely positioned daily/hourly button would land on top of the chart,
+      // so the chart needs to be pushed clear of it.
+      const forecastOnly = config.show_main === false;
+      const showForecast = config.show_forecast !== false;
+
       if (!weather || !weather.attributes) {
         return x`
         <style>
@@ -20359,6 +20503,7 @@ var WeatherChartCard = (function () {
           height: ${config.forecast.chart_height}px;
           width: 100%;
           direction: ltr;
+          margin-top: ${forecastOnly && config.show_forecast_toggle ? '40px' : '0px'};
         }
         .conditions {
           display: flex;
@@ -20453,9 +20598,11 @@ var WeatherChartCard = (function () {
           ${this.renderClock()}
           ${this.renderMain()}
           ${this.renderAttributes()}
-          <div class="chart-container">
-            <canvas id="forecastChart"></canvas>
-          </div>
+          ${showForecast ? x`
+            <div class="chart-container">
+              <canvas id="forecastChart"></canvas>
+            </div>
+          ` : ''}
           ${this.renderForecastConditionIcons()}
           ${this.renderWind()}
           ${this.renderLastUpdated()}
@@ -20638,10 +20785,14 @@ var WeatherChartCard = (function () {
   }
 
   renderClock({ config } = this) {
-    const showTime = config.show_time;
+    // `show_main: false` is the card's forecast-only mode. The clock, day and date
+    // belong to the main section and go with it; the daily/hourly button stays,
+    // since it drives the forecast that is still on screen.
+    const showMain = config.show_main !== false;
+    const showTime = showMain && config.show_time;
     const showDay = config.show_day;
     const showDate = config.show_date;
-    const showForecastToggle = config.show_forecast_toggle;
+    const showForecastToggle = config.show_forecast_toggle && config.show_forecast !== false;
 
     // Clock update logic
     if (showTime) {
@@ -20672,7 +20823,7 @@ var WeatherChartCard = (function () {
         <button class="forecast-toggle"
           @click="${this.handleForecastTypeToggle.bind(this)}"
           ?disabled="${this._canAutoRotate}">
-          ${this._canAutoRotate ? `Auto [${parseInt(config.forecast.auto_rotate, 10)}]` : (this.config.forecast.type === 'daily' ? 'Hourly' : 'Daily')}
+          ${this._canAutoRotate ? `${this.ll('auto')} [${parseInt(config.forecast.auto_rotate, 10)}]` : (this.config.forecast.type === 'daily' ? this.ll('hourly') : this.ll('daily'))}
         </button>
       ` : ''}
     </div>
@@ -20680,6 +20831,11 @@ var WeatherChartCard = (function () {
   }
 
   renderAttributes({ config, humidity, pressure, windSpeed, windDirection, sun, language, uv_index, dew_point, wind_gust_speed, visibility } = this) {
+    // The attributes row describes current conditions, so it is part of the main
+    // section and is hidden in forecast-only mode (`show_main: false`).
+    if (config.show_main === false || config.show_attributes == false)
+      return x``;
+
     let dWindSpeed = this.convertWindSpeed(windSpeed);
     let dPressure = pressure;
     const dewPointNumber = Number(dew_point);
@@ -20725,14 +20881,12 @@ var WeatherChartCard = (function () {
       }
     }
 
-    if (config.show_attributes == false)
-      return x``;
-
     const showHumidity = config.show_humidity !== false;
     const showPressure = config.show_pressure !== false;
     const showWindDirection = config.show_wind_direction !== false;
     const showWindSpeed = config.show_wind_speed !== false;
     const showSun = config.show_sun !== false;
+    const showUv = config.show_uv !== false;
     const showDewpoint = config.show_dew_point == true;
     const showWindgustspeed = config.show_wind_gust_speed == true;
     const showVisibility = config.show_visibility == true;
@@ -20760,9 +20914,9 @@ var WeatherChartCard = (function () {
           ` : ''}
         </div>
       ` : ''}
-      ${((showSun && sun !== undefined) || (typeof uv_index !== 'undefined' && uv_index !== undefined)) ? x`
+      ${((showSun && sun !== undefined) || (showUv && uv_index !== undefined)) ? x`
         <div>
-          ${typeof uv_index !== 'undefined' && uv_index !== undefined ? x`
+          ${showUv && uv_index !== undefined ? x`
             <div>
               <ha-icon icon="hass:white-balance-sunny"></ha-icon> UV: ${Math.round(uv_index * 10) / 10}
             </div>
@@ -20776,8 +20930,8 @@ var WeatherChartCard = (function () {
       ` : ''}
       ${((showWindDirection && windDirection !== undefined) || (showWindSpeed && dWindSpeed !== undefined)) ? x`
         <div>
-          ${showWindDirection && windDirection !== undefined ? x`
-            <ha-icon icon="hass:${this.getWindDirIcon(windDirection)}"></ha-icon> ${this.getWindDir(windDirection)} <br>
+          ${showWindDirection && windDirection !== undefined && windDirection !== null ? x`
+            ${this.getWindDirIcon(windDirection) ? x`<ha-icon icon="hass:${this.getWindDirIcon(windDirection)}"></ha-icon> ` : ''}${this.getWindDir(windDirection)} <br>
           ` : ''}
           ${showWindSpeed && dWindSpeed !== undefined ? x`
             <ha-icon icon="hass:weather-windy"></ha-icon>
@@ -20840,11 +20994,11 @@ var WeatherChartCard = (function () {
   }
 
   renderForecastConditionIcons({ config, forecastItems, sun } = this) {
-    const forecast = this.forecasts ? this.forecasts.slice(0, forecastItems) : [];
-
-    if (config.forecast.condition_icons === false) {
+    if (config.show_forecast === false || config.forecast.condition_icons === false) {
       return x``;
     }
+
+    const forecast = this.forecasts ? this.forecasts.slice(0, forecastItems) : [];
 
     return x`
     <div class="conditions" @click="${(e) => this.showMoreInfo(config.entity)}">
@@ -20903,7 +21057,7 @@ var WeatherChartCard = (function () {
   }
 
   renderWind({ config, weather, windSpeed, windDirection, forecastItems } = this) {
-    const showWindForecast = config.forecast.show_wind_forecast !== false;
+    const showWindForecast = config.show_forecast !== false && config.forecast.show_wind_forecast !== false;
 
     if (!showWindForecast) {
       return x``;
@@ -20911,25 +21065,47 @@ var WeatherChartCard = (function () {
 
     const forecast = this.forecasts ? this.forecasts.slice(0, forecastItems) : [];
 
+    const hasWindData = (item) => Number.isFinite(Number(item.wind_speed))
+      || (item.wind_bearing !== undefined && item.wind_bearing !== null);
+
+    // Not every forecast provider reports wind. Rendering the row regardless left
+    // a strip of bare unit labels under the chart, so drop it entirely when no
+    // forecast item carries wind.
+    if (!forecast.some(hasWindData)) {
+      return x``;
+    }
+
     const forecastType = config.forecast.type || 'daily';
     const forecastWindUnit = this.getForecastEntityAttributes(forecastType).wind_speed_unit
       || (this.weather && this.weather.attributes.wind_speed_unit);
 
     return x`
     <div class="wind-details">
-      ${showWindForecast ? x`
-        ${forecast.map((item) => {
-          const dWindSpeed = this.convertWindSpeed(item.wind_speed, this.unitSpeed, forecastWindUnit);
+      ${forecast.map((item) => {
+        const numericWindSpeed = Number(item.wind_speed);
+        const hasSpeed = Number.isFinite(numericWindSpeed);
+        const bearingIcon = item.wind_bearing !== undefined && item.wind_bearing !== null
+          ? this.getWindDirIcon(item.wind_bearing)
+          : null;
 
-          return x`
-            <div class="wind-detail">
-              <ha-icon class="wind-icon" icon="hass:${this.getWindDirIcon(item.wind_bearing)}"></ha-icon>
+        // An individual gap still needs its column, or the row stops lining up
+        // with the chart and the condition icons above it.
+        if (!hasSpeed && !bearingIcon) {
+          return x`<div class="wind-detail"></div>`;
+        }
+
+        const dWindSpeed = this.convertWindSpeed(item.wind_speed, this.unitSpeed, forecastWindUnit);
+
+        return x`
+          <div class="wind-detail">
+            ${bearingIcon ? x`<ha-icon class="wind-icon" icon="hass:${bearingIcon}"></ha-icon>` : ''}
+            ${hasSpeed ? x`
               <span class="wind-speed">${dWindSpeed}</span>
               <span class="wind-unit">${this.ll('units')[this.unitSpeed] || this.unitSpeed}</span>
-            </div>
-          `;
-        })}
-      ` : ''}
+            ` : ''}
+          </div>
+        `;
+      })}
     </div>
   `;
   }
