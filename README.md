@@ -142,7 +142,8 @@ units:
 | visibility            | string  | none                     | An entity_id for a custom visibility sensor.                                                       |
 | description           | string  | none                     | An entity_id for a custom weather description sensor.                                              |
 | title                 | string  | none                     | Card title.                                                                                        |
-| show_main             | boolean | true                     | Show or hide a section with current weather condition and temperature.                             |
+| show_main             | boolean | true                     | Show or hide the main section (time, current condition, temperature and attributes). Set to `false` for a forecast-only card. |
+| show_forecast         | boolean | true                     | Show or hide the forecast section (chart, condition icons and wind forecast). Set to `false` for a current-conditions-only card. `show_main` and `show_forecast` cannot both be `false`. |
 | show_temperature      | boolean | true                     | Show or hide the current temperature.                                                              |
 | show_current_condition| boolean | true                     | Show or hide the current weather condition.                                                        |
 | show_attributes       | boolean | true                     | Show or hide a section with attributes such as pressure, humidity, wind direction and speed, etc.  |
@@ -153,6 +154,7 @@ units:
 | show_date             | boolean | false                    | Show or hide the current date the card. (Only visible when show_time is true.)                     |
 | show_humidity         | boolean | true                     | Show or hide humidity on the card.                                                                 |
 | show_pressure         | boolean | true                     | Show or hide pressure on the card.                                                                 |
+| show_uv               | boolean | true                     | Show or hide the UV index on the card.                                                             |
 | show_wind_direction   | boolean | true                     | Show or hide wind_direction on the card.                                                           |
 | show_wind_speed       | boolean | true                     | Show or hide wind_speed on the card.                                                               |
 | show_feels_like       | boolean | false                    | Show or hide feels like temperature on the card.                                                   |
@@ -182,6 +184,7 @@ units:
 | ------------------------------ | ------- | -------------------------|--------------------------------------------------------------------------------------------------- |
 | precipitation_type             | string  | rainfall                 | Show precipitation in 'rainfall' or 'probability'.                                                 |
 | show_probability               | boolean | false                    | Also show probability value when precipitation_type = rainfall. (Only when available)              |
+| show_precipitation_labels      | boolean | true                     | Show the value printed on each precipitation bar (e.g. `0.1 in` or `35%`). Set to `false` to keep the bars but drop the text. |
 | labels_font_size               | number  | 11                       | Font size for temperature and precipitation labels.                                                |
 | precip_bar_size                | number  | 100                      | Adjusts the thickness of precipitation bars (1-100).                                               |
 | temperature1_color             | string  | rgba(255, 152, 0, 1.0)   | High/day temperature line color (used when use_color_thresholds is false).                         |
@@ -246,12 +249,29 @@ forecast:
   style: style2
 ```
 
+### Forecast Only
+`show_main: false` hides the whole main section — time, current condition, temperature and attributes — leaving just the forecast.
+
+```yaml
+type: custom:weather-chart-card-ha
+entity: weather.my_home
+show_main: false
+```
+
+### Current Conditions Only
+`show_forecast: false` hides the chart, the forecast condition icons and the wind forecast, leaving the main section.
+
+```yaml
+type: custom:weather-chart-card-ha
+entity: weather.my_home
+show_forecast: false
+```
+
 ### Chart Only (Minimal View)
 ```yaml
 type: custom:weather-chart-card-ha
 entity: weather.my_home
 show_main: false
-show_attributes: false
 forecast:
   condition_icons: false
   show_wind_forecast: false

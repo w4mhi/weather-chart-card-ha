@@ -124,6 +124,17 @@ class WeatherChartCardEditor extends LitElement {
     this.dispatchEvent(event);
   }
 
+  // Native `<input>` elements always expose a `checked` property, `false` for a
+  // text or number field, so testing `checked !== undefined` reads a boolean out
+  // of every text box. Only ask a real toggle for its checked state.
+  _readTargetValue(target) {
+    const toggleTags = ['ha-switch', 'ha-checkbox', 'ha-radio', 'mwc-switch'];
+    const isToggle = toggleTags.includes(target.localName)
+      || target.type === 'checkbox'
+      || target.type === 'radio';
+    return isToggle ? target.checked : target.value;
+  }
+
   _valueChanged(event, key) {
     if (!this._config) {
       return;
@@ -144,17 +155,9 @@ class WeatherChartCardEditor extends LitElement {
       }
 
       const finalKey = parts[parts.length - 1];
-      if (event.target.checked !== undefined) {
-        currentLevel[finalKey] = event.target.checked;
-      } else {
-        currentLevel[finalKey] = event.target.value;
-      }
+      currentLevel[finalKey] = this._readTargetValue(event.target);
     } else {
-      if (event.target.checked !== undefined) {
-        newConfig[key] = event.target.checked;
-      } else {
-        newConfig[key] = event.target.value;
-      }
+      newConfig[key] = this._readTargetValue(event.target);
     }
 
     this.configChanged(newConfig);
@@ -285,6 +288,9 @@ class WeatherChartCardEditor extends LitElement {
         .switch-label {
           padding-left: 14px;
         }
+        .switch-container.locked .switch-label {
+          opacity: 0.5;
+        }
         .switch-container {
           margin-bottom: 12px;
         }
@@ -324,6 +330,9 @@ class WeatherChartCardEditor extends LitElement {
           display: flex;
           align-items: center;
           gap: 5px;
+        }
+        .radio-container.group-spacing {
+          margin-top: 16px;
         }
         .radio-group {
           display: flex;
@@ -516,8 +525,7 @@ class WeatherChartCardEditor extends LitElement {
       </div>
        </div>
 
-      <h5>Forecast type:</h5>
-      <div class="radio-container">
+      <div class="radio-container group-spacing">
         <div class="switch-right">
           <ha-radio
             name="type"
@@ -580,8 +588,7 @@ class WeatherChartCardEditor extends LitElement {
         />
       </div>
 
-      <h5>Chart style:</h5>
-      <div class="radio-container">
+      <div class="radio-container group-spacing">
         <div class="switch-right">
           <ha-radio
             name="style"
@@ -666,13 +673,24 @@ class WeatherChartCardEditor extends LitElement {
 
         <!-- Card Settings Page -->
         <div class="page-container ${this.currentPage === 'card' ? 'active' : ''}">
-          <div class="switch-container">
+          <div class="switch-container ${this._config.show_forecast === false ? 'locked' : ''}">
             <ha-switch
               @change="${(e) => this._valueChanged(e, 'show_main')}"
               .checked="${this._config.show_main !== false}"
+              .disabled="${this._config.show_forecast === false}"
             ></ha-switch>
             <label class="switch-label">
               Show Main
+            </label>
+          </div>
+          <div class="switch-container ${this._config.show_main === false ? 'locked' : ''}">
+            <ha-switch
+              @change="${(e) => this._valueChanged(e, 'show_forecast')}"
+              .checked="${this._config.show_forecast !== false}"
+              .disabled="${this._config.show_main === false}"
+            ></ha-switch>
+            <label class="switch-label">
+              Show Forecast
             </label>
           </div>
       <div class="switch-container">
@@ -744,11 +762,20 @@ class WeatherChartCardEditor extends LitElement {
           </div>
           <div class="switch-container">
             <ha-switch
+              @change="${(e) => this._valueChanged(e, 'show_uv')}"
+              .checked="${this._config.show_uv !== false}"
+            ></ha-switch>
+            <label class="switch-label">
+              Show UV
+            </label>
+          </div>
+          <div class="switch-container">
+            <ha-switch
               @change="${(e) => this._valueChanged(e, 'show_sun')}"
               .checked="${this._config.show_sun !== false}"
             ></ha-switch>
             <label class="switch-label">
-              Show Sun
+              Show Sun Dawn/Dusk
             </label>
           </div>
           <div class="switch-container">
@@ -959,6 +986,15 @@ class WeatherChartCardEditor extends LitElement {
              ></ha-switch>
              <label class="switch-label">
                Show precipitation probability
+             </label>
+         </div>
+         <div class="switch-container">
+             <ha-switch
+               @change="${(e) => this._valueChanged(e, 'forecast.show_precipitation_labels')}"
+               .checked="${forecastConfig.show_precipitation_labels !== false}"
+             ></ha-switch>
+             <label class="switch-label">
+               Show precipitation values on the chart
              </label>
          </div>
           <div class="textfield-container">
