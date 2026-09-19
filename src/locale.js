@@ -1011,6 +1011,50 @@ const locale = {
     'windy': '바람',
     'windy-variant': '강풍'
   },
+  'zh-Hant': {
+    'tempHi': '氣溫',
+    'tempLo': '夜間氣溫',
+    'precip': '降水量',
+    'feelsLike': '體感溫度',
+    'daily': '逐日',
+    'hourly': '逐時',
+    'auto': '自動',
+    'days': ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'],
+    'months': ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月'],
+    'units': {
+      'km/h': 'km/h',
+      'm/s': 'm/s',
+      'mph': 'mph',
+      'kn': 'kn',
+      'Bft': 'Bft',
+      'hPa': 'hPa',
+      'mmHg': 'mmHg',
+      'mm': 'mm',
+      'cm': 'cm',
+      'in': 'in',
+      'l/m2': 'l/m2',
+      'kg/m2': 'kg/m2'
+    },
+    'cardinalDirections': [
+      '北', '北北東', '東北', '東北東', '東', '東南東', '東南', '南南東',
+      '南', '南南西', '西南', '西南西', '西', '西北西', '西北', '北北西', '北'
+    ],
+    'clear-night': '晴朗（夜間）',
+    'cloudy': '陰',
+    'exceptional': '極端天氣',
+    'fog': '霧',
+    'hail': '冰雹',
+    'lightning': '雷電',
+    'lightning-rainy': '雷雨',
+    'partlycloudy': '多雲',
+    'pouring': '大雨',
+    'rainy': '雨',
+    'snowy': '雪',
+    'snowy-rainy': '雨夾雪',
+    'sunny': '晴',
+    'windy': '有風',
+    'windy-variant': '強風'
+  },
 };
 
 export default locale;
