@@ -521,6 +521,7 @@ The compiled file will be in `dist/weather-chart-card-ha.js`
 | Swedish          | sv      |
 | Ukrainian        | uk      |
 | 한국어           | ko      |
+| 繁體中文           | zh-Hant |
 
 ---
 
