@@ -149,6 +149,10 @@ units:
 | show_current_condition| boolean | true                     | Show or hide the current weather condition.                                                        |
 | show_attributes       | boolean | true                     | Show or hide a section with attributes such as pressure, humidity, wind direction and speed, etc.  |
 | show_sun              | boolean | true                     | Show or hide the sunset information                                                                |
+| sunrise_entity        | string  | none                     | Entity whose state is a timestamp to show instead of the calculated sunrise (e.g. a local horizon). |
+| sunset_entity         | string  | none                     | Entity whose state is a timestamp to show instead of the calculated sunset.                        |
+| sunrise_icon          | string/list | mdi:weather-sunset-up | Icon for the sunrise time; a list shows several icons side by side.                               |
+| sunset_icon           | string/list | mdi:weather-sunset-down | Icon for the sunset time, e.g. `[mdi:image-filter-hdr, mdi:arrow-down-thin]` for "behind the mountain". |
 | show_time             | boolean | false                    | Show or hide the current time on the card.                                                         |
 | show_time_seconds     | boolean | false                    | Show or hide seconds for the current time on the card.                                             |
 | show_hour_leading_zero | boolean | true                     | Pad single-digit hours in the clock (`09:05` instead of `9:05`).                                   |
@@ -378,6 +382,18 @@ forecast:
   type: daily
   show_date_labels: true  # Shows "MON" and "8" on separate lines
 ```
+
+### Sunrise/Sunset from Entities
+In valleys the sun disappears behind the mountains long before the calculated sunset. If you have entities that know
+your local horizon (state = timestamp of the next sunrise/sunset), the card can show those instead:
+```yaml
+show_sun: true
+sunrise_entity: sensor.sun_behind_mountain_next_rising
+sunset_entity: sensor.sun_behind_mountain_next_setting
+sunrise_icon: [mdi:image-filter-hdr, mdi:arrow-up-thin]     # optional: mountain + arrow
+sunset_icon: [mdi:image-filter-hdr, mdi:arrow-down-thin]
+```
+If an entity is missing or its state is not a valid time, the calculated value is used.
 
 ### Extra Rows (per-day values from a sensor)
 Weather integrations don't provide everything you may want per day — e.g. sunshine hours or a PV yield forecast.

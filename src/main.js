@@ -2141,6 +2141,10 @@ updateChart({ forecasts, forecastChart } = this) {
           align-items: center;
           margin: 1px;
         }
+        .sun-icon-extra {
+          --mdc-icon-size: 16px;
+          margin-inline-start: -6px;
+        }
         .extra-row {
           display: flex;
           justify-content: space-around;
@@ -2632,10 +2636,25 @@ renderSun({ sun, language } = this) {
     sunsetDate = new Date(sun.attributes.next_setting);
   }
 
+  // Optional overrides, e.g. for a local horizon (mountains): entities whose state is a timestamp.
+  const fromEntity = (entityId) => {
+    const st = entityId && this._hass && this._hass.states[entityId];
+    const date = st ? new Date(st.state) : null;
+    return date && !Number.isNaN(date.getTime()) ? date : null;
+  };
+  sunriseDate = fromEntity(config.sunrise_entity) || sunriseDate;
+  sunsetDate = fromEntity(config.sunset_entity) || sunsetDate;
+
+  // sunrise_icon / sunset_icon: one icon or a list shown side by side (e.g. a mountain plus an arrow).
+  const icons = (option, fallback) => {
+    const list = (Array.isArray(option) ? option : [option || fallback]).filter((icon) => typeof icon === 'string' && icon);
+    return (list.length ? list : [fallback]).map((icon, i) => html`<ha-icon class="${i ? 'sun-icon-extra' : ''}" icon="${icon}"></ha-icon>`);
+  };
+
   return html`
-    <ha-icon icon="mdi:weather-sunset-up"></ha-icon>
+    ${icons(config.sunrise_icon, 'mdi:weather-sunset-up')}
       ${sunriseDate ? sunriseDate.toLocaleTimeString(locale, timeOptions) : '--'}<br>
-    <ha-icon icon="mdi:weather-sunset-down"></ha-icon>
+    ${icons(config.sunset_icon, 'mdi:weather-sunset-down')}
       ${sunsetDate ? sunsetDate.toLocaleTimeString(locale, timeOptions) : '--'}
   `;
 }
