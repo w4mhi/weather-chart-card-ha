@@ -1019,6 +1019,24 @@ class WeatherChartCardEditor extends LitElement {
               Disable Chart Animation
             </label>
           </div>
+          <div class="switch-container">
+            <ha-switch
+              @change="${(e) => this._valueChanged(e, 'forecast.fill_temperature_range')}"
+              .checked="${this._flag('forecast.fill_temperature_range')}"
+            ></ha-switch>
+            <label class="switch-label">
+              Shade Between High and Low Temperatures
+            </label>
+          </div>
+          <div class="switch-container">
+            <ha-switch
+              @change="${(e) => this._valueChanged(e, 'forecast.night_shading')}"
+              .checked="${this._flag('forecast.night_shading')}"
+            ></ha-switch>
+            <label class="switch-label">
+              Shade Night Hours (hourly forecast)
+            </label>
+          </div>
 	  <div class="textfield-container">
           <div>
             <label>Precipitation Type (Probability if supported by the weather entity)</label>
@@ -1042,6 +1060,15 @@ class WeatherChartCardEditor extends LitElement {
              ></ha-switch>
              <label class="switch-label">
                Show precipitation probability
+             </label>
+         </div>
+         <div class="switch-container" ?hidden=${this._value('forecast.precipitation_type') !== 'rainfall'}>
+             <ha-switch
+               @change="${(e) => this._valueChanged(e, 'forecast.show_probability_line')}"
+               .checked="${this._flag('forecast.show_probability_line')}"
+             ></ha-switch>
+             <label class="switch-label">
+               Show precipitation probability as a line
              </label>
          </div>
          <div class="switch-container">

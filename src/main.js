@@ -8,7 +8,8 @@ import {
 } from './const.js';
 import { DEFAULTS, FORECAST_DEFAULTS, UNITS_DEFAULTS } from './defaults.js';
 import iconData from './icon-data.js';
-import {LitElement, html} from 'lit';
+import { GestureDetector, hasAction } from './actions.js';
+import {LitElement, html, nothing} from 'lit';
 import './weather-chart-card-editor.js';
 import {Chart, registerables} from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
@@ -393,6 +394,13 @@ handleForecastTypeToggle() {
     super();
     this.resizeObserver = null;
     this.resizeInitialized = false;
+    this._gestures = new GestureDetector(
+      (action) => this.handleCardAction(action),
+      () => ({
+        hold: hasAction(this.config.hold_action),
+        doubleTap: hasAction(this.config.double_tap_action),
+      })
+    );
   }
 
   connectedCallback() {
@@ -463,6 +471,7 @@ handleForecastTypeToggle() {
     this.cancelAutoscroll();
     this.stopAutoRotate();
     this.unsubscribeForecastEvents();
+    this._gestures.dispose();
     if (this.clockInterval) {
       clearInterval(this.clockInterval);
       this.clockInterval = null;
@@ -524,24 +533,27 @@ ll(str) {
 }
 
 /**
- * Condition text for the main section. The card's own translations cover the
- * weather conditions; `unknown`, `unavailable` and anything new fall back to
- * Home Assistant's translations, then to the raw state.
+ * Condition text for the main section. Home Assistant ships the condition
+ * names in every language it supports, so its translation comes first, as
+ * long as the card shows the same language as Home Assistant (a card `locale`
+ * can differ). The card's own translations come next, then the raw state.
  */
 localizeCondition(condition) {
-  const own = this.ll(condition);
-  if (own) {
-    return own;
-  }
   const localize = this._hass && this._hass.localize;
-  if (typeof localize === 'function') {
-    const translated = localize(`component.weather.entity_component._.state.${condition}`)
-      || localize(`state.default.${condition}`);
-    if (translated) {
-      return translated;
+  const haTranslation = () => {
+    if (typeof localize !== 'function') {
+      return '';
     }
-  }
-  return condition;
+    return localize(`component.weather.entity_component._.state.${condition}`)
+      || localize(`state.default.${condition}`);
+  };
+  const language = (code) => String(code || '').split('-')[0].toLowerCase();
+  const sameLanguage = !this.config.locale
+    || language(this.config.locale) === language(this._hass && this._hass.language);
+  return (sameLanguage && haTranslation())
+    || this.ll(condition)
+    || haTranslation()
+    || condition;
 }
 
 getTimezone() {
@@ -671,6 +683,29 @@ isDaytimeAt(instant, options = {}) {
   const sunriseMinutes = this.getWallClockMinutes(sunrise, timeZone);
   const sunsetMinutes = this.getWallClockMinutes(sunset, timeZone);
   return nowMinutes >= sunriseMinutes && nowMinutes < sunsetMinutes;
+}
+
+/**
+ * Day or night for an hourly forecast slot, at the card's sun location. Falls
+ * back to the `sun.sun` entity when there are no coordinates (or at polar day
+ * and night), and to daytime when that is missing too.
+ * @param {Date} forecastTime
+ * @param {{ lat?: number, lon?: number, timeZone?: string }} [location]
+ */
+isForecastSlotDaytime(forecastTime, location = {}) {
+  const isDay = this.isDaytimeAt(forecastTime, location);
+  if (isDay != null) {
+    return isDay;
+  }
+  const sun = this.sun;
+  if (sun && sun.attributes) {
+    const sunriseTime = new Date(sun.attributes.next_rising);
+    const sunsetTime = new Date(sun.attributes.next_setting);
+    return sunriseTime && sunsetTime
+      ? forecastTime >= sunriseTime && forecastTime <= sunsetTime
+      : true;
+  }
+  return true;
 }
 
 /**
@@ -1459,7 +1494,7 @@ getTemperatureRangeC(data, unit) {
   return null;
 }
 
-createTemperatureGradient(data, unit, ctx, chartArea, rangeC = null) {
+createTemperatureGradient(data, unit, ctx, chartArea, rangeC = null, alpha = 1) {
   if (!chartArea) {
     return null;
   }
@@ -1470,10 +1505,44 @@ createTemperatureGradient(data, unit, ctx, chartArea, rangeC = null) {
   for (let i = 0; i < dataLength; i++) {
     const position = dataLength === 1 ? 0 : i / (dataLength - 1);
     const color = this.getTemperatureColorWithRange(data[i], unit, rangeC);
-    gradient.addColorStop(position, color);
+    gradient.addColorStop(position, alpha === 1 ? color : this.withAlpha(color, alpha));
   }
   
   return gradient;
+}
+
+/**
+ * The same color at another opacity, for rgb(), rgba() and hex colors. Other
+ * CSS colors (names, hsl, variables) come back as a neutral translucent grey.
+ */
+withAlpha(color, alpha) {
+  const value = String(color || '').trim();
+  const rgb = value.match(/^rgba?\(\s*([\d.]+)[\s,]+([\d.]+)[\s,]+([\d.]+)/i);
+  if (rgb) {
+    return `rgba(${rgb[1]}, ${rgb[2]}, ${rgb[3]}, ${alpha})`;
+  }
+  const hex = value.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (hex) {
+    const digits = hex[1].length === 3 ? hex[1].replace(/./g, '$&$&') : hex[1];
+    const [r, g, b] = [0, 2, 4].map((i) => parseInt(digits.slice(i, i + 2), 16));
+    return `rgba(${r}, ${g}, ${b}, ${alpha})`;
+  }
+  return `rgba(127, 127, 127, ${alpha})`;
+}
+
+/**
+ * Pixel span [start, end] of one category column on the chart's x scale,
+ * clipped to the chart area. Works with the reversed (RTL) scale too.
+ */
+getColumnBounds(chart, index) {
+  const xScale = chart.scales.x;
+  const area = chart.chartArea;
+  const count = (chart.data.labels || []).length;
+  const center = xScale.getPixelForValue(index);
+  const step = count > 1
+    ? Math.abs(xScale.getPixelForValue(1) - xScale.getPixelForValue(0))
+    : area.right - area.left;
+  return [Math.max(area.left, center - step / 2), Math.min(area.right, center + step / 2)];
 }
 
 drawChart({ config, language, weather, forecastItems } = this) {
@@ -1517,6 +1586,8 @@ drawChart({ config, language, weather, forecastItems } = this) {
   // callbacks below, so they read the current slice from here, not `data`.
   this._chartData = data;
   const tempColorRange = this.getTemperatureRangeC(data.tempHigh, tempUnit);
+  // Lows have gaps (null) where a forecast item has none; keep them out of the axis range.
+  const temperatures = [...data.tempHigh, ...data.tempLow].filter(Number.isFinite);
 
   // Read theme variables from the card itself, so view- and card-level themes
   // (and card-mod) apply, not only the page theme set on <body>.
@@ -1572,6 +1643,19 @@ drawChart({ config, language, weather, forecastItems } = this) {
             }
           : undefined,
       },
+      // Shade between the high and the low line. Scriptable, because the
+      // gradient needs the chart area, which exists only after the first layout.
+      fill: config.forecast.fill_temperature_range
+        ? (context) => {
+            const chart = context.chart;
+            let color = config.forecast.temperature_range_color;
+            if (!color && config.forecast.use_color_thresholds && chart.chartArea) {
+              color = this.createTemperatureGradient(chart.data.datasets[0].data, tempUnit, chart.ctx, chart.chartArea, tempColorRange, 0.25);
+            }
+            color = color || this.withAlpha(config.forecast.temperature1_color, 0.2);
+            return { target: 1, above: color, below: color };
+          }
+        : false,
     },
     {
       label: this.ll('tempLo'),
@@ -1662,9 +1746,7 @@ drawChart({ config, language, weather, forecastItems } = this) {
     };
 
     datasets[1].datalabels = {
-      display: function (context) {
-        return 'true';
-      },
+      display: (context) => Number.isFinite(context.dataset.data[context.dataIndex]),
       formatter: (value, context) => {
         return this.renderBidiMeasurement(context.dataset.data[context.dataIndex] + '°');
       },
@@ -1680,6 +1762,55 @@ drawChart({ config, language, weather, forecastItems } = this) {
     };
   }
 
+  // Optional: precipitation probability as a line over the rainfall bars, on
+  // its own hidden 0-100 % axis.
+  if (config.forecast.show_probability_line && config.forecast.precipitation_type !== 'probability') {
+    datasets.push({
+      label: this.ll('precip'),
+      type: 'line',
+      data: data.probability,
+      yAxisID: 'ProbAxis',
+      borderColor: config.forecast.probability_line_color || 'rgba(25, 118, 210, 0.9)',
+      backgroundColor: config.forecast.probability_line_color || 'rgba(25, 118, 210, 0.9)',
+      borderDash: [3, 3],
+      pointRadius: 0,
+      // Monotone curves never overshoot, so the line stays within 0-100 %.
+      cubicInterpolationMode: 'monotone',
+      // Above the bars, which share its blue and would otherwise hide it.
+      order: -1,
+      datalabels: { display: false },
+    });
+  }
+
+  // Optional: shade the night on hourly forecasts. Columns are night when the
+  // slot is, by the same rule as the day and night condition icons.
+  let nightCache = { labels: null, night: [] };
+  const nightShadingPlugin = {
+    id: 'nightShading',
+    beforeDatasetsDraw(chart) {
+      if (!config.forecast.night_shading || (config.forecast.type || 'daily') !== 'hourly' || !chart.chartArea) {
+        return;
+      }
+      const labels = chart.data.labels || [];
+      if (nightCache.labels !== labels) {
+        const location = { ...self.getSunLocation(), timeZone: self.getSunTimezone() };
+        nightCache = { labels, night: labels.map((dt) => !self.isForecastSlotDaytime(new Date(dt), location)) };
+      }
+      const area = chart.chartArea;
+      const c = chart.ctx;
+      c.save();
+      c.fillStyle = config.forecast.night_shading_color || 'rgba(100, 120, 160, 0.15)';
+      nightCache.night.forEach((isNight, index) => {
+        if (isNight) {
+          const [start, end] = self.getColumnBounds(chart, index);
+          // Round outwards so neighbouring night columns join without a seam.
+          c.fillRect(Math.floor(start), area.top, Math.ceil(end) - Math.floor(start), area.bottom - area.top);
+        }
+      });
+      c.restore();
+    },
+  };
+
   // Optional: mark today's column (daily forecasts only) with a soft band and a bold date label.
   // Resolved on every draw: updateChart() reuses this chart instance, so labels and "today" change.
   const todayIndexOf = (labels) => (config.forecast.highlight_today && (config.forecast.type || 'daily') === 'daily'
@@ -1693,26 +1824,22 @@ drawChart({ config, language, weather, forecastItems } = this) {
       if (todayIndex < 0) {
         return;
       }
-      const xScale = chart.scales.x;
       const area = chart.chartArea;
-      if (!xScale || !area) {
+      if (!chart.scales.x || !area) {
         return;
       }
-      const center = xScale.getPixelForValue(todayIndex);
-      const step = labels.length > 1
-        ? Math.abs(xScale.getPixelForValue(1) - xScale.getPixelForValue(0))
-        : area.right - area.left;
+      const [start, end] = self.getColumnBounds(chart, todayIndex);
       const c = chart.ctx;
       c.save();
       c.fillStyle = config.forecast.highlight_today_color || 'rgba(127, 127, 127, 0.12)';
-      c.fillRect(Math.max(area.left, center - step / 2), area.top, Math.min(step, area.right - area.left), area.bottom - area.top);
+      c.fillRect(start, area.top, end - start, area.bottom - area.top);
       c.restore();
     },
   };
 
   this.forecastChart = new Chart(ctx, {
     type: 'bar',
-    plugins: [highlightTodayPlugin],
+    plugins: [nightShadingPlugin, highlightTodayPlugin],
     data: {
       labels: data.dateTime,
       datasets: datasets,
@@ -1788,8 +1915,8 @@ drawChart({ config, language, weather, forecastItems } = this) {
         TempAxis: {
           position: 'left',
           beginAtZero: false,
-          suggestedMin: Math.min(...data.tempHigh, ...data.tempLow) - 5,
-          suggestedMax: Math.max(...data.tempHigh, ...data.tempLow) + 3,
+          suggestedMin: Math.min(...temperatures) - 5,
+          suggestedMax: Math.max(...temperatures) + 3,
           grid: {
             display: false,
             drawTicks: false,
@@ -1813,6 +1940,12 @@ drawChart({ config, language, weather, forecastItems } = this) {
             display: false,
           },
         },
+        ProbAxis: {
+          position: 'right',
+          display: false,
+          min: 0,
+          max: 100,
+        },
       },
       plugins: {
         legend: {
@@ -1830,6 +1963,7 @@ drawChart({ config, language, weather, forecastItems } = this) {
             size: config.forecast.labels_font_size,
             lineHeight: 0.7,
           },
+          display: (context) => Number.isFinite(context.dataset.data[context.dataIndex]),
           formatter: (value, context) => {
             return this.renderBidiMeasurement(context.dataset.data[context.dataIndex] + '°');
           },
@@ -1864,7 +1998,7 @@ drawChart({ config, language, weather, forecastItems } = this) {
       var value = context.formattedValue;
       var item = this._chartData.forecast[context.dataIndex];
       var probability = item ? item.precipitation_probability : undefined;
-      var unit = context.datasetIndex === 2 ? precipUnit : tempUnit;
+      var unit = context.datasetIndex === 2 ? precipUnit : context.datasetIndex === 3 ? '%' : tempUnit;
 
       if (config.forecast.precipitation_type === 'rainfall' && context.datasetIndex === 2) {
         const rainfallRaw = context.dataset.data[context.dataIndex];
@@ -1922,6 +2056,7 @@ computeForecastData({ config, forecastItems } = this) {
   var tempHigh = [];
   var tempLow = [];
   var precip = [];
+  var probability = [];
 
   const forecastType = config.forecast.type || 'daily';
   const forecastSourceTempUnit = this.getForecastEntityAttributes(forecastType).temperature_unit
@@ -1940,21 +2075,23 @@ computeForecastData({ config, forecastItems } = this) {
     // Convert temperatures if needed
     if (this.unitTemperature && this.unitTemperature !== forecastSourceTempUnit) {
       highTemp = this.convertTemperature(highTemp, forecastSourceTempUnit, this.unitTemperature);
-      if (typeof lowTemp !== 'undefined') {
+      if (lowTemp != null) {
         lowTemp = this.convertTemperature(lowTemp, forecastSourceTempUnit, this.unitTemperature);
       }
     }
     
     // ALWAYS round temperatures for chart display (whether roundTemp is on or not)
     highTemp = roundTemp ? Math.round(highTemp) : Math.round(highTemp * 10) / 10;
-    if (typeof lowTemp !== 'undefined') {
+    if (lowTemp != null) {
       lowTemp = roundTemp ? Math.round(lowTemp) : Math.round(lowTemp * 10) / 10;
     }
     
     tempHigh.push(highTemp);
-    if (typeof lowTemp !== 'undefined') {
-      tempLow.push(lowTemp);
-    }
+    // A gap keeps later lows under their own day when one item has no low.
+    tempLow.push(Number.isFinite(lowTemp) ? lowTemp : null);
+    probability.push(Number.isFinite(Number(d.precipitation_probability)) && d.precipitation_probability !== null
+      ? Number(d.precipitation_probability)
+      : null);
 
     if (config.forecast.precipitation_type === 'probability') {
       precip.push(d.precipitation_probability);
@@ -1976,6 +2113,7 @@ computeForecastData({ config, forecastItems } = this) {
     tempHigh,
     tempLow,
     precip,
+    probability,
   }
 }
 
@@ -1992,6 +2130,9 @@ updateChart({ forecasts, forecastChart } = this) {
     forecastChart.data.datasets[0].data = data.tempHigh;
     forecastChart.data.datasets[1].data = data.tempLow;
     forecastChart.data.datasets[2].data = data.precip;
+    if (forecastChart.data.datasets[3]) {
+      forecastChart.data.datasets[3].data = data.probability;
+    }
     forecastChart.update();
   }
 }
@@ -2005,6 +2146,7 @@ updateChart({ forecasts, forecastChart } = this) {
     // so the chart needs to be pushed clear of it.
     const forecastOnly = config.show_main === false;
     const showForecast = config.show_forecast !== false;
+    const actionable = this.hasCardActions();
 
     if (!weather || !weather.attributes) {
       return html`
@@ -2257,15 +2399,47 @@ updateChart({ forecasts, forecastChart } = this) {
           --mdc-icon-size: 14px;
           color: inherit;
         }
+        .actionable {
+          cursor: pointer;
+          -webkit-user-select: none;
+          user-select: none;
+          -webkit-touch-callout: none;
+        }
+        .actionable:focus-visible {
+          outline: 2px solid var(--primary-color);
+          outline-offset: 2px;
+        }
       </style>
 
       <ha-card header="${config.title}">
         <div class="card">
           ${this.renderClock()}
-          ${this.renderMain()}
-          ${this.renderAttributes()}
+          ${forecastOnly ? '' : html`
+            <div class="current ${actionable ? 'actionable' : ''}"
+              role=${actionable ? 'button' : nothing}
+              tabindex=${actionable ? '0' : nothing}
+              @pointerdown=${this._onActionPointerDown}
+              @pointermove=${this._onActionPointerMove}
+              @pointerup=${this._onActionPointerUp}
+              @pointercancel=${this._onActionPointerCancel}
+              @pointerleave=${this._onActionPointerCancel}
+              @contextmenu=${this._onActionContextMenu}
+              @keydown=${this._onActionKeyDown}>
+              ${this.renderMain()}
+              ${this.renderAttributes()}
+            </div>
+          `}
           ${showForecast ? html`
-            <div class="chart-container">
+            <div class="chart-container ${actionable ? 'actionable' : ''}"
+              role=${actionable ? 'button' : nothing}
+              tabindex=${actionable ? '0' : nothing}
+              @pointerdown=${this._onActionPointerDown}
+              @pointermove=${this._onActionPointerMove}
+              @pointerup=${this._onActionPointerUp}
+              @pointercancel=${this._onActionPointerCancel}
+              @pointerleave=${this._onActionPointerCancel}
+              @contextmenu=${this._onActionContextMenu}
+              @keydown=${this._onActionKeyDown}>
               <canvas id="forecastChart"></canvas>
             </div>
           ` : ''}
@@ -2625,7 +2799,7 @@ renderSun({ sun, language } = this) {
   `;
 }
 
-renderForecastConditionIcons({ config, forecastItems, sun } = this) {
+renderForecastConditionIcons({ config, forecastItems } = this) {
   if (config.show_forecast === false || config.forecast.condition_icons === false) {
     return html``;
   }
@@ -2635,29 +2809,10 @@ renderForecastConditionIcons({ config, forecastItems, sun } = this) {
   return html`
     <div class="conditions" @click="${(e) => this.showMoreInfo(config.entity)}">
       ${(() => {
-        const { lat, lon } = this.getSunLocation();
-        const timeZone = this.getSunTimezone();
+        const location = { ...this.getSunLocation(), timeZone: this.getSunTimezone() };
         return forecast.map((item) => {
-        const forecastTime = new Date(item.datetime);
-
-        let isDayTime;
-        if (config.forecast.type === 'daily') {
-          isDayTime = true;
-        } else {
-          const isDay = this.isDaytimeAt(forecastTime, { lat, lon, timeZone });
-          if (isDay != null) {
-            isDayTime = isDay;
-          } else if (sun && sun.attributes) {
-            // No coordinates / polar case: fall back to the sun entity.
-            const sunriseTime = new Date(sun.attributes.next_rising);
-            const sunsetTime = new Date(sun.attributes.next_setting);
-            isDayTime = sunriseTime && sunsetTime
-              ? forecastTime >= sunriseTime && forecastTime <= sunsetTime
-              : true;
-          } else {
-            isDayTime = true;
-          }
-        }
+        const isDayTime = config.forecast.type === 'daily'
+          || this.isForecastSlotDaytime(new Date(item.datetime), location);
 
         const sunState = isDayTime ? 'above_horizon' : 'below_horizon';
 
@@ -2872,6 +3027,58 @@ renderLastUpdated() {
 
   showMoreInfo(entity) {
     this._fire('hass-more-info', { entityId: entity });
+  }
+
+  hasCardActions() {
+    const { tap_action, hold_action, double_tap_action } = this.config;
+    return hasAction(tap_action) || hasAction(hold_action) || hasAction(double_tap_action);
+  }
+
+  /**
+   * Run a configured tap, hold or double-tap action. Home Assistant handles
+   * `hass-action` itself, using `entity` for more-info and toggle.
+   */
+  handleCardAction(action) {
+    const key = { tap: 'tap_action', hold: 'hold_action', double_tap: 'double_tap_action' }[action];
+    if (!key || !hasAction(this.config[key])) {
+      return;
+    }
+    const { entity, tap_action, hold_action, double_tap_action } = this.config;
+    this._fire('hass-action', { config: { entity, tap_action, hold_action, double_tap_action }, action });
+  }
+
+  // Pointer and key handlers for the actionable areas (current conditions and
+  // chart). Lit calls them with the card as `this`.
+  _onActionPointerDown(ev) {
+    if (ev.button === 0 && this.hasCardActions()) {
+      this._gestures.down(ev.clientX, ev.clientY);
+    }
+  }
+
+  _onActionPointerMove(ev) {
+    this._gestures.move(ev.clientX, ev.clientY);
+  }
+
+  _onActionPointerUp() {
+    this._gestures.up();
+  }
+
+  _onActionPointerCancel() {
+    this._gestures.cancel();
+  }
+
+  _onActionContextMenu(ev) {
+    // A long press on touch opens the context menu; it belongs to hold_action.
+    if (hasAction(this.config.hold_action)) {
+      ev.preventDefault();
+    }
+  }
+
+  _onActionKeyDown(ev) {
+    if ((ev.key === 'Enter' || ev.key === ' ') && this.hasCardActions()) {
+      ev.preventDefault();
+      this.handleCardAction('tap');
+    }
   }
 
   // Keep canvas measurements in LTR order even when an RTL tooltip is visible.

@@ -179,6 +179,9 @@ units:
 | units                 | object  | none                     | See [units of measurement](#units-of-measurement) for available options.                           |
 | locale                | string  | none                     | See [Supported languages](#supported-languages) for available languages                            |
 | autoscroll            | boolean | false                    | Update the chart each hour, hiding prior forecast datapoints                                       |
+| tap_action            | object  | none                     | [Action](https://www.home-assistant.io/dashboards/actions/) on tapping the current conditions or the chart. See [Tap and Hold Actions](#tap-and-hold-actions). |
+| hold_action           | object  | none                     | Action on a long press (half a second).                                                            |
+| double_tap_action     | object  | none                     | Action on a double tap.                                                                            |
 
 ### Forecast Options
 
@@ -213,6 +216,12 @@ units:
 | extra_rows                     | list    | none                     | Extra rows of per-day values under the forecast, read from a list attribute of any entity (daily forecast only). See [Extra Rows](#extra-rows-per-day-values-from-a-sensor). |
 | highlight_today                | boolean | false                    | Highlight today's column in the daily forecast (soft background band, bold date label).            |
 | highlight_today_color          | string  | rgba(127,127,127,0.12)   | Colour of the today band.                                                                          |
+| night_shading                  | boolean | false                    | Shade the night hours (sunset to sunrise at the card's sun location) in the hourly forecast.       |
+| night_shading_color            | string  | rgba(100,120,160,0.15)   | Colour of the night bands.                                                                         |
+| fill_temperature_range         | boolean | false                    | Shade the area between the high and low temperature lines (daily forecasts with lows).             |
+| temperature_range_color        | string  | (from the high line)     | Colour of the shaded range. Defaults to the temperature gradient, or `temperature1_color`, at low opacity. |
+| show_probability_line          | boolean | false                    | With `precipitation_type: rainfall`, also draw the precipitation probability as a dashed line.     |
+| probability_line_color         | string  | rgba(25,118,210,0.9)     | Colour of the probability line.                                                                    |
 
 ### Units of Measurement
 
@@ -411,6 +420,32 @@ forecast:
   type: daily
   highlight_today: true
   highlight_today_color: 'rgba(255, 193, 7, 0.15)'   # optional
+```
+
+### Tap and Hold Actions
+The current conditions and the chart accept the standard Home Assistant [actions](https://www.home-assistant.io/dashboards/actions/). None is set by default, so a tap on the chart shows its tooltip. The condition icons under the chart always open the weather entity's details.
+```yaml
+type: custom:weather-chart-card-ha
+entity: weather.home
+tap_action:
+  action: more-info
+hold_action:
+  action: navigate
+  navigation_path: /dashboard-weather/radar
+double_tap_action:
+  action: perform-action
+  perform_action: homeassistant.update_entity
+  target:
+    entity_id: weather.home
+```
+
+### Chart Overlays
+```yaml
+forecast:
+  type: hourly
+  night_shading: true             # bands from sunset to sunrise
+  show_probability_line: true     # rain chance over the rainfall bars
+  fill_temperature_range: true    # daily view: shade between high and low
 ```
 
 ### Custom Icon Sizes

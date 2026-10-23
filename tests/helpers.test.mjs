@@ -5,6 +5,7 @@ import { test } from 'node:test';
 globalThis.window = globalThis;
 const { default: WeatherChartCard } = await import('../src/main.js');
 const { DEFAULTS, FORECAST_DEFAULTS, configValue } = await import('../src/defaults.js');
+const actions = await import('../src/actions.js');
 
 // A card with config and hass applied, without rendering it.
 function makeCard(config = {}, hass = {}) {
@@ -318,4 +319,90 @@ test('animated icons are bundled, in the configured style, with custom icons fir
   // A condition with no image (or no MDI icon) still gets an icon.
   assert.equal(makeCard().getWeatherIcon('unavailable'), 'mdi:weather-cloudy-alert');
   assert.equal(makeCard({ icons: '/local/w/' }).getWeatherIcon('unknown'), 'mdi:weather-cloudy-alert');
+});
+
+test('gestures: tap, hold and double tap, each only when configured', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const { GestureDetector, HOLD_MS, DOUBLE_TAP_MS } = actions;
+  const fired = [];
+  let options = { hold: false, doubleTap: false };
+  const g = new GestureDetector((action) => fired.push(action), () => options);
+
+  // Nothing but a tap configured: a long press is still a tap, fired at once.
+  g.down(0, 0); t.mock.timers.tick(HOLD_MS + 100); g.up();
+  assert.deepEqual(fired, ['tap']);
+
+  options = { hold: true, doubleTap: true };
+  fired.length = 0;
+  g.down(0, 0); t.mock.timers.tick(HOLD_MS); g.up();
+  assert.deepEqual(fired, ['hold'], 'release after a hold is not also a tap');
+
+  fired.length = 0;
+  g.down(0, 0); g.up(); g.down(0, 0); g.up();
+  assert.deepEqual(fired, ['double_tap']);
+
+  fired.length = 0;
+  g.down(0, 0); g.up(); t.mock.timers.tick(DOUBLE_TAP_MS);
+  assert.deepEqual(fired, ['tap'], 'a single tap waits for a possible second one');
+
+  fired.length = 0;
+  g.down(0, 0); g.move(0, 30); g.up(); t.mock.timers.tick(HOLD_MS + DOUBLE_TAP_MS);
+  assert.deepEqual(fired, [], 'a scroll is not a tap');
+});
+
+test('card actions fire hass-action with the entity, only for configured gestures', () => {
+  const card = makeCard({ tap_action: { action: 'more-info' }, hold_action: { action: 'none' } });
+  const events = [];
+  card._fire = (type, detail) => events.push({ type, detail });
+  assert.equal(card.hasCardActions(), true);
+  card.handleCardAction('hold');
+  card.handleCardAction('double_tap');
+  card.handleCardAction('tap');
+  assert.deepEqual(events, [{ type: 'hass-action', detail: {
+    config: { entity: 'weather.home', tap_action: { action: 'more-info' }, hold_action: { action: 'none' }, double_tap_action: undefined },
+    action: 'tap',
+  } }]);
+  assert.equal(makeCard().hasCardActions(), false);
+});
+
+test('condition names come from Home Assistant when the card shows its language', () => {
+  const localize = (key) => ({ 'component.weather.entity_component._.state.rainy': 'Ploios' })[key] || '';
+  assert.equal(makeCard({}, { language: 'ro', localize }).localizeCondition('rainy'), 'Ploios');
+  assert.equal(makeCard({ locale: 'ro-RO' }, { language: 'ro', localize }).localizeCondition('rainy'), 'Ploios');
+  // A card locale other than Home Assistant's keeps the card's own translation.
+  assert.equal(makeCard({ locale: 'de' }, { language: 'ro', localize }).localizeCondition('rainy'), makeCard({ locale: 'de' }).ll('rainy'));
+  // Without a Home Assistant translation the card's own is used.
+  assert.equal(makeCard({ locale: 'en' }, { language: 'en', localize: () => '' }).localizeCondition('sunny'), 'Sunny');
+});
+
+test('a missing low leaves a gap instead of shifting later lows', () => {
+  const card = makeCard({}, { states: { 'weather.home': { state: 'sunny', attributes: { supported_features: 1 } } } });
+  card.forecasts = [
+    { datetime: '2026-10-21T00:00:00Z', temperature: 20, precipitation_probability: 40 },
+    { datetime: '2026-10-22T00:00:00Z', temperature: 18, templow: 9, precipitation_probability: null },
+    { datetime: '2026-10-23T00:00:00Z', temperature: 17, templow: null },
+  ];
+  const data = card.computeForecastData({ config: card.config, forecastItems: 3 });
+  assert.deepEqual(data.tempLow, [null, 9, null]);
+  assert.deepEqual(data.probability, [40, null, null]);
+});
+
+test('hourly slots are night between sunset and sunrise at the card location', () => {
+  const card = makeCard({ sun_latitude: 51.5, sun_longitude: 0, sun_timezone: 'Europe/London' });
+  const location = { ...card.getSunLocation(), timeZone: card.getSunTimezone() };
+  assert.equal(card.isForecastSlotDaytime(new Date('2026-06-21T12:00:00Z'), location), true);
+  assert.equal(card.isForecastSlotDaytime(new Date('2026-06-21T23:00:00Z'), location), false);
+  // No coordinates and no sun entity: treat as day rather than shading everything.
+  const nowhere = makeCard();
+  nowhere._hass.config = { time_zone: 'UTC' };
+  assert.equal(nowhere.isForecastSlotDaytime(new Date('2026-06-21T23:00:00Z')), true);
+});
+
+test('withAlpha re-tints rgb, rgba and hex colors', () => {
+  const card = makeCard();
+  assert.equal(card.withAlpha('rgba(255, 152, 0, 1.0)', 0.2), 'rgba(255, 152, 0, 0.2)');
+  assert.equal(card.withAlpha('rgb(1,2,3)', 0.5), 'rgba(1, 2, 3, 0.5)');
+  assert.equal(card.withAlpha('#f80', 0.2), 'rgba(255, 136, 0, 0.2)');
+  assert.equal(card.withAlpha('#4473a0', 0.2), 'rgba(68, 115, 160, 0.2)');
+  assert.equal(card.withAlpha('orange', 0.2), 'rgba(127, 127, 127, 0.2)');
 });

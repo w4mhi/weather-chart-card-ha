@@ -24,6 +24,9 @@ export const FORECAST_DEFAULTS = {
   disable_animation: false,
   show_date_labels: true,
   highlight_today: false,
+  night_shading: false,
+  fill_temperature_range: false,
+  show_probability_line: false,
   auto_rotate: 0,
   auto_rotate_seconds: 0,
 };
