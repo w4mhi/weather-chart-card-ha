@@ -1223,7 +1223,7 @@ function xt(t){return t+.5|0}customElements.get("weather-chart-card-ha-editor")|
           ${this.renderExtraRows()}
           ${this.renderLastUpdated()}
         </div>
-        <div class="card-version">v${"1.9.0"}</div>
+        <div class="card-version">v${"1.10.0"}</div>
       </ha-card>
     `:q`
         <style>
