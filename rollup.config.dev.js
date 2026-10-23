@@ -1,4 +1,4 @@
-import resolve from 'rollup-plugin-node-resolve';
+import resolve from '@rollup/plugin-node-resolve';
 import serve from 'rollup-plugin-serve';
 import copy from 'rollup-plugin-copy';
 import cardVersion from './rollup.version.mjs';
