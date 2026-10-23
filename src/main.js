@@ -7,11 +7,15 @@ import {
   WeatherEntityFeature
 } from './const.js';
 import { DEFAULTS, FORECAST_DEFAULTS, UNITS_DEFAULTS } from './defaults.js';
+import iconData from './icon-data.js';
 import {LitElement, html} from 'lit';
 import './weather-chart-card-editor.js';
 import {Chart, registerables} from 'chart.js';
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 Chart.register(...registerables, ChartDataLabels);
+
+// Data URIs of the bundled icons, built on first use and shared by every card.
+const bundledIconUris = {};
 
 // Injected by the rollup build from package.json; 'dev' when run unbundled (tests).
 const CARD_VERSION = typeof __CARD_VERSION__ !== 'undefined' ? __CARD_VERSION__ : 'dev';
@@ -68,19 +72,6 @@ setConfig(config) {
   };
 
   cardConfig.units.speed = config.speed ? config.speed : cardConfig.units.speed;
-
-  // Icon path configuration: Prioritize CDN, fallback to custom path if specified
-  if (config.icons) {
-    // User specified custom icons path
-    this.baseIconPath = config.icons;
-  } else {
-    // Use icons from GitHub repository via jsdelivr CDN
-    // Using @latest for better CDN caching and reliability
-    // style1 = fill (default), style2 = line
-    this.baseIconPath = cardConfig.icon_style === 'style2'
-      ? 'https://cdn.jsdelivr.net/gh/w4mhi/weather-chart-card-ha@latest/dist/icons2/'
-      : 'https://cdn.jsdelivr.net/gh/w4mhi/weather-chart-card-ha@latest/dist/icons/';
-  }
 
   // An empty title disables the card header. The default 'Weather' is applied
   // above only when no title key is present in the user config. A config saved
@@ -337,7 +328,7 @@ handleForecastTypeToggle() {
 
   // Restart animated icon SVG animations after re-render
   this.updateComplete.then(() => {
-    const icons = this.shadowRoot.querySelectorAll('img[src$=".svg"]');
+    const icons = this.shadowRoot.querySelectorAll('img');
     icons.forEach((img) => {
       const src = img.src;
       img.src = '';
@@ -886,67 +877,67 @@ getLocalizedMonthNameShort(date, timezone) {
     return this._hass.config.unit_system[unit] || '';
   }
 
+  /**
+   * Icon for a condition: an image URL (custom `icons` path, or the animated
+   * icon bundled with the card) or an MDI icon name. Custom icons win over
+   * the bundled ones; a condition with no image falls back to MDI.
+   */
   getWeatherIcon(condition, sun) {
-    if (this.config.animated_icons === true) {
-      const iconName = sun === 'below_horizon' ? weatherIconsNight[condition] : weatherIconsDay[condition];
-      return `${this.baseIconPath}${iconName}.svg`;
-    } else if (this.config.icons) {
-      const iconName = sun === 'below_horizon' ? weatherIconsNight[condition] : weatherIconsDay[condition];
+    const iconName = (sun === 'below_horizon' ? weatherIconsNight : weatherIconsDay)[condition];
+    if (iconName && this.config.icons) {
       return `${this.config.icons}${iconName}.svg`;
     }
-    return weatherIcons[condition];
-  }
-
-  /**
-   * Get local icon path - tries different common paths for HACS/manual installation
-   */
-  getLocalIconPath() {
-    // Get the card's script URL to determine installation path
-    const scripts = document.querySelectorAll('script[src*="weather-chart-card"]');
-    if (scripts.length > 0) {
-      const scriptSrc = scripts[scripts.length - 1].src;
-      const basePath = scriptSrc.substring(0, scriptSrc.lastIndexOf('/'));
-      return `${basePath}/icons/`;
+    if (iconName && this.config.animated_icons === true) {
+      const bundled = this.getBundledIcon(iconName);
+      if (bundled) {
+        return bundled;
+      }
     }
-    // Fallback paths for common installations
-    return '/hacsfiles/weather-chart-card-ha/icons/';
+    return weatherIcons[condition] || 'mdi:weather-cloudy-alert';
   }
 
   /**
-   * Handle icon loading error - fallback to local icons or MDI icons
+   * Data URI of an animated icon shipped inside the bundle, in the configured
+   * `icon_style`. Bundling them means no CDN, no extra files to install and no
+   * icons from a different release.
+   */
+  getBundledIcon(iconName) {
+    const style = this.config.icon_style === 'style2' ? 'style2' : 'style1';
+    const key = `${style}/${iconName}`;
+    if (!(key in bundledIconUris)) {
+      const svg = iconData[style][iconName];
+      bundledIconUris[key] = svg ? `data:image/svg+xml,${encodeURIComponent(svg)}` : null;
+    }
+    return bundledIconUris[key];
+  }
+
+  renderWeatherIcon(condition, sunState) {
+    const icon = this.getWeatherIcon(condition, sunState);
+    if (/^(mdi|hass):/.test(icon)) {
+      return html`<ha-icon icon="${icon}"></ha-icon>`;
+    }
+    return html`<img src="${icon}"
+                     @error="${(e) => this.handleIconError(e, condition, sunState)}"
+                     alt="">`;
+  }
+
+  /**
+   * A custom icon failed to load: show the bundled animated icon instead, and
+   * if that is missing too, the MDI icon.
    */
   handleIconError(event, condition, sun) {
     const img = event.target;
-    const currentSrc = img.src;
-    
-    // If already tried local bundled icons, try custom path if configured
-    if (img.dataset.fallbackAttempted === 'bundled') {
-      if (this.config.icons && !currentSrc.includes(this.config.icons)) {
-        img.dataset.fallbackAttempted = 'custom';
-        const iconName = sun === 'below_horizon' ? weatherIconsNight[condition] : weatherIconsDay[condition];
-        img.src = `${this.config.icons}${iconName}.svg`;
-        return;
-      }
-      img.dataset.fallbackAttempted = 'final';
-    }
-    
-    // If all fallbacks failed, use MDI icon
-    if (img.dataset.fallbackAttempted === 'custom' || img.dataset.fallbackAttempted === 'final') {
-      // Replace img with ha-icon
-      const haIcon = document.createElement('ha-icon');
-      haIcon.setAttribute('icon', weatherIcons[condition]);
-      haIcon.style.cssText = img.style.cssText;
-      img.parentNode.replaceChild(haIcon, img);
+    const iconName = (sun === 'below_horizon' ? weatherIconsNight : weatherIconsDay)[condition];
+    const bundled = iconName ? this.getBundledIcon(iconName) : null;
+    if (bundled && !img.dataset.fallbackAttempted) {
+      img.dataset.fallbackAttempted = 'bundled';
+      img.src = bundled;
       return;
     }
-    
-    // First fallback: try local bundled icons
-    if (!img.dataset.fallbackAttempted) {
-      img.dataset.fallbackAttempted = 'bundled';
-      const iconName = sun === 'below_horizon' ? weatherIconsNight[condition] : weatherIconsDay[condition];
-      const localPath = this.getLocalIconPath();
-      img.src = `${localPath}${iconName}.svg`;
-    }
+    const haIcon = document.createElement('ha-icon');
+    haIcon.setAttribute('icon', weatherIcons[condition] || 'mdi:weather-cloudy-alert');
+    haIcon.style.cssText = img.style.cssText;
+    img.parentNode.replaceChild(haIcon, img);
   }
 
 getWindDirIcon(deg) {
@@ -2352,12 +2343,6 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
     }
   }
 
-  const iconHtml = config.animated_icons || config.icons
-    ? html`<img src="${this.getWeatherIcon(currentCondition, currentSunState)}"
-                 @error="${(e) => this.handleIconError(e, currentCondition, currentSunState)}"
-                 alt="">`
-    : html`<ha-icon icon="${this.getWeatherIcon(currentCondition, currentSunState)}"></ha-icon>`;
-
   return html`
     <div class="main">
       <!-- Left: Temperature and condition info -->
@@ -2385,7 +2370,7 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
       
       <!-- Center: Large weather icon -->
       <div class="weather-icon">
-        ${iconHtml}
+        ${this.renderWeatherIcon(currentCondition, currentSunState)}
       </div>
       
     </div>
@@ -2674,27 +2659,11 @@ renderForecastConditionIcons({ config, forecastItems, sun } = this) {
           }
         }
 
-        const weatherIcons = isDayTime ? weatherIconsDay : weatherIconsNight;
-        const condition = item.condition;
         const sunState = isDayTime ? 'above_horizon' : 'below_horizon';
-
-        let iconHtml;
-
-        if (config.animated_icons || config.icons) {
-          const iconSrc = config.animated_icons ?
-            `${this.baseIconPath}${weatherIcons[condition]}.svg` :
-            `${this.config.icons}${weatherIcons[condition]}.svg`;
-          iconHtml = html`<img class="icon"
-                               src="${iconSrc}"
-                               @error="${(e) => this.handleIconError(e, condition, sunState)}"
-                               alt="">`;
-        } else {
-          iconHtml = html`<ha-icon icon="${this.getWeatherIcon(condition, sunState)}"></ha-icon>`;
-        }
 
         return html`
           <div class="forecast-item">
-            ${iconHtml}
+            ${this.renderWeatherIcon(item.condition, sunState)}
           </div>
         `;
       });

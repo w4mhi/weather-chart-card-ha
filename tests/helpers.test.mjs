@@ -299,3 +299,23 @@ test('config changes select the cached forecast before redrawing', async () => {
   assert.equal(drawnForecasts.at(-1), hourly);
   assert.deepEqual(Object.keys(card._forecastSubscriptions), ['hourly']);
 });
+
+test('animated icons are bundled, in the configured style, with custom icons first', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { generateIconModule } = await import('../scripts/build-icons.mjs');
+  const generated = readFileSync(new URL('../src/icon-data.js', import.meta.url), 'utf8');
+  assert.equal(generated, generateIconModule(), 'src/icon-data.js is stale: run npm run icons');
+
+  const decode = (uri) => decodeURIComponent(uri.replace('data:image/svg+xml,', ''));
+  const style1 = makeCard().getWeatherIcon('sunny', 'above_horizon');
+  assert.match(style1, /^data:image\/svg\+xml,/);
+  assert.equal(decode(style1), readFileSync(new URL('../src/icons/clear-day.svg', import.meta.url), 'utf8').trim());
+  const style2 = makeCard({ icon_style: 'style2' }).getWeatherIcon('sunny', 'below_horizon');
+  assert.equal(decode(style2), readFileSync(new URL('../src/icons2/clear-night.svg', import.meta.url), 'utf8').trim());
+
+  assert.equal(makeCard({ icons: '/local/w/' }).getWeatherIcon('rainy', 'below_horizon'), '/local/w/overcast-night-rain.svg');
+  assert.equal(makeCard({ animated_icons: false }).getWeatherIcon('rainy'), 'hass:weather-rainy');
+  // A condition with no image (or no MDI icon) still gets an icon.
+  assert.equal(makeCard().getWeatherIcon('unavailable'), 'mdi:weather-cloudy-alert');
+  assert.equal(makeCard({ icons: '/local/w/' }).getWeatherIcon('unknown'), 'mdi:weather-cloudy-alert');
+});

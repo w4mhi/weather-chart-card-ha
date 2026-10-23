@@ -167,8 +167,8 @@ units:
 | show_last_changed     | boolean | false                    | Show or hide when last data changed on the card.                                                   |
 | show_forecast_toggle  | boolean | false                    | Show or hide the Daily/Hourly toggle button in the top-right corner.                               |
 | use_12hour_format     | boolean | false                    | Display time in 12-hour format (AM/PM) instead of 24-hour format.                                  |
-| icons                 | string  | none                     | Path to the location of custom icons in svg format, for example `/local/weather-icons/`.           |
-| animated_icons        | boolean | true                     | Enable the use of animated icons                                                                   |
+| icons                 | string  | none                     | Path to the location of custom icons in svg format, for example `/local/weather-icons/`. Takes priority over the bundled animated icons. |
+| animated_icons        | boolean | true                     | Use the animated icons bundled with the card (no network needed). `false` uses MDI icons.          |
 | icon_style            | string  | 'style1'                 | Options are 'style1' and 'style2' for different set of animated icons.                             |
 | icons_size            | number  | 30                       | The size of the animated or custom icons in pixels.                                                |
 | main_icon_size        | number  | 150                      | Size of main current weather icon in pixels.                                                       |
@@ -427,6 +427,8 @@ forecast:
 
 ## 🎨 Custom Icons
 
+The animated icons ship inside `weather-chart-card-ha.js`, so they need no internet connection, no extra files and no CDN. To use your own, point `icons` at a folder of SVG files; any icon that fails to load falls back to the bundled one.
+
 Icons should be in SVG format. Icons should have names as shown [here](https://github.com/mlamberts78/weather-chart-card-ha/blob/master/src/const.js#L24).
 
 Example:
@@ -609,7 +611,7 @@ See [Releases](https://github.com/w4mhi/weather-chart-card-ha/releases) for vers
 ## 🙏 Credits
 
 - **Original Card**: [mlamberts78](https://github.com/mlamberts78/weather-chart-card-ha) - Created the original weather-chart-card-ha
-- **Weather Icons**: [Basmilius](https://github.com/basmilius/weather-icons) - Beautiful animated weather icons (served via this project's CDN for reliability)
+- **Weather Icons**: [Basmilius](https://github.com/basmilius/weather-icons) - Beautiful animated weather icons (bundled inside the card, so they work offline)
 - **Enhancements**: [W4MHI](https://github.com/w4mhi) - Temperature gradients, timezone support, daily/hourly toggle, layout improvements
 
 ---

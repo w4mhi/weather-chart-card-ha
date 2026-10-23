@@ -43,8 +43,9 @@
   },
   "scripts": {
     "start": "rollup -c rollup.config.dev.js --watch",
-    "build": "npm run lint && npm run rollup",
-    "lint": "eslint src tests eslint.config.js rollup.config.mjs rollup.config.dev.js rollup.version.mjs",
+    "icons": "node scripts/build-icons.mjs",
+    "build": "npm run icons && npm run lint && npm run rollup",
+    "lint": "eslint src tests scripts eslint.config.js rollup.config.mjs rollup.config.dev.js rollup.version.mjs",
     "rollup": "rollup -c",
     "test:rtl": "node --test tests/rtl-browser.test.mjs",
     "test": "node --test tests/helpers.test.mjs"

@@ -152,3 +152,46 @@ for (const width of [390, 1200]) {
     });
   }
 }
+
+test('animated icons render from the bundle with the network blocked', async () => {
+  const page = await browser.newPage({ viewport: { width: 600, height: 844 } });
+  const errors = [];
+  const blocked = [];
+  page.on('pageerror', error => errors.push(error.message));
+  try {
+    await page.route('**/*', route => {
+      const path = new URL(route.request().url()).pathname;
+      if (path === '/card.js') return route.fulfill({ contentType:'text/javascript', body:bundle });
+      if (path === '/') return route.fulfill({ contentType:'text/html', body:'<!doctype html><html><meta charset="utf-8"><style>ha-card{display:block}</style><script src="/card.js"></script></html>' });
+      blocked.push(route.request().url());
+      return route.abort();
+    });
+    await page.goto('http://icons.test/');
+    await page.evaluate(() => {
+      const forecasts = Array.from({length:5}, (_, i) => ({
+        datetime: new Date(Date.UTC(2026, 9, 18 + i, 12)).toISOString(),
+        temperature: 20, templow: 10, condition: ['sunny', 'rainy', 'cloudy', 'snowy', 'fog'][i],
+      }));
+      const card = document.createElement('weather-chart-card-ha');
+      card.setConfig({ entity:'weather.home', icon_style:'style2' });
+      card.hass = {
+        language:'en', config:{ time_zone:'UTC', unit_system:{ temperature:'°C', length:'km' } },
+        states:{ 'weather.home':{ state:'sunny', last_changed:'2026-10-18T11:00:00Z', attributes:{ temperature:20, temperature_unit:'°C', supported_features:3 } } },
+        connection:{ subscribeMessage(callback) { setTimeout(() => callback({forecast:forecasts}), 0); return Promise.resolve(() => {}); } },
+      };
+      document.body.append(card);
+      window.card = card;
+    });
+    await page.waitForFunction(() => window.card.shadowRoot.querySelectorAll('.forecast-item img').length === 5, null, {timeout:10000});
+    await page.waitForFunction(() => [...window.card.shadowRoot.querySelectorAll('img')].every(img => img.complete));
+    const icons = await page.evaluate(() => [...window.card.shadowRoot.querySelectorAll('img')]
+      .map(img => ({ scheme:img.src.split(':')[0], width:img.naturalWidth })));
+    assert.equal(icons.length, 6);
+    for (const icon of icons) {
+      assert.equal(icon.scheme, 'data');
+      assert.ok(icon.width > 0, 'icon decoded');
+    }
+    assert.deepEqual(blocked, []);
+    assert.deepEqual(errors, []);
+  } finally { await page.close(); }
+});
