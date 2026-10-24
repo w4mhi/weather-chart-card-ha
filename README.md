@@ -213,6 +213,7 @@ units:
 | number_of_forecasts            | number  | 0                        | Overrides the number of forecasts to display. Set to "0" for automatic mode.                       |
 | disable_animation              | boolean | false                    | Disable the chart animation.                                                                       |
 | show_date_labels               | boolean | true                     | Show date numbers below weekday labels in daily forecast view.                                     |
+| wind_warning                   | boolean/list | false               | Colour the wind forecast by Beaufort force: `true` uses 6 (orange) and 8 (red), or give `[warning, danger]`. |
 | extra_rows                     | list    | none                     | Extra rows of per-day values under the forecast, read from a list attribute of any entity (daily forecast only). See [Extra Rows](#extra-rows-per-day-values-from-a-sensor). |
 | highlight_today                | boolean | false                    | Highlight today's column in the daily forecast (soft background band, bold date label).            |
 | highlight_today_color          | string  | rgba(127,127,127,0.12)   | Colour of the today band.                                                                          |
@@ -386,6 +387,14 @@ entity: weather.my_home
 forecast:
   type: daily
   show_date_labels: true  # Shows "MON" and "8" on separate lines
+```
+
+### Wind Warning Colours
+Colour the wind forecast when it gets strong (Beaufort force, computed from the forecast's wind speed unit):
+```yaml
+forecast:
+  wind_warning: true      # 6 Bft orange, 8 Bft red
+  # wind_warning: [5, 7]  # custom levels [warning, danger]
 ```
 
 ### Extra Rows (per-day values from a sensor)

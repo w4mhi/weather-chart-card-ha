@@ -2875,9 +2875,10 @@ renderWind({ config, weather, windSpeed, windDirection, forecastItems } = this) 
         }
 
         const dWindSpeed = this.convertWindSpeed(item.wind_speed, this.unitSpeed, forecastWindUnit);
+        const warningColor = hasSpeed ? this.getWindWarningColor(item.wind_speed, forecastWindUnit) : null;
 
         return html`
-          <div class="wind-detail">
+          <div class="wind-detail" style="${warningColor ? `color: ${warningColor}; font-weight: 500;` : ''}">
             ${bearingIcon ? html`<ha-icon class="wind-icon" icon="hass:${bearingIcon}"></ha-icon>` : ''}
             ${hasSpeed ? html`
               <span class="wind-speed">${dWindSpeed}</span>
@@ -2888,6 +2889,37 @@ renderWind({ config, weather, windSpeed, windDirection, forecastItems } = this) 
       })}
     </div>
   `;
+}
+
+/**
+ * Optional warning colour for the wind forecast, by Beaufort force:
+ *   forecast:
+ *     wind_warning: true          # default levels: 6 (strong wind) and 8 (gale)
+ *     wind_warning: [6, 8]        # or explicit levels [warning, danger]
+ * Returns null below the first level or when disabled.
+ */
+getWindWarningColor(windSpeed, sourceUnit) {
+  const option = this.config.forecast.wind_warning;
+  if (!option) {
+    return null;
+  }
+  // Without a known unit calculateBeaufortScale() returns the raw value, which
+  // would be compared as if it were a Beaufort force; skip colouring instead.
+  if (!['km/h', 'm/s', 'mph', 'kn', 'Bft', 'Beaufort'].includes(sourceUnit)) {
+    return null;
+  }
+  const levels = Array.isArray(option) ? option.map(Number) : [6, 8];
+  const beaufort = Number(this.calculateBeaufortScale(windSpeed, sourceUnit));
+  if (!Number.isFinite(beaufort)) {
+    return null;
+  }
+  if (Number.isFinite(levels[1]) && beaufort >= levels[1]) {
+    return 'var(--error-color, #db4437)';
+  }
+  if (Number.isFinite(levels[0]) && beaufort >= levels[0]) {
+    return 'var(--warning-color, #ff9800)';
+  }
+  return null;
 }
 
 getExtraRows() {
