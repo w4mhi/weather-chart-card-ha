@@ -266,6 +266,7 @@ test('chart overlays render and gestures fire hass-action', async () => {
     // Tap and hold on the current conditions, with real pointer events.
     const current = page.locator('weather-chart-card-ha .current');
     assert.equal(await current.getAttribute('role'), 'button');
+    assert.equal(await page.locator('weather-chart-card-ha .chart-container').getAttribute('aria-label'), 'Forecast: Hourly');
     await current.click();
     const box = await current.boundingBox();
     await page.mouse.move(box.x + 20, box.y + 20);

@@ -430,3 +430,66 @@ test('the three icon folders hold the same icon names', async () => {
   const { AMCHARTS_MAPPING, CROP_CENTERS } = await import('../scripts/import-amcharts.mjs');
   for (const file of Object.values(AMCHARTS_MAPPING)) assert.ok(CROP_CENTERS[file], `crop centre for ${file}`);
 });
+
+test('review: Traditional and Simplified Chinese are different languages', () => {
+  const card = makeCard();
+  assert.equal(card.languageAndScript('zh-TW'), card.languageAndScript('zh-Hant'));
+  assert.notEqual(card.languageAndScript('zh-Hant'), card.languageAndScript('zh-Hans'));
+  assert.equal(card.languageAndScript('ro-RO'), card.languageAndScript('ro'));
+  const localize = (key) => ({ 'component.weather.entity_component._.state.rainy': '下雨' })[key] || '';
+  const traditional = makeCard({ locale: 'zh-Hant' }, { language: 'zh-Hans', localize });
+  assert.equal(traditional.localizeCondition('rainy'), traditional.ll('rainy'));
+});
+
+test('review: the sun-entity fallback takes the transitions in order', () => {
+  // No coordinates, so the sun entity decides. It is day: setting comes first.
+  const card = makeCard({ timezone: 'UTC' });
+  card._hass.config = { time_zone: 'UTC' };
+  card.sun = { state: 'above_horizon', attributes: {
+    next_setting: '2026-06-21T20:00:00Z', next_rising: '2026-06-22T04:00:00Z',
+  } };
+  const at = (iso) => card.isForecastSlotDaytime(new Date(iso), { timeZone: 'UTC' });
+  assert.equal(at('2026-06-21T15:00:00Z'), true);
+  assert.equal(at('2026-06-21T23:00:00Z'), false);
+  assert.equal(at('2026-06-22T10:00:00Z'), true);
+  // Beyond both transitions, by time of day.
+  assert.equal(at('2026-06-23T02:00:00Z'), false);
+  assert.equal(at('2026-06-23T12:00:00Z'), true);
+  // Polar day: the next setting is weeks away, so every hourly slot is day.
+  card.sun = { state: 'above_horizon', attributes: { next_setting: '2026-07-20T22:00:00Z', next_rising: '2026-07-21T01:00:00Z' } };
+  assert.equal(at('2026-06-22T00:00:00Z'), true);
+});
+
+test('review: the temperature gradient runs right to left on a reversed scale', () => {
+  const card = makeCard();
+  const stops = (reverse) => {
+    const recorded = [];
+    const ctx = { createLinearGradient: () => ({ addColorStop: (offset, color) => recorded.push([offset, color]) }) };
+    card.createTemperatureGradient([0, 40], '°C', ctx, { left: 0, right: 100 }, null, 1, reverse);
+    return recorded;
+  };
+  const cold = card.getTemperatureColorWithRange(0, '°C', null);
+  assert.deepEqual(stops(false)[0], [0, cold]);
+  assert.deepEqual(stops(true)[0], [1, cold]);
+});
+
+test('review: keyboard and assistive clicks run the configured action, pointer clicks do not repeat it', () => {
+  const card = makeCard({ hold_action: { action: 'more-info' } });
+  const fired = [];
+  card._fire = (type, detail) => fired.push(detail.action);
+  const key = { key: 'Enter', repeat: false, preventDefault() {} };
+  card._onActionKeyDown(key);
+  card._onActionKeyDown({ ...key, repeat: true });
+  assert.deepEqual(fired, ['hold'], 'only a hold action: Enter runs it, key repeat does not');
+
+  fired.length = 0;
+  card._onActionClick({ detail: 0 });
+  assert.deepEqual(fired, ['hold'], 'a screen-reader click with no pointer events');
+  card._lastPointerUp = Date.now();
+  card._onActionClick({ detail: 0 });
+  card._onActionClick({ detail: 1 });
+  assert.deepEqual(fired, ['hold'], 'clicks after a pointer gesture are not doubled');
+
+  assert.equal(makeCard({ tap_action: { action: 'more-info' }, hold_action: { action: 'more-info' } }).primaryAction(), 'tap');
+  assert.equal(makeCard({ locale: 'en' }).forecastLabel(), 'Forecast: Daily');
+});

@@ -547,13 +547,26 @@ localizeCondition(condition) {
     return localize(`component.weather.entity_component._.state.${condition}`)
       || localize(`state.default.${condition}`);
   };
-  const language = (code) => String(code || '').split('-')[0].toLowerCase();
   const sameLanguage = !this.config.locale
-    || language(this.config.locale) === language(this._hass && this._hass.language);
+    || this.languageAndScript(this.config.locale) === this.languageAndScript(this._hass && this._hass.language);
   return (sameLanguage && haTranslation())
     || this.ll(condition)
     || haTranslation()
     || condition;
+}
+
+/**
+ * Language plus script of a locale ('zh-TW' and 'zh-Hant' both give
+ * 'zh-Hant', 'ro-RO' gives 'ro-Latn'), so Traditional and Simplified Chinese,
+ * or Latin and Cyrillic Serbian, do not count as the same language.
+ */
+languageAndScript(code) {
+  try {
+    const { language, script } = new Intl.Locale(String(code)).maximize();
+    return `${language}-${script || ''}`;
+  } catch (e) {
+    return String(code || '').split('-')[0].toLowerCase();
+  }
 }
 
 getTimezone() {
@@ -698,14 +711,31 @@ isForecastSlotDaytime(forecastTime, location = {}) {
     return isDay;
   }
   const sun = this.sun;
-  if (sun && sun.attributes) {
-    const sunriseTime = new Date(sun.attributes.next_rising);
-    const sunsetTime = new Date(sun.attributes.next_setting);
-    return sunriseTime && sunsetTime
-      ? forecastTime >= sunriseTime && forecastTime <= sunsetTime
-      : true;
+  const rising = sun && sun.attributes ? new Date(sun.attributes.next_rising) : null;
+  const setting = sun && sun.attributes ? new Date(sun.attributes.next_setting) : null;
+  if (!rising || !setting || Number.isNaN(rising.getTime()) || Number.isNaN(setting.getTime())) {
+    return true;
   }
-  return true;
+  // The sun keeps its current state until the next transition, then flips
+  // until the one after. During the day next_setting comes before
+  // next_rising, so both have to be taken in order.
+  const isUp = sun.state === 'above_horizon';
+  const [first, second] = isUp ? [setting, rising] : [rising, setting];
+  if (forecastTime < first) {
+    return isUp;
+  }
+  if (forecastTime < second) {
+    return !isUp;
+  }
+  // Past both transitions: compare the time of day with the sunrise and
+  // sunset times, which change by only minutes from one day to the next.
+  const timeZone = location.timeZone || this.getSunTimezone();
+  const minutes = this.getWallClockMinutes(forecastTime, timeZone);
+  const sunrise = this.getWallClockMinutes(rising, timeZone);
+  const sunset = this.getWallClockMinutes(setting, timeZone);
+  return sunrise < sunset
+    ? minutes >= sunrise && minutes < sunset
+    : minutes >= sunrise || minutes < sunset;
 }
 
 /**
@@ -1494,7 +1524,7 @@ getTemperatureRangeC(data, unit) {
   return null;
 }
 
-createTemperatureGradient(data, unit, ctx, chartArea, rangeC = null, alpha = 1) {
+createTemperatureGradient(data, unit, ctx, chartArea, rangeC = null, alpha = 1, reverse = false) {
   if (!chartArea) {
     return null;
   }
@@ -1503,7 +1533,9 @@ createTemperatureGradient(data, unit, ctx, chartArea, rangeC = null, alpha = 1) 
   const dataLength = data.length;
   
   for (let i = 0; i < dataLength; i++) {
-    const position = dataLength === 1 ? 0 : i / (dataLength - 1);
+    // A reversed (RTL) x scale puts the first forecast on the right.
+    const offset = dataLength === 1 ? 0 : i / (dataLength - 1);
+    const position = reverse ? 1 - offset : offset;
     const color = this.getTemperatureColorWithRange(data[i], unit, rangeC);
     gradient.addColorStop(position, alpha === 1 ? color : this.withAlpha(color, alpha));
   }
@@ -1588,6 +1620,8 @@ drawChart({ config, language, weather, forecastItems } = this) {
   const tempColorRange = this.getTemperatureRangeC(data.tempHigh, tempUnit);
   // Lows have gaps (null) where a forecast item has none; keep them out of the axis range.
   const temperatures = [...data.tempHigh, ...data.tempLow].filter(Number.isFinite);
+  // Matches the x scale's `reverse` below.
+  const xReversed = document.dir === 'rtl';
 
   // Read theme variables from the card itself, so view- and card-level themes
   // (and card-mod) apply, not only the page theme set on <body>.
@@ -1622,7 +1656,7 @@ drawChart({ config, language, weather, forecastItems } = this) {
       borderColor: config.forecast.use_color_thresholds 
         ? (context) => {
             if (context.chart.chartArea) {
-              return this.createTemperatureGradient(context.chart.data.datasets[0].data, tempUnit, context.chart.ctx, context.chart.chartArea, tempColorRange);
+              return this.createTemperatureGradient(context.chart.data.datasets[0].data, tempUnit, context.chart.ctx, context.chart.chartArea, tempColorRange, 1, xReversed);
             }
             return config.forecast.temperature1_color;
           }
@@ -1630,7 +1664,7 @@ drawChart({ config, language, weather, forecastItems } = this) {
       backgroundColor: config.forecast.use_color_thresholds
         ? (context) => {
             if (context.chart.chartArea) {
-              return this.createTemperatureGradient(context.chart.data.datasets[0].data, tempUnit, context.chart.ctx, context.chart.chartArea, tempColorRange);
+              return this.createTemperatureGradient(context.chart.data.datasets[0].data, tempUnit, context.chart.ctx, context.chart.chartArea, tempColorRange, 1, xReversed);
             }
             return config.forecast.temperature1_color;
           }
@@ -1650,7 +1684,7 @@ drawChart({ config, language, weather, forecastItems } = this) {
             const chart = context.chart;
             let color = config.forecast.temperature_range_color;
             if (!color && config.forecast.use_color_thresholds && chart.chartArea) {
-              color = this.createTemperatureGradient(chart.data.datasets[0].data, tempUnit, chart.ctx, chart.chartArea, tempColorRange, 0.25);
+              color = this.createTemperatureGradient(chart.data.datasets[0].data, tempUnit, chart.ctx, chart.chartArea, tempColorRange, 0.25, xReversed);
             }
             color = color || this.withAlpha(config.forecast.temperature1_color, 0.2);
             return { target: 1, above: color, below: color };
@@ -1910,7 +1944,7 @@ drawChart({ config, language, weather, forecastItems } = this) {
                   return time;
               },
           },
-          reverse: document.dir === 'rtl' ? true : false,
+          reverse: xReversed,
         },
         TempAxis: {
           position: 'left',
@@ -2424,7 +2458,8 @@ updateChart({ forecasts, forecastChart } = this) {
               @pointercancel=${this._onActionPointerCancel}
               @pointerleave=${this._onActionPointerCancel}
               @contextmenu=${this._onActionContextMenu}
-              @keydown=${this._onActionKeyDown}>
+              @keydown=${this._onActionKeyDown}
+              @click=${this._onActionClick}>
               ${this.renderMain()}
               ${this.renderAttributes()}
             </div>
@@ -2433,13 +2468,15 @@ updateChart({ forecasts, forecastChart } = this) {
             <div class="chart-container ${actionable ? 'actionable' : ''}"
               role=${actionable ? 'button' : nothing}
               tabindex=${actionable ? '0' : nothing}
+              aria-label=${actionable ? this.forecastLabel() : nothing}
               @pointerdown=${this._onActionPointerDown}
               @pointermove=${this._onActionPointerMove}
               @pointerup=${this._onActionPointerUp}
               @pointercancel=${this._onActionPointerCancel}
               @pointerleave=${this._onActionPointerCancel}
               @contextmenu=${this._onActionContextMenu}
-              @keydown=${this._onActionKeyDown}>
+              @keydown=${this._onActionKeyDown}
+              @click=${this._onActionClick}>
               <canvas id="forecastChart"></canvas>
             </div>
           ` : ''}
@@ -3101,6 +3138,7 @@ renderLastUpdated() {
   }
 
   _onActionPointerUp() {
+    this._lastPointerUp = Date.now();
     this._gestures.up();
   }
 
@@ -3116,10 +3154,39 @@ renderLastUpdated() {
   }
 
   _onActionKeyDown(ev) {
-    if ((ev.key === 'Enter' || ev.key === ' ') && this.hasCardActions()) {
+    if ((ev.key === 'Enter' || ev.key === ' ') && !ev.repeat && this.hasCardActions()) {
       ev.preventDefault();
-      this.handleCardAction('tap');
+      this.handleCardAction(this.primaryAction());
     }
+  }
+
+  // Screen readers and voice control can activate a button with a bare click
+  // (detail 0) and no pointer events. Mouse and touch clicks (detail >= 1)
+  // already went through the gesture detector, so they are ignored here.
+  _onActionClick(ev) {
+    const afterPointer = this._lastPointerUp && Date.now() - this._lastPointerUp < 1000;
+    if (ev.detail === 0 && !afterPointer && this.hasCardActions()) {
+      this.handleCardAction(this.primaryAction());
+    }
+  }
+
+  /**
+   * The gesture keyboard and assistive-technology activation stand for: tap
+   * when it is configured, otherwise hold, otherwise double tap, so a card
+   * with only a hold action is still usable without a pointer.
+   */
+  primaryAction() {
+    if (hasAction(this.config.tap_action)) return 'tap';
+    if (hasAction(this.config.hold_action)) return 'hold';
+    return 'double_tap';
+  }
+
+  // Accessible name of the chart when it acts as a button.
+  forecastLabel() {
+    const localize = this._hass && this._hass.localize;
+    const translated = typeof localize === 'function' ? localize('ui.card.weather.forecast') : '';
+    const type = this.ll(this.currentForecastType() === 'hourly' ? 'hourly' : 'daily');
+    return `${translated || 'Forecast'}: ${type}`;
   }
 
   // Keep canvas measurements in LTR order even when an RTL tooltip is visible.

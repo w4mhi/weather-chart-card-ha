@@ -10,6 +10,7 @@
 // uses one name for both (cloudy, snow, hail, sleet, wind).
 import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { pathToFileURL } from 'node:url';
 
 export const AMCHARTS_MAPPING = {
   'clear-day': 'day',
@@ -72,7 +73,8 @@ export function cleanSvg(svg, center = [32, 32]) {
     .join('\n');
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// pathToFileURL encodes the path (spaces, Windows drive letters) like import.meta.url.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   const source = join(process.argv[2] || '', 'animated');
   const target = new URL('../src/icons3/', import.meta.url);
   const reference = readdirSync(new URL('../src/icons/', import.meta.url)).filter((f) => f.endsWith('.svg')).sort();

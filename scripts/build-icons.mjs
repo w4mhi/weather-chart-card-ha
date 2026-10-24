@@ -3,6 +3,7 @@
 // and needs no network or extra files to show them. Run with `npm run icons`;
 // the unit tests fail when the generated file is out of date.
 import { readdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { pathToFileURL } from 'node:url';
 
 const root = new URL('../', import.meta.url);
 
@@ -26,6 +27,7 @@ export function generateIconModule() {
   return lines.join('\n');
 }
 
-if (import.meta.url === `file://${process.argv[1]}`) {
+// pathToFileURL encodes the path (spaces, Windows drive letters) like import.meta.url.
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
   writeFileSync(new URL('src/icon-data.js', root), generateIconModule());
 }

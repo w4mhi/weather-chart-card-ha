@@ -432,7 +432,7 @@ forecast:
 ```
 
 ### Tap and Hold Actions
-The current conditions and the chart accept the standard Home Assistant [actions](https://www.home-assistant.io/dashboards/actions/). None is set by default, so a tap on the chart shows its tooltip. The condition icons under the chart always open the weather entity's details.
+The current conditions and the chart accept the standard Home Assistant [actions](https://www.home-assistant.io/dashboards/actions/). None is set by default, so a tap on the chart shows its tooltip. The condition icons under the chart always open the weather entity's details. With an action set, both areas can be focused with the keyboard: Enter or Space runs `tap_action`, or `hold_action` (then `double_tap_action`) when no tap action is set. Screen readers activate them the same way.
 ```yaml
 type: custom:weather-chart-card-ha
 entity: weather.home
