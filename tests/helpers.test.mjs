@@ -406,3 +406,11 @@ test('withAlpha re-tints rgb, rgba and hex colors', () => {
   assert.equal(card.withAlpha('#4473a0', 0.2), 'rgba(68, 115, 160, 0.2)');
   assert.equal(card.withAlpha('orange', 0.2), 'rgba(127, 127, 127, 0.2)');
 });
+
+test('round_temp rounds the current temperature and feels like too', () => {
+  assert.equal(makeCard({ forecast: { round_temp: true } }).roundTemperature(11.3), 11);
+  assert.equal(makeCard({ forecast: { round_temp: true } }).roundTemperature(11.6), 12);
+  assert.equal(String(makeCard({ forecast: { round_temp: true } }).roundTemperature(-0.4)), '0');
+  assert.equal(makeCard().roundTemperature(11.36), 11.4);
+  assert.ok(Number.isNaN(makeCard().roundTemperature(NaN)));
+});

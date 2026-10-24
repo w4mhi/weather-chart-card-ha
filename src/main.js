@@ -2473,9 +2473,7 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
     );
   }
   
-  if (!isNaN(roundedTemperature) && roundedTemperature % 1 !== 0) {
-    roundedTemperature = Math.round(roundedTemperature * 10) / 10;
-  }
+  roundedTemperature = this.roundTemperature(roundedTemperature);
 
   let roundedFeelsLike = parseFloat(feels_like);
   
@@ -2488,9 +2486,7 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
     );
   }
   
-  if (!isNaN(roundedFeelsLike) && roundedFeelsLike % 1 !== 0) {
-    roundedFeelsLike = Math.round(roundedFeelsLike * 10) / 10;
-  }
+  roundedFeelsLike = this.roundTemperature(roundedFeelsLike);
 
   // Day/night for the current-conditions icon and condition text. When the card
   // explicitly targets a sun location (multi-location dashboards), compute it
@@ -2529,7 +2525,7 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
             ${this.localizeCondition(currentCondition)}
           </div>
         ` : ''}
-        ${showFeelsLike && roundedFeelsLike ? html`
+        ${showFeelsLike && Number.isFinite(roundedFeelsLike) ? html`
           <div class="feels-like">
             ${this.ll('feelsLike')}
             ${roundedFeelsLike}${this.unitTemperature || this.getUnit('temperature')}
@@ -2549,6 +2545,19 @@ renderMain({ config, sun, weather, temperature, feels_like, description } = this
       
     </div>
   `;
+}
+
+/**
+ * Round a current temperature for display: to whole degrees when
+ * `forecast.round_temp` is on (like the chart), otherwise to one decimal.
+ */
+roundTemperature(value) {
+  if (isNaN(value)) {
+    return value;
+  }
+  return this.config.forecast.round_temp == true
+    ? Math.round(value)
+    : Math.round(value * 10) / 10;
 }
 
 updateClock() {

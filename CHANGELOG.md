@@ -12,9 +12,11 @@
 ### Changed
 - The animated icons are bundled inside the card. They no longer come from a CDN, so they work offline and always match the installed version.
 - Condition names use Home Assistant's own translations when the card shows Home Assistant's language.
+- `forecast.round_temp` also rounds the current temperature and feels like (11.3 → 11, 11.6 → 12).
 - The bundle is minified: 789 KB before, 473 KB now (118 KB gzipped), icons included.
 
 ### Fixed
+- A feels-like temperature of exactly 0° was hidden.
 - A forecast day without a low temperature shifted every later low one column left; a missing low was drawn as 0.
 
 ### Development
