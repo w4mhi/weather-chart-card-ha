@@ -35,15 +35,38 @@ export const AMCHARTS_MAPPING = {
   'wind': 'cloudy',
 };
 
+// The amCharts artwork fills only about 55% of its 64x64 frame, against 70-80%
+// for the style1 icons, so it looked small at the same icons_size. Every icon
+// is cropped to the same CROP_SIZE square (one scale for all), centred on its
+// own content. Centres are the middle of each icon's bounding box, measured in
+// Chromium over 6 s of animation so moving parts (rain, rays) stay inside; the
+// largest icon is 43 units wide, so 46 leaves a margin.
+export const CROP_SIZE = 46;
+export const CROP_CENTERS = {
+  'cloudy': [32.5, 31.5],
+  'cloudy-day-1': [28.5, 30.5],
+  'cloudy-night-1': [36, 31.5],
+  'day': [32, 32],
+  'night': [33.5, 35],
+  'rainy-3': [27.5, 34],
+  'rainy-5': [32, 38],
+  'rainy-6': [32, 38.5],
+  'rainy-7': [32, 38.5],
+  'snowy-5': [33, 38.5],
+  'thunder': [31.5, 38.5],
+};
+
 /**
- * Make an amCharts SVG fit the card: `viewbox` must be `viewBox` (SVG is case
- * sensitive; Chrome forgives it, Firefox and Safari do not scale the icon), and
+ * Make an amCharts SVG fit the card: crop it to CROP_SIZE around `center`,
+ * written as `viewBox` (SVG is case sensitive and the files say `viewbox`;
+ * Chrome forgives it, Firefox and Safari do not scale the icon), and
  * the -webkit-/-moz-/-ms- copies of every CSS property are dropped, since each
  * has an unprefixed twin that all current browsers use.
  */
-export function cleanSvg(svg) {
+export function cleanSvg(svg, center = [32, 32]) {
+  const [x, y] = center.map((c) => c - CROP_SIZE / 2);
   return svg
-    .replace(/\bviewbox=/, 'viewBox=')
+    .replace(/\bviewbox="[^"]*"/i, `viewBox="${x} ${y} ${CROP_SIZE} ${CROP_SIZE}"`)
     .split('\n')
     .filter((line) => !/^\s*-(webkit|moz|ms)-[a-z-]+\s*:[^;]*;\s*$/.test(line))
     .join('\n');
@@ -60,7 +83,7 @@ if (import.meta.url === `file://${process.argv[1]}`) {
   rmSync(target, { recursive: true, force: true });
   mkdirSync(target);
   for (const [name, file] of Object.entries(AMCHARTS_MAPPING)) {
-    writeFileSync(new URL(`${name}.svg`, target), cleanSvg(readFileSync(join(source, `${file}.svg`), 'utf8')));
+    writeFileSync(new URL(`${name}.svg`, target), cleanSvg(readFileSync(join(source, `${file}.svg`), 'utf8'), CROP_CENTERS[file]));
   }
   console.log(`Wrote ${names.length} icons to src/icons3`);
 }

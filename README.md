@@ -471,7 +471,7 @@ forecast:
 
 ## 🎨 Custom Icons
 
-The animated icons ship inside `weather-chart-card-ha.js`, so they need no internet connection, no extra files and no CDN. Three sets are included: `icon_style: style1` (filled, default), `style2` (outline) and `style3` (amCharts). The amCharts artwork leaves more space around each icon, so with `style3` you may want a larger `icons_size` and `main_icon_size`. To use your own, point `icons` at a folder of SVG files; any icon that fails to load falls back to the bundled one.
+The animated icons ship inside `weather-chart-card-ha.js`, so they need no internet connection, no extra files and no CDN. Three sets are included: `icon_style: style1` (filled, default), `style2` (outline) and `style3` (amCharts). To use your own, point `icons` at a folder of SVG files; any icon that fails to load falls back to the bundled one.
 
 Icons should be in SVG format. Icons should have names as shown [here](https://github.com/mlamberts78/weather-chart-card-ha/blob/master/src/const.js#L24).
 
@@ -656,7 +656,7 @@ See [Releases](https://github.com/w4mhi/weather-chart-card-ha/releases) for vers
 
 - **Original Card**: [mlamberts78](https://github.com/mlamberts78/weather-chart-card-ha) - Created the original weather-chart-card-ha
 - **Weather Icons**: [Basmilius](https://github.com/basmilius/weather-icons) - Beautiful animated weather icons, `style1` and `style2` (bundled inside the card, so they work offline)
-- **Weather Icons**: [amCharts](https://www.amcharts.com/free-animated-svg-weather-icons/) - Animated weather icons, `style3`, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Converted for the card (renamed, `viewBox` fixed, vendor-prefixed CSS removed); fog and wind use the cloud icon, hail and sleet the mixed-precipitation icon, as the set has no artwork for them.
+- **Weather Icons**: [amCharts](https://www.amcharts.com/free-animated-svg-weather-icons/) - Animated weather icons, `style3`, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Converted for the card (renamed, cropped to match the size of the other sets, `viewBox` fixed, vendor-prefixed CSS removed); fog and wind use the cloud icon, hail and sleet the mixed-precipitation icon, as the set has no artwork for them.
 - **Enhancements**: [W4MHI](https://github.com/w4mhi) - Temperature gradients, timezone support, daily/hourly toggle, layout improvements
 
 ---

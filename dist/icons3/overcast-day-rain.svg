@@ -6,7 +6,7 @@
     xmlns:xlink="http://www.w3.org/1999/xlink"
     width="64"
     height="64"
-    viewBox="0 0 64 64">
+    viewBox="4.5 11 46 46">
     <defs>
         <filter id="blur" width="200%" height="200%">
             <feGaussianBlur in="SourceAlpha" stdDeviation="3"/>

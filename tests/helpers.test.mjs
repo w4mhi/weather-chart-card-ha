@@ -425,6 +425,8 @@ test('the three icon folders hold the same icon names', async () => {
   assert.deepEqual(list('icons2'), list('icons'));
   assert.deepEqual(list('icons3'), list('icons'));
   const { cleanSvg } = await import('../scripts/import-amcharts.mjs');
-  assert.equal(cleanSvg('<svg viewbox="0 0 64 64">\n  -webkit-transform: none;\n  transform: none;\n</svg>'),
-    '<svg viewBox="0 0 64 64">\n  transform: none;\n</svg>');
+  assert.equal(cleanSvg('<svg viewbox="0 0 64 64">\n  -webkit-transform: none;\n  transform: none;\n</svg>', [30, 40]),
+    '<svg viewBox="7 17 46 46">\n  transform: none;\n</svg>');
+  const { AMCHARTS_MAPPING, CROP_CENTERS } = await import('../scripts/import-amcharts.mjs');
+  for (const file of Object.values(AMCHARTS_MAPPING)) assert.ok(CROP_CENTERS[file], `crop centre for ${file}`);
 });
