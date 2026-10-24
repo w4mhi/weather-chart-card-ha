@@ -16,7 +16,8 @@ export default {
     copy({
       targets: [
         { src: 'src/icons/*', dest: 'dist/icons' },
-        { src: 'src/icons2/*', dest: 'dist/icons2' }
+        { src: 'src/icons2/*', dest: 'dist/icons2' },
+        { src: 'src/icons3/*', dest: 'dist/icons3' }
       ]
     }),
     serve({

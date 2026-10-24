@@ -314,6 +314,10 @@ test('animated icons are bundled, in the configured style, with custom icons fir
   const style2 = makeCard({ icon_style: 'style2' }).getWeatherIcon('sunny', 'below_horizon');
   assert.equal(decode(style2), readFileSync(new URL('../src/icons2/clear-night.svg', import.meta.url), 'utf8').trim());
 
+  const style3 = makeCard({ icon_style: 'style3' }).getWeatherIcon('rainy', 'below_horizon');
+  assert.equal(decode(style3), readFileSync(new URL('../src/icons3/overcast-night-rain.svg', import.meta.url), 'utf8').trim());
+  // An unknown style falls back to style1.
+  assert.equal(makeCard({ icon_style: 'style9' }).getWeatherIcon('sunny', 'above_horizon'), style1);
   assert.equal(makeCard({ icons: '/local/w/' }).getWeatherIcon('rainy', 'below_horizon'), '/local/w/overcast-night-rain.svg');
   assert.equal(makeCard({ animated_icons: false }).getWeatherIcon('rainy'), 'hass:weather-rainy');
   // A condition with no image (or no MDI icon) still gets an icon.
@@ -413,4 +417,14 @@ test('round_temp rounds the current temperature and feels like too', () => {
   assert.equal(String(makeCard({ forecast: { round_temp: true } }).roundTemperature(-0.4)), '0');
   assert.equal(makeCard().roundTemperature(11.36), 11.4);
   assert.ok(Number.isNaN(makeCard().roundTemperature(NaN)));
+});
+
+test('the three icon folders hold the same icon names', async () => {
+  const { readdirSync } = await import('node:fs');
+  const list = (dir) => readdirSync(new URL(`../src/${dir}/`, import.meta.url)).filter((f) => f.endsWith('.svg')).sort();
+  assert.deepEqual(list('icons2'), list('icons'));
+  assert.deepEqual(list('icons3'), list('icons'));
+  const { cleanSvg } = await import('../scripts/import-amcharts.mjs');
+  assert.equal(cleanSvg('<svg viewbox="0 0 64 64">\n  -webkit-transform: none;\n  transform: none;\n</svg>'),
+    '<svg viewBox="0 0 64 64">\n  transform: none;\n</svg>');
 });

@@ -937,7 +937,7 @@ getLocalizedMonthNameShort(date, timezone) {
    * icons from a different release.
    */
   getBundledIcon(iconName) {
-    const style = this.config.icon_style === 'style2' ? 'style2' : 'style1';
+    const style = iconData[this.config.icon_style] ? this.config.icon_style : 'style1';
     const key = `${style}/${iconName}`;
     if (!(key in bundledIconUris)) {
       const svg = iconData[style][iconName];

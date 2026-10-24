@@ -8,6 +8,7 @@
 - `forecast.fill_temperature_range`: shade between the high and low lines.
 - `forecast.show_probability_line`: precipitation probability as a line over the rainfall bars.
 - Editor switches for the three chart options.
+- `icon_style: style3`: the amCharts animated weather icons (CC BY 4.0), bundled like the other two sets.
 - `forecast.wind_warning`: colour the wind forecast by Beaufort force (#57).
 
 ### Changed

@@ -703,6 +703,17 @@ class WeatherChartCardEditor extends LitElement {
             Style 2
           </label>
         </div>
+        <div class="switch-right radio-container" style="${this._flag('animated_icons') ? 'display: flex;' : 'display: none;'}">
+          <ha-radio
+            name="icon_style"
+            value="style3"
+            @change="${this._handleIconStyleChange}"
+            .checked="${this._value('icon_style') === 'style3'}"
+          ></ha-radio>
+          <label class="check-label">
+            Style 3
+          </label>
+        </div>
       </div>
       <div class="flex-container">
         <ha-textfield
