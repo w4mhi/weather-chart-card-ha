@@ -289,3 +289,53 @@ test('chart overlays render and gestures fire hass-action', async () => {
     assert.deepEqual(errors, []);
   } finally { await page.close(); }
 });
+
+test('editor choices render without Home Assistant components and update the config', async () => {
+  const page = await browser.newPage({ viewport: { width: 600, height: 1600 } });
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  try {
+    await page.route('**/*', route => {
+      const path = new URL(route.request().url()).pathname;
+      if (path === '/card.js') return route.fulfill({ contentType:'text/javascript', body:bundle });
+      if (path === '/') return route.fulfill({ contentType:'text/html', body:'<!doctype html><meta charset="utf-8"><script src="/card.js"></script>' });
+      return route.abort();
+    });
+    await page.goto('http://editor.test/');
+    // No ha-radio, ha-checkbox or ha-switch is defined here, as in a dashboard
+    // where Home Assistant has not loaded them.
+    const result = await page.evaluate(async () => {
+      const editor = document.createElement('weather-chart-card-ha-editor');
+      editor.hass = { states: { 'weather.home': { state: 'sunny', attributes: {} } }, config: {}, language: 'en' };
+      editor.setConfig({ entity: 'weather.home' });
+      const changes = [];
+      editor.addEventListener('config-changed', (e) => changes.push(e.detail.config));
+      document.body.append(editor);
+      await editor.updateComplete;
+      const root = editor.shadowRoot;
+      const ids = ['forecast-type', 'chart-style', 'icon-style'];
+      // Pages are toggled by class; show them all to measure every select.
+      root.querySelectorAll('.page-container').forEach(p => p.classList.add('active'));
+      const shown = {};
+      for (const id of ids) {
+        const select = root.getElementById(id);
+        shown[id] = { width: select.getBoundingClientRect().width, value: select.value, options: select.options.length };
+      }
+      const icon = root.getElementById('icon-style');
+      icon.value = 'style3';
+      icon.dispatchEvent(new Event('change'));
+      const chart = root.getElementById('chart-style');
+      chart.value = 'style1';
+      chart.dispatchEvent(new Event('change'));
+      const checkboxes = root.querySelectorAll('input.native-checkbox').length;
+      return { shown, last: changes.at(-1), first: changes[0], checkboxes };
+    });
+    for (const [id, select] of Object.entries(result.shown)) assert.ok(select.width > 50, `${id} is visible`);
+    assert.deepEqual(result.shown['icon-style'], { ...result.shown['icon-style'], value: 'style1', options: 3 });
+    assert.equal(result.shown['forecast-type'].value, 'daily');
+    assert.equal(result.first.icon_style, 'style3');
+    assert.equal(result.last.forecast.style, 'style1');
+    assert.equal(result.checkboxes, 4);
+    assert.deepEqual(errors, []);
+  } finally { await page.close(); }
+});

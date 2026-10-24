@@ -18,6 +18,7 @@
 - The bundle is minified: 789 KB before, 473 KB now (118 KB gzipped), icons included.
 
 ### Fixed
+- The editor's forecast type, chart style and icon style choices, and the clock checkboxes, showed only their labels: Home Assistant does not always load `ha-radio` and `ha-checkbox` for card editors. They are now native dropdowns and checkboxes.
 - A feels-like temperature of exactly 0° was hidden.
 - A forecast day without a low temperature shifted every later low one column left; a missing low was drawn as 0.
 

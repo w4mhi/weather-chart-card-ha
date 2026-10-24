@@ -182,7 +182,7 @@ class WeatherChartCardEditor extends LitElement {
       return;
     }
     const newConfig = JSON.parse(JSON.stringify(this._config));
-    newConfig.forecast.style = event.target.value;
+    newConfig.forecast = { ...newConfig.forecast, style: event.target.value };
     this.configChanged(newConfig);
     this.requestUpdate();
   }
@@ -192,7 +192,7 @@ class WeatherChartCardEditor extends LitElement {
       return;
     }
     const newConfig = JSON.parse(JSON.stringify(this._config));
-    newConfig.forecast.type = event.target.value;
+    newConfig.forecast = { ...newConfig.forecast, type: event.target.value };
     this.configChanged(newConfig);
     this.requestUpdate();
   }
@@ -349,7 +349,8 @@ class WeatherChartCardEditor extends LitElement {
         }
         .icon-container {
           display: flex;
-          flex-direction: row;
+          flex-direction: column;
+          align-items: stretch;
           margin-bottom: 12px;
         }
         .switch-right {
@@ -373,8 +374,35 @@ class WeatherChartCardEditor extends LitElement {
           align-items: center;
           gap: 5px;
         }
-        .radio-container.group-spacing {
+        .radio-container.group-spacing,
+        .select-row.group-spacing {
           margin-top: 16px;
+        }
+        /* Native controls: HA loads ha-radio and ha-checkbox only for its own
+           screens, so in a card editor they can be undefined and render nothing. */
+        .select-row {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          margin: 8px 0;
+        }
+        .select-row[hidden] {
+          display: none;
+        }
+        .native-select {
+          flex: 1;
+          padding: 8px;
+          font-size: 14px;
+          border: 1px solid var(--divider-color);
+          border-radius: 4px;
+          background: var(--card-background-color);
+          color: var(--primary-text-color);
+        }
+        .native-checkbox {
+          width: 18px;
+          height: 18px;
+          margin: 8px;
+          accent-color: var(--primary-color);
         }
         .radio-group {
           display: flex;
@@ -576,30 +604,12 @@ class WeatherChartCardEditor extends LitElement {
       </div>
        </div>
 
-      <div class="radio-container group-spacing">
-        <div class="switch-right">
-          <ha-radio
-            name="type"
-            value="daily"
-            @change="${this._handleTypeChange}"
-            .checked="${this._value('forecast.type') === 'daily'}"
-          ></ha-radio>
-          <label class="check-label">
-            Daily forecast
-          </label>
-        </div>
-
-        <div class="switch-right">
-          <ha-radio
-            name="type"
-            value="hourly"
-            @change="${this._handleTypeChange}"
-            .checked="${this._value('forecast.type') === 'hourly'}"
-          ></ha-radio>
-          <label class="check-label">
-            Hourly forecast
-          </label>
-        </div>
+      <div class="select-row group-spacing">
+        <label for="forecast-type">Forecast type</label>
+        <select id="forecast-type" class="native-select" @change="${this._handleTypeChange}">
+          <option value="daily" ?selected=${this._value('forecast.type') === 'daily'}>Daily</option>
+          <option value="hourly" ?selected=${this._value('forecast.type') === 'hourly'}>Hourly</option>
+        </select>
       </div>
 
       <div class="switch-container">
@@ -644,30 +654,12 @@ class WeatherChartCardEditor extends LitElement {
         </select> s
       </div>
 
-      <div class="radio-container group-spacing">
-        <div class="switch-right">
-          <ha-radio
-            name="style"
-            value="style1"
-            @change="${this._handleStyleChange}"
-            .checked="${this._value('forecast.style') === 'style1'}"
-          ></ha-radio>
-          <label class="check-label">
-            Chart style 1
-          </label>
-        </div>
-
-        <div class="switch-right">
-          <ha-radio
-            name="style"
-            value="style2"
-            @change="${this._handleStyleChange}"
-            .checked="${this._value('forecast.style') === 'style2'}"
-          ></ha-radio>
-          <label class="check-label">
-            Chart style 2
-          </label>
-        </div>
+      <div class="select-row group-spacing">
+        <label for="chart-style">Chart style</label>
+        <select id="chart-style" class="native-select" @change="${this._handleStyleChange}">
+          <option value="style1" ?selected=${this._value('forecast.style') === 'style1'}>Style 1: labels in boxes</option>
+          <option value="style2" ?selected=${this._value('forecast.style') === 'style2'}>Style 2: plain labels</option>
+        </select>
       </div>
 
       <h5>Icons settings:</h5>
@@ -681,38 +673,13 @@ class WeatherChartCardEditor extends LitElement {
             Use Animated Icons
           </label>
         </div>
-        <div class="switch-right radio-container" style="${this._flag('animated_icons') ? 'display: flex;' : 'display: none;'}">
-          <ha-radio
-            name="icon_style"
-            value="style1"
-            @change="${this._handleIconStyleChange}"
-            .checked="${this._value('icon_style') === 'style1'}"
-          ></ha-radio>
-          <label class="check-label">
-            Style 1
-          </label>
-        </div>
-        <div class="switch-right radio-container" style="${this._flag('animated_icons') ? 'display: flex;' : 'display: none;'}">
-          <ha-radio
-            name="icon_style"
-            value="style2"
-            @change="${this._handleIconStyleChange}"
-            .checked="${this._value('icon_style') === 'style2'}"
-          ></ha-radio>
-          <label class="check-label">
-            Style 2
-          </label>
-        </div>
-        <div class="switch-right radio-container" style="${this._flag('animated_icons') ? 'display: flex;' : 'display: none;'}">
-          <ha-radio
-            name="icon_style"
-            value="style3"
-            @change="${this._handleIconStyleChange}"
-            .checked="${this._value('icon_style') === 'style3'}"
-          ></ha-radio>
-          <label class="check-label">
-            Style 3
-          </label>
+        <div class="select-row" ?hidden=${!this._flag('animated_icons')}>
+          <label for="icon-style">Icon style</label>
+          <select id="icon-style" class="native-select" @change="${this._handleIconStyleChange}">
+            <option value="style1" ?selected=${this._value('icon_style') === 'style1'}>Style 1: filled</option>
+            <option value="style2" ?selected=${this._value('icon_style') === 'style2'}>Style 2: outline</option>
+            <option value="style3" ?selected=${this._value('icon_style') === 'style3'}>Style 3: amCharts</option>
+          </select>
         </div>
       </div>
       <div class="flex-container">
@@ -934,37 +901,37 @@ class WeatherChartCardEditor extends LitElement {
               </label>
             </div>
             <div class="switch-right checkbox-container" style="${this._flag('show_time') ? 'display: flex;' : 'display: none;'}">
-              <ha-checkbox
+              <input type="checkbox" class="native-checkbox"
                 @change="${(e) => this._valueChanged(e, 'show_time_seconds')}"
                 .checked="${this._flag('show_time_seconds')}"
-              ></ha-checkbox>
+              />
               <label class="check-label">
                 Show Seconds
               </label>
             </div>
             <div class="switch-right checkbox-container" style="${this._flag('show_time') ? 'display: flex;' : 'display: none;'}">
-              <ha-checkbox
+              <input type="checkbox" class="native-checkbox"
                 @change="${(e) => this._valueChanged(e, 'show_hour_leading_zero')}"
                 .checked="${this._flag('show_hour_leading_zero')}"
-              ></ha-checkbox>
+              />
               <label class="check-label">
                 Leading zero for hour
               </label>
             </div>
             <div class="switch-right checkbox-container" style="${this._flag('show_time') ? 'display: flex;' : 'display: none;'}">
-              <ha-checkbox
+              <input type="checkbox" class="native-checkbox"
                 @change="${(e) => this._valueChanged(e, 'show_day')}"
                 .checked="${this._flag('show_day')}"
-              ></ha-checkbox>
+              />
               <label class="check-label">
                 Show Day
               </label>
             </div>
             <div class="switch-right checkbox-container" style="${this._flag('show_time') ? 'display: flex;' : 'display: none;'}">
-              <ha-checkbox
+              <input type="checkbox" class="native-checkbox"
                 @change="${(e) => this._valueChanged(e, 'show_date')}"
                 .checked="${this._flag('show_date')}"
-              ></ha-checkbox>
+              />
               <label class="check-label">
                 Show Date
               </label>
