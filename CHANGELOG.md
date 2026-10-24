@@ -8,6 +8,7 @@
 - `forecast.fill_temperature_range`: shade between the high and low lines.
 - `forecast.show_probability_line`: precipitation probability as a line over the rainfall bars.
 - Editor switches for the three chart options.
+- `forecast.wind_warning`: colour the wind forecast by Beaufort force (#57).
 
 ### Changed
 - The animated icons are bundled inside the card. They no longer come from a CDN, so they work offline and always match the installed version.
