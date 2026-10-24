@@ -152,3 +152,140 @@ for (const width of [390, 1200]) {
     });
   }
 }
+
+test('animated icons render from the bundle with the network blocked', async () => {
+  const page = await browser.newPage({ viewport: { width: 600, height: 844 } });
+  const errors = [];
+  const blocked = [];
+  page.on('pageerror', error => errors.push(error.message));
+  try {
+    await page.route('**/*', route => {
+      const path = new URL(route.request().url()).pathname;
+      if (path === '/card.js') return route.fulfill({ contentType:'text/javascript', body:bundle });
+      if (path === '/') return route.fulfill({ contentType:'text/html', body:'<!doctype html><html><meta charset="utf-8"><style>ha-card{display:block}</style><script src="/card.js"></script></html>' });
+      blocked.push(route.request().url());
+      return route.abort();
+    });
+    await page.goto('http://icons.test/');
+    await page.evaluate(() => {
+      const forecasts = Array.from({length:5}, (_, i) => ({
+        datetime: new Date(Date.UTC(2026, 9, 18 + i, 12)).toISOString(),
+        temperature: 20, templow: 10, condition: ['sunny', 'rainy', 'cloudy', 'snowy', 'fog'][i],
+      }));
+      const card = document.createElement('weather-chart-card-ha');
+      card.setConfig({ entity:'weather.home', icon_style:'style2' });
+      card.hass = {
+        language:'en', config:{ time_zone:'UTC', unit_system:{ temperature:'°C', length:'km' } },
+        states:{ 'weather.home':{ state:'sunny', last_changed:'2026-10-18T11:00:00Z', attributes:{ temperature:20, temperature_unit:'°C', supported_features:3 } } },
+        connection:{ subscribeMessage(callback) { setTimeout(() => callback({forecast:forecasts}), 0); return Promise.resolve(() => {}); } },
+      };
+      document.body.append(card);
+      window.card = card;
+    });
+    await page.waitForFunction(() => window.card.shadowRoot.querySelectorAll('.forecast-item img').length === 5, null, {timeout:10000});
+    await page.waitForFunction(() => [...window.card.shadowRoot.querySelectorAll('img')].every(img => img.complete));
+    const icons = await page.evaluate(() => [...window.card.shadowRoot.querySelectorAll('img')]
+      .map(img => ({ scheme:img.src.split(':')[0], width:img.naturalWidth })));
+    assert.equal(icons.length, 6);
+    for (const icon of icons) {
+      assert.equal(icon.scheme, 'data');
+      assert.ok(icon.width > 0, 'icon decoded');
+    }
+    assert.deepEqual(blocked, []);
+    assert.deepEqual(errors, []);
+  } finally { await page.close(); }
+});
+
+test('chart overlays render and gestures fire hass-action', async () => {
+  const page = await browser.newPage({ viewport: { width: 600, height: 844 } });
+  const errors = [];
+  page.on('pageerror', error => errors.push(error.message));
+  try {
+    await page.clock.setFixedTime(new Date('2026-06-21T12:00:00Z'));
+    await page.route('**/*', route => {
+      const path = new URL(route.request().url()).pathname;
+      if (path === '/card.js') return route.fulfill({ contentType:'text/javascript', body:bundle });
+      if (path === '/') return route.fulfill({ contentType:'text/html', body:'<!doctype html><html><meta charset="utf-8"><style>ha-card{display:block;background:#fff}</style><script src="/card.js"></script></html>' });
+      return route.abort();
+    });
+    await page.goto('http://overlays.test/');
+    await page.evaluate(() => {
+      const hourly = Array.from({length:24}, (_, i) => ({
+        datetime: new Date(Date.UTC(2026, 5, 21, 12 + i)).toISOString(),
+        temperature: 15 + 5 * Math.sin(i / 4), condition: 'rainy', precipitation: (i % 3) * 0.5, precipitation_probability: (i * 13) % 100,
+      }));
+      const daily = Array.from({length:5}, (_, i) => ({
+        datetime: new Date(Date.UTC(2026, 5, 21 + i, 12)).toISOString(),
+        temperature: 24 + i, templow: i === 0 ? undefined : 14 + i, condition: 'sunny', precipitation: 1,
+      }));
+      const card = document.createElement('weather-chart-card-ha');
+      card.setConfig({
+        entity:'weather.home', animated_icons:false, sun_latitude:51.5, sun_longitude:0, sun_timezone:'Europe/London',
+        tap_action:{ action:'more-info' }, hold_action:{ action:'navigate', navigation_path:'/radar' },
+        forecast:{ type:'hourly', number_of_forecasts:24, disable_animation:true, night_shading:true, show_probability_line:true, fill_temperature_range:true },
+      });
+      card.hass = {
+        language:'en', config:{ time_zone:'Europe/London', unit_system:{ temperature:'°C', length:'km' } },
+        states:{ 'weather.home':{ state:'rainy', last_changed:'2026-06-21T11:00:00Z', attributes:{ temperature:15, temperature_unit:'°C', supported_features:3 } } },
+        connection:{ subscribeMessage(callback, message) {
+          setTimeout(() => callback({ forecast: message.forecast_type === 'hourly' ? hourly : daily }), 0);
+          return Promise.resolve(() => {});
+        } },
+      };
+      window.actions = [];
+      card.addEventListener('hass-action', (e) => window.actions.push(e.detail.action));
+      document.body.append(card);
+      window.card = card;
+    });
+    await page.waitForFunction(() => window.card.forecastChart, null, {timeout:10000});
+    const hourly = await page.evaluate(() => {
+      const chart = window.card.forecastChart;
+      // Count the night columns the plugin paints: sample the canvas at the top of each column.
+      const ctx = chart.canvas.getContext('2d', { willReadFrequently: true });
+      const ratio = chart.currentDevicePixelRatio;
+      const shaded = chart.data.labels.map((_, i) => {
+        const x = Math.round(chart.scales.x.getPixelForValue(i) * ratio);
+        // Any pixel of the bare night band colour, rgba(100, 120, 160, 0.15), in the
+        // column; lines, labels and bars cover parts of it.
+        const { top, bottom } = chart.chartArea;
+        const column = ctx.getImageData(x, Math.round(top * ratio), 1, Math.round((bottom - top) * ratio)).data;
+        for (let p = 0; p < column.length; p += 4) {
+          const [r, g, b, a] = column.slice(p, p + 4);
+          if (Math.abs(r - 100) < 4 && Math.abs(g - 120) < 4 && Math.abs(b - 160) < 4 && Math.abs(a - 38) < 3) return true;
+        }
+        return false;
+      });
+      return { datasets: chart.data.datasets.length, probability: chart.data.datasets[3].data.slice(0, 3), shaded };
+    });
+    if (process.env.WCC_SCREENSHOT) await page.screenshot({ path: process.env.WCC_SCREENSHOT.replace('.png', '-hourly.png') });
+    assert.equal(hourly.datasets, 4);
+    assert.deepEqual(hourly.probability, [0, 13, 26]);
+    // Slots start at 13:00 BST; London sunset is 21:21 and sunrise 04:43 BST, so 22:00 to 04:00 are night.
+    assert.deepEqual(hourly.shaded.map(Number).join(''), '000000000111111100000000');
+
+    // Tap and hold on the current conditions, with real pointer events.
+    const current = page.locator('weather-chart-card-ha .current');
+    assert.equal(await current.getAttribute('role'), 'button');
+    await current.click();
+    const box = await current.boundingBox();
+    await page.mouse.move(box.x + 20, box.y + 20);
+    await page.mouse.down();
+    await page.waitForTimeout(700);
+    await page.mouse.up();
+    await page.waitForFunction(() => window.actions.length >= 2);
+    assert.deepEqual(await page.evaluate(() => window.actions), ['tap', 'hold']);
+
+    // Daily view: range fill, with a gap where the first day has no low.
+    await page.evaluate(() => window.card.handleForecastTypeToggle());
+    await page.waitForFunction(() => window.card.forecastChart.data.labels.length === 5);
+    const daily = await page.evaluate(() => {
+      const chart = window.card.forecastChart;
+      return { lows: chart.data.datasets[1].data, fill: chart.getDatasetMeta(0).dataset.options.fill };
+    });
+    assert.deepEqual(daily.lows, [null, 15, 16, 17, 18]);
+    assert.equal(daily.fill.target, 1);
+    assert.ok(daily.fill.above, 'fill colour resolved');
+    await page.screenshot({ path: process.env.WCC_SCREENSHOT || '/dev/null' }).catch(() => {});
+    assert.deepEqual(errors, []);
+  } finally { await page.close(); }
+});
