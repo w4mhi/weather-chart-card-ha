@@ -50,6 +50,13 @@ jobs:
       - name: Check committed bundle matches source
         run: git diff --exit-code --stat -- dist/
 
+      - name: Upload the rebuilt bundle for comparison
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: rebuilt-dist
+          path: dist/weather-chart-card-ha.js
+
       - name: Install test browser
         run: npx playwright install --with-deps chromium
 
