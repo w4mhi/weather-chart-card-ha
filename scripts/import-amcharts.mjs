@@ -61,16 +61,19 @@ export const CROP_CENTERS = {
  * Make an amCharts SVG fit the card: crop it to CROP_SIZE around `center`,
  * written as `viewBox` (SVG is case sensitive and the files say `viewbox`;
  * Chrome forgives it, Firefox and Safari do not scale the icon), and
- * the -webkit-/-moz-/-ms- copies of every CSS property are dropped, since each
- * has an unprefixed twin that all current browsers use.
+ * the -webkit-/-moz-/-ms- copies of every CSS property are dropped (with any
+ * trailing comment), since each has an unprefixed twin that all current
+ * browsers use.
  */
 export function cleanSvg(svg, center = [32, 32]) {
   const [x, y] = center.map((c) => c - CROP_SIZE / 2);
   return svg
     .replace(/\bviewbox="[^"]*"/i, `viewBox="${x} ${y} ${CROP_SIZE} ${CROP_SIZE}"`)
     .split('\n')
-    .filter((line) => !/^\s*-(webkit|moz|ms)-[a-z-]+\s*:[^;]*;\s*$/.test(line))
-    .join('\n');
+    .filter((line) => !/^\s*-(webkit|moz|ms)-[a-z-]+\s*:[^;]*;\s*(\/\*.*\*\/\s*)?$/.test(line))
+    .join('\n')
+    // One upstream line says fifll="none".
+    .replace(/\bfifll=/g, 'fill=');
 }
 
 /**

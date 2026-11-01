@@ -39,7 +39,8 @@ const LICENSE_NOTICE = `/*!
  * https://www.amcharts.com/free-animated-svg-weather-icons/
  * Licensed under CC BY 4.0, https://creativecommons.org/licenses/by/4.0/
  * Changes: renamed to the card's icon names, cropped to a tighter viewBox
- * (viewbox corrected to viewBox), vendor-prefixed CSS properties removed.
+ * (viewbox corrected to viewBox), vendor-prefixed CSS properties removed,
+ * a misspelled fill attribute corrected.
  */`;
 
 export function generateIconModule() {

@@ -64,5 +64,5 @@ Public License: https://creativecommons.org/licenses/by/4.0/
 
 Changes: files renamed to the card's icon names (several names share one icon,
 see scripts/import-amcharts.mjs), cropped to a tighter `viewBox` (the
-original `viewbox` attribute corrected to `viewBox`), and vendor-prefixed CSS
-properties removed.
+original `viewbox` attribute corrected to `viewBox`), vendor-prefixed CSS
+properties removed, and a misspelled `fill` attribute corrected.

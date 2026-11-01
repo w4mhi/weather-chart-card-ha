@@ -66,9 +66,6 @@
           animation-duration: 6s;
           animation-timing-function: linear;
           animation-iteration-count: infinite;
-  -webkit-transform-origin: 12.5px 15.15px 0; /* TODO FF CENTER ISSUE */
-     -moz-transform-origin: 12.5px 15.15px 0; /* TODO FF CENTER ISSUE */
-      -ms-transform-origin: 12.5px 15.15px 0; /* TODO FF CENTER ISSUE */
           transform-origin: 12.5px 15.15px 0; /* TODO FF CENTER ISSUE */
 }
 

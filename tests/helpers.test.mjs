@@ -427,6 +427,14 @@ test('the three icon folders hold the same icon names', async () => {
   const { cleanSvg } = await import('../scripts/import-amcharts.mjs');
   assert.equal(cleanSvg('<svg viewbox="0 0 64 64">\n  -webkit-transform: none;\n  transform: none;\n</svg>', [30, 40]),
     '<svg viewBox="7 17 46 46">\n  transform: none;\n</svg>');
+  // amCharts ends some prefixed lines with a comment, and misspells one fill.
+  assert.equal(cleanSvg('<svg viewbox="0 0 64 64">\n  -moz-transform-origin: 1px 2px 0; /* TODO FF CENTER ISSUE */\n  <line fifll="none"/>\n</svg>'),
+    '<svg viewBox="9 9 46 46">\n  <line fill="none"/>\n</svg>');
+  // The shipped icons have no prefixed CSS left.
+  const { readFileSync } = await import('node:fs');
+  for (const file of readdirSync(new URL('../src/icons3/', import.meta.url))) {
+    assert.doesNotMatch(readFileSync(new URL(`../src/icons3/${file}`, import.meta.url), 'utf8'), /-(webkit|moz|ms)-|fifll=/, file);
+  }
   const { AMCHARTS_MAPPING, CROP_CENTERS } = await import('../scripts/import-amcharts.mjs');
   for (const file of Object.values(AMCHARTS_MAPPING)) assert.ok(CROP_CENTERS[file], `crop centre for ${file}`);
 });
