@@ -10,7 +10,7 @@
 // uses one name for both (cloudy, snow, hail, sleet, wind).
 import { mkdirSync, readFileSync, readdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { pathToFileURL } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 export const AMCHARTS_MAPPING = {
   'clear-day': 'day',
@@ -73,19 +73,31 @@ export function cleanSvg(svg, center = [32, 32]) {
     .join('\n');
 }
 
+/**
+ * Writes the mapped icons from an amCharts `animated` folder to `target`.
+ * Every file is read and cleaned before the target is touched, so a wrong
+ * path or a missing SVG leaves the current icons as they were.
+ */
+export function importIcons(source, target) {
+  const icons = Object.entries(AMCHARTS_MAPPING).map(([name, file]) => [
+    `${name}.svg`,
+    cleanSvg(readFileSync(join(source, `${file}.svg`), 'utf8'), CROP_CENTERS[file]),
+  ]);
+  rmSync(target, { recursive: true, force: true });
+  mkdirSync(target);
+  for (const [name, svg] of icons) {
+    writeFileSync(join(target, name), svg);
+  }
+  return icons.length;
+}
+
 // pathToFileURL encodes the path (spaces, Windows drive letters) like import.meta.url.
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) {
-  const source = join(process.argv[2] || '', 'animated');
-  const target = new URL('../src/icons3/', import.meta.url);
   const reference = readdirSync(new URL('../src/icons/', import.meta.url)).filter((f) => f.endsWith('.svg')).sort();
   const names = Object.keys(AMCHARTS_MAPPING).map((name) => `${name}.svg`).sort();
   if (JSON.stringify(reference) !== JSON.stringify(names)) {
     throw new Error('The mapping must cover exactly the file names in src/icons.');
   }
-  rmSync(target, { recursive: true, force: true });
-  mkdirSync(target);
-  for (const [name, file] of Object.entries(AMCHARTS_MAPPING)) {
-    writeFileSync(new URL(`${name}.svg`, target), cleanSvg(readFileSync(join(source, `${file}.svg`), 'utf8'), CROP_CENTERS[file]));
-  }
-  console.log(`Wrote ${names.length} icons to src/icons3`);
+  const count = importIcons(join(process.argv[2] || '', 'animated'), fileURLToPath(new URL('../src/icons3/', import.meta.url)));
+  console.log(`Wrote ${count} icons to src/icons3`);
 }

@@ -528,3 +528,58 @@ test('the wind forecast names the direction under the arrow, unless turned off',
   hidden.forecasts = card.forecasts;
   assert.ok(!labels(hidden).hasClass);
 });
+
+test('review: taps far apart are two taps, not a double tap', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const { GestureDetector, DOUBLE_TAP_MS } = actions;
+  const fired = [];
+  const g = new GestureDetector((action) => fired.push(action), () => ({ hold: false, doubleTap: true }));
+
+  // Current conditions, then the chart: the first tap runs at once, the second
+  // still waits for a possible double tap of its own.
+  g.down(100, 40); g.up(); g.down(100, 300); g.up();
+  assert.deepEqual(fired, ['tap']);
+  t.mock.timers.tick(DOUBLE_TAP_MS);
+  assert.deepEqual(fired, ['tap', 'tap']);
+
+  fired.length = 0;
+  g.down(100, 300); g.up(); g.down(110, 310); g.up();
+  assert.deepEqual(fired, ['double_tap'], 'a second tap close by is a double tap');
+});
+
+test('review: the bundle keeps the icon license notices', async () => {
+  const { readFileSync } = await import('node:fs');
+  const bundle = readFileSync(new URL('../dist/weather-chart-card-ha.js', import.meta.url), 'utf8');
+  assert.match(bundle, /Copyright \(c\) 2020 Bas Milius/);
+  assert.match(bundle, /Permission is hereby granted/);
+  assert.match(bundle, /amCharts/);
+  assert.match(bundle, /creativecommons\.org\/licenses\/by\/4\.0/);
+});
+
+test('review: a failed icon import leaves the existing icons alone', async () => {
+  const { mkdtempSync, mkdirSync, writeFileSync, readdirSync, readFileSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const { tmpdir } = await import('node:os');
+  const { importIcons, AMCHARTS_MAPPING } = await import('../scripts/import-amcharts.mjs');
+  const dir = mkdtempSync(join(tmpdir(), 'wcc-icons-'));
+  const target = join(dir, 'icons3');
+  mkdirSync(target);
+  writeFileSync(join(target, 'clear-day.svg'), 'kept');
+
+  // A wrong download path, then a download missing one file.
+  assert.throws(() => importIcons(join(dir, 'nowhere'), target));
+  const source = join(dir, 'amcharts', 'animated');
+  mkdirSync(source, { recursive: true });
+  const files = [...new Set(Object.values(AMCHARTS_MAPPING))];
+  for (const file of files.slice(1)) {
+    writeFileSync(join(source, `${file}.svg`), '<svg viewbox="0 0 64 64"></svg>');
+  }
+  assert.throws(() => importIcons(source, target));
+  assert.deepEqual(readdirSync(target), ['clear-day.svg']);
+  assert.equal(readFileSync(join(target, 'clear-day.svg'), 'utf8'), 'kept');
+
+  // With every file present the folder is replaced.
+  writeFileSync(join(source, `${files[0]}.svg`), '<svg viewbox="0 0 64 64"></svg>');
+  importIcons(source, target);
+  assert.equal(readdirSync(target).length, Object.keys(AMCHARTS_MAPPING).length);
+});

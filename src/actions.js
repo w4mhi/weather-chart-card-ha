@@ -8,6 +8,9 @@ export const HOLD_MS = 500;
 export const DOUBLE_TAP_MS = 250;
 // A pointer that travels further than this is scrolling, not tapping.
 const MOVE_PX = 10;
+// A second tap further than this from the first is a new tap, not a double
+// tap: the current conditions and the chart share one detector.
+const DOUBLE_TAP_PX = 30;
 
 export function hasAction(actionConfig) {
   return Boolean(actionConfig && actionConfig.action) && actionConfig.action !== 'none';
@@ -27,6 +30,7 @@ export class GestureDetector {
     this.held = false;
     this.holdTimer = null;
     this.tapTimer = null;
+    this.tapAt = null;
   }
 
   down(x, y) {
@@ -52,6 +56,7 @@ export class GestureDetector {
     if (!this.start) {
       return;
     }
+    const at = this.start;
     this.start = null;
     this.cancelHold();
     if (this.held) {
@@ -60,16 +65,23 @@ export class GestureDetector {
     }
     if (!this.getOptions().doubleTap) {
       this.onAction('tap');
-    } else if (this.tapTimer) {
+      return;
+    }
+    if (this.tapTimer) {
       clearTimeout(this.tapTimer);
       this.tapTimer = null;
-      this.onAction('double_tap');
-    } else {
-      this.tapTimer = setTimeout(() => {
-        this.tapTimer = null;
-        this.onAction('tap');
-      }, DOUBLE_TAP_MS);
+      if (Math.hypot(at.x - this.tapAt.x, at.y - this.tapAt.y) <= DOUBLE_TAP_PX) {
+        this.onAction('double_tap');
+        return;
+      }
+      // Too far away: the first tap stands alone, this one starts afresh.
+      this.onAction('tap');
     }
+    this.tapAt = at;
+    this.tapTimer = setTimeout(() => {
+      this.tapTimer = null;
+      this.onAction('tap');
+    }, DOUBLE_TAP_MS);
   }
 
   cancel() {
