@@ -981,6 +981,15 @@ class WeatherChartCardEditor extends LitElement {
           </div>
           <div class="switch-container">
             <ha-switch
+              @change="${(e) => this._valueChanged(e, 'forecast.show_wind_direction')}"
+              .checked="${this._flag('forecast.show_wind_direction')}"
+            ></ha-switch>
+            <label class="switch-label">
+              Show Wind Direction Names
+            </label>
+          </div>
+          <div class="switch-container">
+            <ha-switch
               @change="${(e) => this._valueChanged(e, 'forecast.round_temp')}"
               .checked="${this._flag('forecast.round_temp')}"
             ></ha-switch>

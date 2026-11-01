@@ -504,3 +504,27 @@ test('a compass name gets the same arrow as its bearing in degrees', () => {
   assert.equal(card.getWindDirIcon('N'), 'arrow-down');
   assert.equal(card.getWindDirIcon('WNW'), 'arrow-bottom-right');
 });
+
+test('the wind forecast names the direction under the arrow, unless turned off', () => {
+  const card = makeCard({ forecast: { type: 'daily' } });
+  card.forecasts = [
+    { datetime: '2026-11-03T20:00:00Z', wind_bearing: 344.9, wind_speed: 10 },
+    { datetime: '2026-11-04T20:00:00Z', wind_bearing: 95.1 },
+    { datetime: '2026-11-05T20:00:00Z', wind_speed: 4 },
+  ];
+  const labels = (c) => {
+    const strings = c.renderWind().strings.join('');
+    const values = JSON.stringify(c.renderWind().values, (k, v) => (typeof v === 'function' ? undefined : v));
+    return { hasClass: strings.includes('wind-dir-label') || values.includes('wind-dir-label'), values };
+  };
+  const shown = labels(card);
+  assert.ok(shown.hasClass);
+  // Compact names: N-NW becomes NNW; the slot without a bearing has no label.
+  assert.ok(shown.values.includes('"NNW"') && shown.values.includes('"E"'));
+  assert.equal(card.getWindDirLabel(344.9), 'NNW');
+  assert.equal(card.getWindDirLabel(undefined), null);
+
+  const hidden = makeCard({ forecast: { type: 'daily', show_wind_direction: false } });
+  hidden.forecasts = card.forecasts;
+  assert.ok(!labels(hidden).hasClass);
+});

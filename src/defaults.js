@@ -19,6 +19,7 @@ export const FORECAST_DEFAULTS = {
   gradient_preset: 'temperate',
   condition_icons: true,
   show_wind_forecast: true,
+  show_wind_direction: true,
   round_temp: false,
   number_of_forecasts: 0,
   disable_animation: false,

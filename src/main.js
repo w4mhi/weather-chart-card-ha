@@ -1051,6 +1051,15 @@ getWindDirIcon(deg) {
   }
 }
 
+// Compact direction name for the narrow forecast columns: N-NW becomes NNW.
+getWindDirLabel(deg) {
+  if (deg === undefined || deg === null || deg === '') {
+    return null;
+  }
+  const name = this.getWindDir(typeof deg === 'string' ? deg : Number(deg));
+  return typeof name === 'string' ? name.replace(/-/g, '') : null;
+}
+
 getWindDir(deg) {
   if (typeof deg === 'number') {
     return this.ll('cardinalDirections')[parseInt((deg + 11.25) / 22.5)];
@@ -2341,8 +2350,22 @@ updateChart({ forecasts, forecastChart } = this) {
         }
         .wind-detail {
           display: flex;
+          flex-direction: column;
           align-items: center;
           margin: 1px;
+        }
+        .wind-main {
+          display: flex;
+          align-items: center;
+        }
+        .wind-details.with-direction {
+          margin-top: ${config.forecast.condition_icons === false ? '0px' : '-4px'};
+        }
+        .wind-dir-label {
+          font-size: 9px;
+          line-height: 10px;
+          opacity: 0.7;
+          white-space: nowrap;
         }
         .wind-detail ha-icon {
           --mdc-icon-size: 15px;
@@ -2890,12 +2913,13 @@ renderWind({ config, weather, windSpeed, windDirection, forecastItems } = this) 
     return html``;
   }
 
+  const showDirection = config.forecast.show_wind_direction !== false;
   const forecastType = config.forecast.type || 'daily';
   const forecastWindUnit = this.getForecastEntityAttributes(forecastType).wind_speed_unit
     || (this.weather && this.weather.attributes.wind_speed_unit);
 
   return html`
-    <div class="wind-details">
+    <div class="wind-details ${showDirection ? 'with-direction' : ''}">
       ${forecast.map((item) => {
         const numericWindSpeed = Number(item.wind_speed);
         const hasSpeed = Number.isFinite(numericWindSpeed);
@@ -2911,14 +2935,20 @@ renderWind({ config, weather, windSpeed, windDirection, forecastItems } = this) 
 
         const dWindSpeed = this.convertWindSpeed(item.wind_speed, this.unitSpeed, forecastWindUnit);
         const warningColor = hasSpeed ? this.getWindWarningColor(item.wind_speed, forecastWindUnit) : null;
+        // The arrow shows where the wind blows to; the name says where it comes
+        // from, as forecasts word it. Together they cannot be misread.
+        const directionLabel = showDirection && bearingIcon ? this.getWindDirLabel(item.wind_bearing) : null;
 
         return html`
           <div class="wind-detail" style="${warningColor ? `color: ${warningColor}; font-weight: 500;` : ''}">
-            ${bearingIcon ? html`<ha-icon class="wind-icon" icon="hass:${bearingIcon}"></ha-icon>` : ''}
-            ${hasSpeed ? html`
-              <span class="wind-speed">${dWindSpeed}</span>
-              <span class="wind-unit">${this.ll('units')[this.unitSpeed] || this.unitSpeed}</span>
-            ` : ''}
+            <div class="wind-main">
+              ${bearingIcon ? html`<ha-icon class="wind-icon" icon="hass:${bearingIcon}"></ha-icon>` : ''}
+              ${hasSpeed ? html`
+                <span class="wind-speed">${dWindSpeed}</span>
+                <span class="wind-unit">${this.ll('units')[this.unitSpeed] || this.unitSpeed}</span>
+              ` : ''}
+            </div>
+            ${directionLabel ? html`<div class="wind-dir-label">${directionLabel}</div>` : ''}
           </div>
         `;
       })}

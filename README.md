@@ -203,6 +203,7 @@ units:
 | chart_height                   | number  | 180                      | Adjust the forecast chart height                                                                   |
 | condition_icons                | boolean | true                     | Show or hide forecast condition icons.                                                             |
 | show_wind_forecast             | boolean | true                     | Show or hide wind forecast on the card.                                                            |
+| show_wind_direction            | boolean | true                     | Name the wind direction (where it comes from, e.g. NNW) under each forecast arrow.                 |
 | round_temp                     | boolean | false                    | Round temperatures to whole degrees: the forecast, the current temperature and feels like (11.3 → 11, 11.6 → 12). |
 | style                          | string  | style2                   | Change chart style, options: 'style1' or 'style2'                                                  |
 | type                           | string  | daily                    | Show daily or hourly forecast if available, options: 'daily' or 'hourly'                           |
