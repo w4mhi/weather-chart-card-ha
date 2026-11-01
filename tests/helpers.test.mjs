@@ -493,3 +493,14 @@ test('review: keyboard and assistive clicks run the configured action, pointer c
   assert.equal(makeCard({ tap_action: { action: 'more-info' }, hold_action: { action: 'more-info' } }).primaryAction(), 'tap');
   assert.equal(makeCard({ locale: 'en' }).forecastLabel(), 'Forecast: Daily');
 });
+
+test('a compass name gets the same arrow as its bearing in degrees', () => {
+  const card = makeCard();
+  const names = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+  names.forEach((name, i) => {
+    assert.equal(card.getWindDirIcon(name), card.getWindDirIcon(i * 22.5), name);
+  });
+  // The arrow shows where the wind blows to: a north wind points south.
+  assert.equal(card.getWindDirIcon('N'), 'arrow-down');
+  assert.equal(card.getWindDirIcon('WNW'), 'arrow-bottom-right');
+});

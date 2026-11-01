@@ -1011,6 +1011,7 @@ getWindDirIcon(deg) {
   } else {
     var i = 9;
     switch (deg) {
+      case "NNW":
       case "N":
         i = 0;
         break;
@@ -1038,12 +1039,9 @@ getWindDirIcon(deg) {
       case "W":
         i = 6;
         break;
-      case "NW":
-      case "NNW":
-        i = 7;
-        break;
       case "WNW":
-        i = 8;
+      case "NW":
+        i = 7;
         break;
       default:
         // Unknown or missing bearing: there is no arrow to point.
