@@ -1,4 +1,4 @@
-import resolve from 'rollup-plugin-node-resolve';
+import resolve from '@rollup/plugin-node-resolve';
 import serve from 'rollup-plugin-serve';
 import copy from 'rollup-plugin-copy';
 import cardVersion from './rollup.version.mjs';
@@ -16,7 +16,8 @@ export default {
     copy({
       targets: [
         { src: 'src/icons/*', dest: 'dist/icons' },
-        { src: 'src/icons2/*', dest: 'dist/icons2' }
+        { src: 'src/icons2/*', dest: 'dist/icons2' },
+        { src: 'src/icons3/*', dest: 'dist/icons3' }
       ]
     }),
     serve({

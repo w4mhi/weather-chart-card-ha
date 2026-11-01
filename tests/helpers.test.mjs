@@ -5,6 +5,7 @@ import { test } from 'node:test';
 globalThis.window = globalThis;
 const { default: WeatherChartCard } = await import('../src/main.js');
 const { DEFAULTS, FORECAST_DEFAULTS, configValue } = await import('../src/defaults.js');
+const actions = await import('../src/actions.js');
 
 // A card with config and hass applied, without rendering it.
 function makeCard(config = {}, hass = {}) {
@@ -298,4 +299,295 @@ test('config changes select the cached forecast before redrawing', async () => {
   assert.equal(card.forecasts, hourly);
   assert.equal(drawnForecasts.at(-1), hourly);
   assert.deepEqual(Object.keys(card._forecastSubscriptions), ['hourly']);
+});
+
+test('animated icons are bundled, in the configured style, with custom icons first', async () => {
+  const { readFileSync } = await import('node:fs');
+  const { generateIconModule } = await import('../scripts/build-icons.mjs');
+  const generated = readFileSync(new URL('../src/icon-data.js', import.meta.url), 'utf8');
+  assert.equal(generated, generateIconModule(), 'src/icon-data.js is stale: run npm run icons');
+
+  const decode = (uri) => decodeURIComponent(uri.replace('data:image/svg+xml,', ''));
+  const style1 = makeCard().getWeatherIcon('sunny', 'above_horizon');
+  assert.match(style1, /^data:image\/svg\+xml,/);
+  assert.equal(decode(style1), readFileSync(new URL('../src/icons/clear-day.svg', import.meta.url), 'utf8').trim());
+  const style2 = makeCard({ icon_style: 'style2' }).getWeatherIcon('sunny', 'below_horizon');
+  assert.equal(decode(style2), readFileSync(new URL('../src/icons2/clear-night.svg', import.meta.url), 'utf8').trim());
+
+  const style3 = makeCard({ icon_style: 'style3' }).getWeatherIcon('rainy', 'below_horizon');
+  assert.equal(decode(style3), readFileSync(new URL('../src/icons3/overcast-night-rain.svg', import.meta.url), 'utf8').trim());
+  // An unknown style falls back to style1.
+  assert.equal(makeCard({ icon_style: 'style9' }).getWeatherIcon('sunny', 'above_horizon'), style1);
+  assert.equal(makeCard({ icons: '/local/w/' }).getWeatherIcon('rainy', 'below_horizon'), '/local/w/overcast-night-rain.svg');
+  assert.equal(makeCard({ animated_icons: false }).getWeatherIcon('rainy'), 'hass:weather-rainy');
+  // A condition with no image (or no MDI icon) still gets an icon.
+  assert.equal(makeCard().getWeatherIcon('unavailable'), 'mdi:weather-cloudy-alert');
+  assert.equal(makeCard({ icons: '/local/w/' }).getWeatherIcon('unknown'), 'mdi:weather-cloudy-alert');
+});
+
+test('gestures: tap, hold and double tap, each only when configured', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const { GestureDetector, HOLD_MS, DOUBLE_TAP_MS } = actions;
+  const fired = [];
+  let options = { hold: false, doubleTap: false };
+  const g = new GestureDetector((action) => fired.push(action), () => options);
+
+  // Nothing but a tap configured: a long press is still a tap, fired at once.
+  g.down(0, 0); t.mock.timers.tick(HOLD_MS + 100); g.up();
+  assert.deepEqual(fired, ['tap']);
+
+  options = { hold: true, doubleTap: true };
+  fired.length = 0;
+  g.down(0, 0); t.mock.timers.tick(HOLD_MS); g.up();
+  assert.deepEqual(fired, ['hold'], 'release after a hold is not also a tap');
+
+  fired.length = 0;
+  g.down(0, 0); g.up(); g.down(0, 0); g.up();
+  assert.deepEqual(fired, ['double_tap']);
+
+  fired.length = 0;
+  g.down(0, 0); g.up(); t.mock.timers.tick(DOUBLE_TAP_MS);
+  assert.deepEqual(fired, ['tap'], 'a single tap waits for a possible second one');
+
+  fired.length = 0;
+  g.down(0, 0); g.move(0, 30); g.up(); t.mock.timers.tick(HOLD_MS + DOUBLE_TAP_MS);
+  assert.deepEqual(fired, [], 'a scroll is not a tap');
+});
+
+test('card actions fire hass-action with the entity, only for configured gestures', () => {
+  const card = makeCard({ tap_action: { action: 'more-info' }, hold_action: { action: 'none' } });
+  const events = [];
+  card._fire = (type, detail) => events.push({ type, detail });
+  assert.equal(card.hasCardActions(), true);
+  card.handleCardAction('hold');
+  card.handleCardAction('double_tap');
+  card.handleCardAction('tap');
+  assert.deepEqual(events, [{ type: 'hass-action', detail: {
+    config: { entity: 'weather.home', tap_action: { action: 'more-info' }, hold_action: { action: 'none' }, double_tap_action: undefined },
+    action: 'tap',
+  } }]);
+  assert.equal(makeCard().hasCardActions(), false);
+});
+
+test('condition names come from Home Assistant when the card shows its language', () => {
+  const localize = (key) => ({ 'component.weather.entity_component._.state.rainy': 'Ploios' })[key] || '';
+  assert.equal(makeCard({}, { language: 'ro', localize }).localizeCondition('rainy'), 'Ploios');
+  assert.equal(makeCard({ locale: 'ro-RO' }, { language: 'ro', localize }).localizeCondition('rainy'), 'Ploios');
+  // A card locale other than Home Assistant's keeps the card's own translation.
+  assert.equal(makeCard({ locale: 'de' }, { language: 'ro', localize }).localizeCondition('rainy'), makeCard({ locale: 'de' }).ll('rainy'));
+  // Without a Home Assistant translation the card's own is used.
+  assert.equal(makeCard({ locale: 'en' }, { language: 'en', localize: () => '' }).localizeCondition('sunny'), 'Sunny');
+});
+
+test('a missing low leaves a gap instead of shifting later lows', () => {
+  const card = makeCard({}, { states: { 'weather.home': { state: 'sunny', attributes: { supported_features: 1 } } } });
+  card.forecasts = [
+    { datetime: '2026-10-21T00:00:00Z', temperature: 20, precipitation_probability: 40 },
+    { datetime: '2026-10-22T00:00:00Z', temperature: 18, templow: 9, precipitation_probability: null },
+    { datetime: '2026-10-23T00:00:00Z', temperature: 17, templow: null },
+  ];
+  const data = card.computeForecastData({ config: card.config, forecastItems: 3 });
+  assert.deepEqual(data.tempLow, [null, 9, null]);
+  assert.deepEqual(data.probability, [40, null, null]);
+});
+
+test('hourly slots are night between sunset and sunrise at the card location', () => {
+  const card = makeCard({ sun_latitude: 51.5, sun_longitude: 0, sun_timezone: 'Europe/London' });
+  const location = { ...card.getSunLocation(), timeZone: card.getSunTimezone() };
+  assert.equal(card.isForecastSlotDaytime(new Date('2026-06-21T12:00:00Z'), location), true);
+  assert.equal(card.isForecastSlotDaytime(new Date('2026-06-21T23:00:00Z'), location), false);
+  // No coordinates and no sun entity: treat as day rather than shading everything.
+  const nowhere = makeCard();
+  nowhere._hass.config = { time_zone: 'UTC' };
+  assert.equal(nowhere.isForecastSlotDaytime(new Date('2026-06-21T23:00:00Z')), true);
+});
+
+test('withAlpha re-tints rgb, rgba and hex colors', () => {
+  const card = makeCard();
+  assert.equal(card.withAlpha('rgba(255, 152, 0, 1.0)', 0.2), 'rgba(255, 152, 0, 0.2)');
+  assert.equal(card.withAlpha('rgb(1,2,3)', 0.5), 'rgba(1, 2, 3, 0.5)');
+  assert.equal(card.withAlpha('#f80', 0.2), 'rgba(255, 136, 0, 0.2)');
+  assert.equal(card.withAlpha('#4473a0', 0.2), 'rgba(68, 115, 160, 0.2)');
+  assert.equal(card.withAlpha('orange', 0.2), 'rgba(127, 127, 127, 0.2)');
+});
+
+test('round_temp rounds the current temperature and feels like too', () => {
+  assert.equal(makeCard({ forecast: { round_temp: true } }).roundTemperature(11.3), 11);
+  assert.equal(makeCard({ forecast: { round_temp: true } }).roundTemperature(11.6), 12);
+  assert.equal(String(makeCard({ forecast: { round_temp: true } }).roundTemperature(-0.4)), '0');
+  assert.equal(makeCard().roundTemperature(11.36), 11.4);
+  assert.ok(Number.isNaN(makeCard().roundTemperature(NaN)));
+});
+
+test('the three icon folders hold the same icon names', async () => {
+  const { readdirSync } = await import('node:fs');
+  const list = (dir) => readdirSync(new URL(`../src/${dir}/`, import.meta.url)).filter((f) => f.endsWith('.svg')).sort();
+  assert.deepEqual(list('icons2'), list('icons'));
+  assert.deepEqual(list('icons3'), list('icons'));
+  const { cleanSvg } = await import('../scripts/import-amcharts.mjs');
+  assert.equal(cleanSvg('<svg viewbox="0 0 64 64">\n  -webkit-transform: none;\n  transform: none;\n</svg>', [30, 40]),
+    '<svg viewBox="7 17 46 46">\n  transform: none;\n</svg>');
+  // amCharts ends some prefixed lines with a comment, and misspells one fill.
+  assert.equal(cleanSvg('<svg viewbox="0 0 64 64">\n  -moz-transform-origin: 1px 2px 0; /* TODO FF CENTER ISSUE */\n  <line fifll="none"/>\n</svg>'),
+    '<svg viewBox="9 9 46 46">\n  <line fill="none"/>\n</svg>');
+  // The shipped icons have no prefixed CSS left.
+  const { readFileSync } = await import('node:fs');
+  for (const file of readdirSync(new URL('../src/icons3/', import.meta.url))) {
+    assert.doesNotMatch(readFileSync(new URL(`../src/icons3/${file}`, import.meta.url), 'utf8'), /-(webkit|moz|ms)-|fifll=/, file);
+  }
+  const { AMCHARTS_MAPPING, CROP_CENTERS } = await import('../scripts/import-amcharts.mjs');
+  for (const file of Object.values(AMCHARTS_MAPPING)) assert.ok(CROP_CENTERS[file], `crop centre for ${file}`);
+});
+
+test('review: Traditional and Simplified Chinese are different languages', () => {
+  const card = makeCard();
+  assert.equal(card.languageAndScript('zh-TW'), card.languageAndScript('zh-Hant'));
+  assert.notEqual(card.languageAndScript('zh-Hant'), card.languageAndScript('zh-Hans'));
+  assert.equal(card.languageAndScript('ro-RO'), card.languageAndScript('ro'));
+  const localize = (key) => ({ 'component.weather.entity_component._.state.rainy': '下雨' })[key] || '';
+  const traditional = makeCard({ locale: 'zh-Hant' }, { language: 'zh-Hans', localize });
+  assert.equal(traditional.localizeCondition('rainy'), traditional.ll('rainy'));
+});
+
+test('review: the sun-entity fallback takes the transitions in order', () => {
+  // No coordinates, so the sun entity decides. It is day: setting comes first.
+  const card = makeCard({ timezone: 'UTC' });
+  card._hass.config = { time_zone: 'UTC' };
+  card.sun = { state: 'above_horizon', attributes: {
+    next_setting: '2026-06-21T20:00:00Z', next_rising: '2026-06-22T04:00:00Z',
+  } };
+  const at = (iso) => card.isForecastSlotDaytime(new Date(iso), { timeZone: 'UTC' });
+  assert.equal(at('2026-06-21T15:00:00Z'), true);
+  assert.equal(at('2026-06-21T23:00:00Z'), false);
+  assert.equal(at('2026-06-22T10:00:00Z'), true);
+  // Beyond both transitions, by time of day.
+  assert.equal(at('2026-06-23T02:00:00Z'), false);
+  assert.equal(at('2026-06-23T12:00:00Z'), true);
+  // Polar day: the next setting is weeks away, so every hourly slot is day.
+  card.sun = { state: 'above_horizon', attributes: { next_setting: '2026-07-20T22:00:00Z', next_rising: '2026-07-21T01:00:00Z' } };
+  assert.equal(at('2026-06-22T00:00:00Z'), true);
+});
+
+test('review: the temperature gradient runs right to left on a reversed scale', () => {
+  const card = makeCard();
+  const stops = (reverse) => {
+    const recorded = [];
+    const ctx = { createLinearGradient: () => ({ addColorStop: (offset, color) => recorded.push([offset, color]) }) };
+    card.createTemperatureGradient([0, 40], '°C', ctx, { left: 0, right: 100 }, null, 1, reverse);
+    return recorded;
+  };
+  const cold = card.getTemperatureColorWithRange(0, '°C', null);
+  assert.deepEqual(stops(false)[0], [0, cold]);
+  assert.deepEqual(stops(true)[0], [1, cold]);
+});
+
+test('review: keyboard and assistive clicks run the configured action, pointer clicks do not repeat it', () => {
+  const card = makeCard({ hold_action: { action: 'more-info' } });
+  const fired = [];
+  card._fire = (type, detail) => fired.push(detail.action);
+  const key = { key: 'Enter', repeat: false, preventDefault() {} };
+  card._onActionKeyDown(key);
+  card._onActionKeyDown({ ...key, repeat: true });
+  assert.deepEqual(fired, ['hold'], 'only a hold action: Enter runs it, key repeat does not');
+
+  fired.length = 0;
+  card._onActionClick({ detail: 0 });
+  assert.deepEqual(fired, ['hold'], 'a screen-reader click with no pointer events');
+  card._lastPointerUp = Date.now();
+  card._onActionClick({ detail: 0 });
+  card._onActionClick({ detail: 1 });
+  assert.deepEqual(fired, ['hold'], 'clicks after a pointer gesture are not doubled');
+
+  assert.equal(makeCard({ tap_action: { action: 'more-info' }, hold_action: { action: 'more-info' } }).primaryAction(), 'tap');
+  assert.equal(makeCard({ locale: 'en' }).forecastLabel(), 'Forecast: Daily');
+});
+
+test('a compass name gets the same arrow as its bearing in degrees', () => {
+  const card = makeCard();
+  const names = ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'];
+  names.forEach((name, i) => {
+    assert.equal(card.getWindDirIcon(name), card.getWindDirIcon(i * 22.5), name);
+  });
+  // The arrow shows where the wind blows to: a north wind points south.
+  assert.equal(card.getWindDirIcon('N'), 'arrow-down');
+  assert.equal(card.getWindDirIcon('WNW'), 'arrow-bottom-right');
+});
+
+test('the wind forecast names the direction under the arrow, unless turned off', () => {
+  const card = makeCard({ forecast: { type: 'daily' } });
+  card.forecasts = [
+    { datetime: '2026-11-03T20:00:00Z', wind_bearing: 344.9, wind_speed: 10 },
+    { datetime: '2026-11-04T20:00:00Z', wind_bearing: 95.1 },
+    { datetime: '2026-11-05T20:00:00Z', wind_speed: 4 },
+  ];
+  const labels = (c) => {
+    const strings = c.renderWind().strings.join('');
+    const values = JSON.stringify(c.renderWind().values, (k, v) => (typeof v === 'function' ? undefined : v));
+    return { hasClass: strings.includes('wind-dir-label') || values.includes('wind-dir-label'), values };
+  };
+  const shown = labels(card);
+  assert.ok(shown.hasClass);
+  // Compact names: N-NW becomes NNW; the slot without a bearing has no label.
+  assert.ok(shown.values.includes('"NNW"') && shown.values.includes('"E"'));
+  assert.equal(card.getWindDirLabel(344.9), 'NNW');
+  assert.equal(card.getWindDirLabel(undefined), null);
+
+  const hidden = makeCard({ forecast: { type: 'daily', show_wind_direction: false } });
+  hidden.forecasts = card.forecasts;
+  assert.ok(!labels(hidden).hasClass);
+});
+
+test('review: taps far apart are two taps, not a double tap', (t) => {
+  t.mock.timers.enable({ apis: ['setTimeout'] });
+  const { GestureDetector, DOUBLE_TAP_MS } = actions;
+  const fired = [];
+  const g = new GestureDetector((action) => fired.push(action), () => ({ hold: false, doubleTap: true }));
+
+  // Current conditions, then the chart: the first tap runs at once, the second
+  // still waits for a possible double tap of its own.
+  g.down(100, 40); g.up(); g.down(100, 300); g.up();
+  assert.deepEqual(fired, ['tap']);
+  t.mock.timers.tick(DOUBLE_TAP_MS);
+  assert.deepEqual(fired, ['tap', 'tap']);
+
+  fired.length = 0;
+  g.down(100, 300); g.up(); g.down(110, 310); g.up();
+  assert.deepEqual(fired, ['double_tap'], 'a second tap close by is a double tap');
+});
+
+test('review: the bundle keeps the icon license notices', async () => {
+  const { readFileSync } = await import('node:fs');
+  const bundle = readFileSync(new URL('../dist/weather-chart-card-ha.js', import.meta.url), 'utf8');
+  assert.match(bundle, /Copyright \(c\) 2020 Bas Milius/);
+  assert.match(bundle, /Permission is hereby granted/);
+  assert.match(bundle, /amCharts/);
+  assert.match(bundle, /creativecommons\.org\/licenses\/by\/4\.0/);
+});
+
+test('review: a failed icon import leaves the existing icons alone', async () => {
+  const { mkdtempSync, mkdirSync, writeFileSync, readdirSync, readFileSync } = await import('node:fs');
+  const { join } = await import('node:path');
+  const { tmpdir } = await import('node:os');
+  const { importIcons, AMCHARTS_MAPPING } = await import('../scripts/import-amcharts.mjs');
+  const dir = mkdtempSync(join(tmpdir(), 'wcc-icons-'));
+  const target = join(dir, 'icons3');
+  mkdirSync(target);
+  writeFileSync(join(target, 'clear-day.svg'), 'kept');
+
+  // A wrong download path, then a download missing one file.
+  assert.throws(() => importIcons(join(dir, 'nowhere'), target));
+  const source = join(dir, 'amcharts', 'animated');
+  mkdirSync(source, { recursive: true });
+  const files = [...new Set(Object.values(AMCHARTS_MAPPING))];
+  for (const file of files.slice(1)) {
+    writeFileSync(join(source, `${file}.svg`), '<svg viewbox="0 0 64 64"></svg>');
+  }
+  assert.throws(() => importIcons(source, target));
+  assert.deepEqual(readdirSync(target), ['clear-day.svg']);
+  assert.equal(readFileSync(join(target, 'clear-day.svg'), 'utf8'), 'kept');
+
+  // With every file present the folder is replaced.
+  writeFileSync(join(source, `${files[0]}.svg`), '<svg viewbox="0 0 64 64"></svg>');
+  importIcons(source, target);
+  assert.equal(readdirSync(target).length, Object.keys(AMCHARTS_MAPPING).length);
 });

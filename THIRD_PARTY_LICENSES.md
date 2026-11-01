@@ -53,3 +53,16 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+amCharts Weather Icons
+----------------------
+The `style3` icons (src/icons3) are the animated SVG weather icons by amCharts
+(https://www.amcharts.com/free-animated-svg-weather-icons/), version 1.0.0.
+
+They are licensed under the Creative Commons Attribution 4.0 International
+Public License: https://creativecommons.org/licenses/by/4.0/
+
+Changes: files renamed to the card's icon names (several names share one icon,
+see scripts/import-amcharts.mjs), cropped to a tighter `viewBox` (the
+original `viewbox` attribute corrected to `viewBox`), vendor-prefixed CSS
+properties removed, and a misspelled `fill` attribute corrected.

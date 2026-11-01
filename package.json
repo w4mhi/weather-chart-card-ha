@@ -1,6 +1,6 @@
 {
   "name": "weather-chart-card-ha",
-  "version": "1.9.0",
+  "version": "1.10.0",
   "description": "Enhanced weather chart card with temperature gradients, timezone support, and customizable layouts for Home Assistant",
   "type": "module",
   "keywords": [
@@ -28,21 +28,24 @@
   "dependencies": {
     "chart.js": "^4.4.1",
     "chartjs-plugin-datalabels": "^2.2.0",
-    "lit": "^2.8.0",
-    "relative-time": "^1.0.0"
+    "lit": "^2.8.0"
   },
   "devDependencies": {
-    "eslint": "^8.56.0",
+    "@eslint/js": "^9.39.5",
+    "@rollup/plugin-node-resolve": "^16.0.3",
+    "@rollup/plugin-terser": "^1.0.2",
+    "eslint": "^9.39.5",
+    "globals": "^17.13.0",
     "playwright": "~1.56.1",
     "rollup": "^4.9.6",
     "rollup-plugin-copy": "^3.5.0",
-    "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-serve": "^2.0.3"
   },
   "scripts": {
     "start": "rollup -c rollup.config.dev.js --watch",
-    "build": "npm run lint && npm run rollup",
-    "lint": "eslint 'src/**/*.js'",
+    "icons": "node scripts/build-icons.mjs",
+    "build": "npm run icons && npm run lint && npm run rollup",
+    "lint": "eslint src tests scripts eslint.config.js rollup.config.mjs rollup.config.dev.js rollup.version.mjs",
     "rollup": "rollup -c",
     "test:rtl": "node --test tests/rtl-browser.test.mjs",
     "test": "node --test tests/helpers.test.mjs"

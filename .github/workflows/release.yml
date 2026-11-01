@@ -18,7 +18,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '22'
       
       - name: Diagnostic - Check environment
         run: |
@@ -57,7 +57,7 @@ jobs:
       - name: Package release files
         run: |
           cd dist
-          zip -r ../weather-chart-card-ha.zip weather-chart-card-ha.js icons/ icons2/
+          zip -r ../weather-chart-card-ha.zip weather-chart-card-ha.js icons/ icons2/ icons3/
           cd ..
           echo "Package created: weather-chart-card-ha.zip"
           unzip -l weather-chart-card-ha.zip

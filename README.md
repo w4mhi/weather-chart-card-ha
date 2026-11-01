@@ -167,9 +167,9 @@ units:
 | show_last_changed     | boolean | false                    | Show or hide when last data changed on the card.                                                   |
 | show_forecast_toggle  | boolean | false                    | Show or hide the Daily/Hourly toggle button in the top-right corner.                               |
 | use_12hour_format     | boolean | false                    | Display time in 12-hour format (AM/PM) instead of 24-hour format.                                  |
-| icons                 | string  | none                     | Path to the location of custom icons in svg format, for example `/local/weather-icons/`.           |
-| animated_icons        | boolean | true                     | Enable the use of animated icons                                                                   |
-| icon_style            | string  | 'style1'                 | Options are 'style1' and 'style2' for different set of animated icons.                             |
+| icons                 | string  | none                     | Path to the location of custom icons in svg format, for example `/local/weather-icons/`. Takes priority over the bundled animated icons. |
+| animated_icons        | boolean | true                     | Use the animated icons bundled with the card (no network needed). `false` uses MDI icons.          |
+| icon_style            | string  | 'style1'                 | Animated icon set: 'style1' (filled) and 'style2' (outline) by Bas Milius, 'style3' by amCharts. |
 | icons_size            | number  | 30                       | The size of the animated or custom icons in pixels.                                                |
 | main_icon_size        | number  | 150                      | Size of main current weather icon in pixels.                                                       |
 | current_temp_size     | number  | 35                       | The size of the current temperature in pixels.                                                     |
@@ -179,6 +179,9 @@ units:
 | units                 | object  | none                     | See [units of measurement](#units-of-measurement) for available options.                           |
 | locale                | string  | none                     | See [Supported languages](#supported-languages) for available languages                            |
 | autoscroll            | boolean | false                    | Update the chart each hour, hiding prior forecast datapoints                                       |
+| tap_action            | object  | none                     | [Action](https://www.home-assistant.io/dashboards/actions/) on tapping the current conditions or the chart. See [Tap and Hold Actions](#tap-and-hold-actions). |
+| hold_action           | object  | none                     | Action on a long press (half a second).                                                            |
+| double_tap_action     | object  | none                     | Action on a double tap.                                                                            |
 
 ### Forecast Options
 
@@ -200,7 +203,8 @@ units:
 | chart_height                   | number  | 180                      | Adjust the forecast chart height                                                                   |
 | condition_icons                | boolean | true                     | Show or hide forecast condition icons.                                                             |
 | show_wind_forecast             | boolean | true                     | Show or hide wind forecast on the card.                                                            |
-| round_temp                     | boolean | false                    | Option for rounding the forecast temperatures                                                      |
+| show_wind_direction            | boolean | true                     | Name the wind direction (where it comes from, e.g. NNW) under each forecast arrow.                 |
+| round_temp                     | boolean | false                    | Round temperatures to whole degrees: the forecast, the current temperature and feels like (11.3 → 11, 11.6 → 12). |
 | style                          | string  | style2                   | Change chart style, options: 'style1' or 'style2'                                                  |
 | type                           | string  | daily                    | Show daily or hourly forecast if available, options: 'daily' or 'hourly'                           |
 | auto_rotate                    | number  | 0                        | Auto-rotate minutes (0-60), added to `auto_rotate_seconds`. Needs both forecast types.             |
@@ -214,6 +218,12 @@ units:
 | extra_rows                     | list    | none                     | Extra rows of per-day values under the forecast, read from a list attribute of any entity (daily forecast only). See [Extra Rows](#extra-rows-per-day-values-from-a-sensor). |
 | highlight_today                | boolean | false                    | Highlight today's column in the daily forecast (soft background band, bold date label).            |
 | highlight_today_color          | string  | rgba(127,127,127,0.12)   | Colour of the today band.                                                                          |
+| night_shading                  | boolean | false                    | Shade the night hours (sunset to sunrise at the card's sun location) in the hourly forecast.       |
+| night_shading_color            | string  | rgba(100,120,160,0.15)   | Colour of the night bands.                                                                         |
+| fill_temperature_range         | boolean | false                    | Shade the area between the high and low temperature lines (daily forecasts with lows).             |
+| temperature_range_color        | string  | (from the high line)     | Colour of the shaded range. Defaults to the temperature gradient, or `temperature1_color`, at low opacity. |
+| show_probability_line          | boolean | false                    | With `precipitation_type: rainfall`, also draw the precipitation probability as a dashed line.     |
+| probability_line_color         | string  | rgba(25,118,210,0.9)     | Colour of the probability line.                                                                    |
 
 ### Units of Measurement
 
@@ -422,6 +432,32 @@ forecast:
   highlight_today_color: 'rgba(255, 193, 7, 0.15)'   # optional
 ```
 
+### Tap and Hold Actions
+The current conditions and the chart accept the standard Home Assistant [actions](https://www.home-assistant.io/dashboards/actions/). None is set by default, so a tap on the chart shows its tooltip. The condition icons under the chart always open the weather entity's details. With an action set, both areas can be focused with the keyboard: Enter or Space runs `tap_action`, or `hold_action` (then `double_tap_action`) when no tap action is set. Screen readers activate them the same way.
+```yaml
+type: custom:weather-chart-card-ha
+entity: weather.home
+tap_action:
+  action: more-info
+hold_action:
+  action: navigate
+  navigation_path: /dashboard-weather/radar
+double_tap_action:
+  action: perform-action
+  perform_action: homeassistant.update_entity
+  target:
+    entity_id: weather.home
+```
+
+### Chart Overlays
+```yaml
+forecast:
+  type: hourly
+  night_shading: true             # bands from sunset to sunrise
+  show_probability_line: true     # rain chance over the rainfall bars
+  fill_temperature_range: true    # daily view: shade between high and low
+```
+
 ### Custom Icon Sizes
 Fine-tune icon sizes for your layout:
 ```yaml
@@ -435,6 +471,8 @@ forecast:
 ---
 
 ## 🎨 Custom Icons
+
+The animated icons ship inside `weather-chart-card-ha.js`, so they need no internet connection, no extra files and no CDN. Three sets are included: `icon_style: style1` (filled, default), `style2` (outline) and `style3` (amCharts). To use your own, point `icons` at a folder of SVG files; any icon that fails to load falls back to the bundled one.
 
 Icons should be in SVG format. Icons should have names as shown [here](https://github.com/mlamberts78/weather-chart-card-ha/blob/master/src/const.js#L24).
 
@@ -618,7 +656,8 @@ See [Releases](https://github.com/w4mhi/weather-chart-card-ha/releases) for vers
 ## 🙏 Credits
 
 - **Original Card**: [mlamberts78](https://github.com/mlamberts78/weather-chart-card-ha) - Created the original weather-chart-card-ha
-- **Weather Icons**: [Basmilius](https://github.com/basmilius/weather-icons) - Beautiful animated weather icons (served via this project's CDN for reliability)
+- **Weather Icons**: [Basmilius](https://github.com/basmilius/weather-icons) - Beautiful animated weather icons, `style1` and `style2` (bundled inside the card, so they work offline)
+- **Weather Icons**: [amCharts](https://www.amcharts.com/free-animated-svg-weather-icons/) - Animated weather icons, `style3`, licensed under [CC BY 4.0](https://creativecommons.org/licenses/by/4.0/). Converted for the card (renamed, cropped to match the size of the other sets, `viewBox` fixed, vendor-prefixed CSS removed); fog and wind use the cloud icon, hail and sleet the mixed-precipitation icon, as the set has no artwork for them.
 - **Enhancements**: [W4MHI](https://github.com/w4mhi) - Temperature gradients, timezone support, daily/hourly toggle, layout improvements
 
 ---
