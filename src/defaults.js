@@ -13,6 +13,8 @@ export const FORECAST_DEFAULTS = {
   precip_bar_size: 100,
   temperature1_color: 'rgba(255, 152, 0, 1.0)',
   temperature2_color: 'rgba(68, 115, 158, 1.0)',
+  temperature1_line_style: 'solid',
+  temperature2_line_style: 'dashed',
   precipitation_color: 'rgba(132, 209, 253, 1.0)',
   use_color_thresholds: true,
   gradient_mode: 'classic',

@@ -1660,6 +1660,7 @@ drawChart({ config, language, weather, forecastItems } = this) {
       type: 'line',
       data: data.tempHigh,
       yAxisID: 'TempAxis',
+      borderDash: config.forecast.temperature1_line_style === 'dashed' ? [5, 5] : [],
       borderColor: config.forecast.use_color_thresholds 
         ? (context) => {
             if (context.chart.chartArea) {
@@ -1703,7 +1704,7 @@ drawChart({ config, language, weather, forecastItems } = this) {
       type: 'line',
       data: data.tempLow,
       yAxisID: 'TempAxis',
-      borderDash: [5, 5],
+      borderDash: config.forecast.temperature2_line_style === 'solid' ? [] : [5, 5],
       borderColor: config.forecast.temperature2_color,
       backgroundColor: config.forecast.temperature2_color,
     },

@@ -194,6 +194,8 @@ units:
 | precip_bar_size                | number  | 100                      | Adjusts the thickness of precipitation bars (1-100).                                               |
 | temperature1_color             | string  | rgba(255, 152, 0, 1.0)   | High/day temperature line color (used when use_color_thresholds is false).                         |
 | temperature2_color             | string  | rgba(68, 115, 158, 1.0)  | Low/night temperature line color.                                                                  |
+| temperature1_line_style        | string  | solid                   | High/day temperature line style: `solid` or `dashed`. |
+| temperature2_line_style        | string  | dashed                  | Low/night temperature line style: `solid` or `dashed`. |
 | precipitation_color            | string  | rgba(132, 209, 253, 1.0) | Precipitation bar chart color.                                                                     |
 | use_color_thresholds           | boolean | true                     | Enable automatic temperature-based gradient colors for high temperature line (6 comfort levels).   |
 | gradient_mode                  | string  | classic                  | Gradient scale for the high temperature line: 'classic', 'climate_preset' or 'adaptive'.           |
@@ -378,6 +380,22 @@ forecast:
   use_color_thresholds: false
   temperature1_color: rgba(255, 152, 0, 1.0)
   temperature2_color: rgba(68, 115, 158, 1.0)
+```
+
+### Temperature Line Styles
+
+Set `forecast.temperature1_line_style` (high/day) and
+`forecast.temperature2_line_style` (low/night) to `solid` or `dashed`.
+The defaults remain `solid` and `dashed`, respectively; unsupported values
+fall back to those defaults. These options work independently of temperature
+gradient colours and apply to both daily and hourly forecasts.
+
+To use solid lines for both temperatures:
+
+```yaml
+forecast:
+  temperature1_line_style: solid
+  temperature2_line_style: solid
 ```
 
 ### Date Labels in Daily Forecast
