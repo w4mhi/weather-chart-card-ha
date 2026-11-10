@@ -978,6 +978,15 @@ class WeatherChartCardEditor extends LitElement {
           </div>
           <div class="switch-container">
             <ha-switch
+              @change="${(e) => this._valueChanged(e, 'show_version')}"
+              .checked="${this._flag('show_version')}"
+            ></ha-switch>
+            <label class="switch-label">
+              Show the card version
+            </label>
+          </div>
+          <div class="switch-container">
+            <ha-switch
               @change="${(e) => this._valueChanged(e, 'use_12hour_format')}"
               .checked="${this._flag('use_12hour_format')}"
             ></ha-switch>
