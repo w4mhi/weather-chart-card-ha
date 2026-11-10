@@ -58,6 +58,7 @@ export const DEFAULTS = {
   show_wind_gust_speed: false,
   show_visibility: false,
   show_last_changed: false,
+  last_changed_source: 'changed',
   show_forecast_toggle: false,
   show_time: false,
   show_time_seconds: false,

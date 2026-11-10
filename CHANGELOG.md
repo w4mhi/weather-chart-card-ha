@@ -1,5 +1,18 @@
 # Changelog
 
+## Unreleased
+
+### Added
+- `last_changed_source`: pick which Home Assistant timestamp the "last changed" line shows: `changed` (default, the condition changed), `updated` (any attribute changed too) or `reported` (HA last received a value). The editor shows it as three radio buttons under the switch.
+- `forecast.compact_precipitation_labels`: precipitation values without the box and the rainfall unit, hiding values that would overlap. For many hourly forecasts on a narrow screen (#73). The values keep a 2px gap below the bars.
+- `description_attribute`: show an attribute as the description, e.g. `content` from an OpenWeatherMap summary sensor, without a template sensor (#61). The description wraps and stops at three lines.
+
+### Fixed
+- Sunrise and sunset came from the card's own approximation even for the Home Assistant home location, so they could differ by a minute or so from `sun.sun` and the rest of Home Assistant. Without a custom card location the card now shows `sun.sun`'s times; its own calculation is kept for a custom location, or when `sun.sun` is missing or unavailable.
+- With a custom card location but no `sun.sun` entity, sunrise and sunset were hidden. They are now calculated.
+- A weather entity without a valid `last_changed` timestamp made the whole card fail to render, even with `show_last_changed` off.
+- The editor's precipitation probability switches looked broken when the forecast has no `precipitation_probability`: they changed nothing on the chart. They are now greyed out with a note in that case.
+
 ## 1.10.0
 
 ### Added

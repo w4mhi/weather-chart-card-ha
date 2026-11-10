@@ -4,7 +4,8 @@ import { configValue } from './defaults.js';
 const ALT_SCHEMA = [
   { name: "temp", title: "Alternative temperature sensor", selector: { entity: { domain: 'sensor' } } },
   { name: "feels_like", title: "Alternative feels like temperature sensor", selector: { entity: { domain: 'sensor' } } },
-  { name: "description", title: "Alternative weather description sensor", selector: { entity: { domain: 'sensor' } } },
+  { name: "description", title: "Alternative weather description entity", selector: { entity: {} } },
+  { name: "description_attribute", title: "Description attribute (optional; read from the entity above, or the weather entity)", selector: { text: {} } },
   { name: "press", title: "Alternative pressure sensor", selector: { entity: { domain: 'sensor' } } },
   { name: "humid", title: "Alternative humidity sensor", selector: { entity: { domain: 'sensor' } } },
   { name: "uv", title: "Alternative UV index sensor", selector: { entity: { domain: 'sensor' } } },
@@ -82,7 +83,7 @@ class WeatherChartCardEditor extends LitElement {
       this.hass.states[config.entity] &&
       this.hass.states[config.entity].attributes &&
       this.hass.states[config.entity].attributes.description !== undefined
-    ) || config.description !== undefined;
+    ) || config.description !== undefined || config.description_attribute !== undefined;
     this.fetchEntities();	  
     this.requestUpdate();
   }
@@ -108,6 +109,85 @@ class WeatherChartCardEditor extends LitElement {
     if (changedProperties.has('_config') && this._config && this._config.entity) {
       this._entity = this._config.entity;
     }
+    if (changedProperties.has('hass') || changedProperties.has('_config')) {
+      this._probeProbability();
+    }
+  }
+
+  disconnectedCallback() {
+    super.disconnectedCallback();
+    this._stopProbabilityProbe();
+    this._probabilityKey = null;
+  }
+
+  /**
+   * Whether the forecast the card shows carries `precipitation_probability`.
+   * Many integrations leave it out, at least for one forecast type, and the
+   * probability switches then change nothing on the chart. One subscription
+   * per entity and type reads the first forecast and closes again.
+   * `_hasProbability` stays undefined until the answer arrives (or when the
+   * entity cannot be asked), so the switches remain usable meanwhile.
+   */
+  _probeProbability() {
+    if (!this.hass || !this.hass.connection || !this._config || !this._config.entity) {
+      return;
+    }
+    const type = this._value('forecast.type') || 'daily';
+    const forecastConfig = this._config.forecast || {};
+    const entityId = (type === 'hourly' ? forecastConfig.hourly_entity : forecastConfig.daily_entity)
+      || this._config.entity;
+    const key = `${entityId}|${type}`;
+    if (key === this._probabilityKey) {
+      return;
+    }
+    this._stopProbabilityProbe();
+    this._probabilityKey = key;
+    this._hasProbability = undefined;
+
+    const unsubscribe = this.hass.connection.subscribeMessage((event) => {
+      const forecast = (event && event.forecast) || [];
+      if (this._probabilityKey !== key || !forecast.length) {
+        return;
+      }
+      this._hasProbability = forecast.some((item) => item.precipitation_probability !== null
+        && item.precipitation_probability !== undefined
+        && Number.isFinite(Number(item.precipitation_probability)));
+      this._stopProbabilityProbe();
+      this.requestUpdate();
+    }, {
+      type: 'weather/subscribe_forecast',
+      forecast_type: type,
+      entity_id: entityId,
+    });
+    this._probabilityUnsubscribe = Promise.resolve(unsubscribe);
+    // An entity without this forecast type rejects: leave the answer unknown.
+    this._probabilityUnsubscribe.catch(() => {});
+  }
+
+  _stopProbabilityProbe() {
+    const pending = this._probabilityUnsubscribe;
+    this._probabilityUnsubscribe = null;
+    if (pending) {
+      pending.then((unsubscribe) => unsubscribe && unsubscribe()).catch(() => {});
+    }
+  }
+
+  // A probability switch greyed out while the forecast has no probability.
+  // Still usable when on, so it can be turned off.
+  _probabilitySwitch(key, label) {
+    const missing = this._hasProbability === false;
+    return html`
+      <div class="switch-container ${missing ? 'locked' : ''}" ?hidden=${this._value('forecast.precipitation_type') !== 'rainfall'}>
+        <ha-switch
+          @change="${(e) => this._valueChanged(e, key)}"
+          .checked="${this._flag(key)}"
+          .disabled="${missing && !this._flag(key)}"
+        ></ha-switch>
+        <label class="switch-label">
+          ${label}${missing ? html`<br><small>This forecast has no precipitation probability</small>` : ''}
+        </label>
+      </div>
+    `;
   }
 
   fetchEntities() {
@@ -203,6 +283,15 @@ class WeatherChartCardEditor extends LitElement {
     }
     const newConfig = JSON.parse(JSON.stringify(this._config));
     newConfig.icon_style = event.target.value;
+    this.configChanged(newConfig);
+    this.requestUpdate();
+  }
+
+  _handleLastChangedSourceChange(event) {
+    if (!this._config || !event.target.checked) {
+      return;
+    }
+    const newConfig = { ...this._config, last_changed_source: event.target.value };
     this.configChanged(newConfig);
     this.requestUpdate();
   }
@@ -872,6 +961,21 @@ class WeatherChartCardEditor extends LitElement {
               Show when last data changed
             </label>
           </div>
+          <div class="select-row radio-group" ?hidden=${!this._flag('show_last_changed')}>
+            <span>The data changed on last:</span>
+            ${[['updated', 'update'], ['changed', 'change'], ['reported', 'report']].map(([value, label]) => html`
+              <input
+                type="radio"
+                id="last-changed-source-${value}"
+                name="last-changed-source"
+                value="${value}"
+                .checked="${this._value('last_changed_source') === value}"
+                @change="${this._handleLastChangedSourceChange}"
+              >
+              <label for="last-changed-source-${value}">${label}</label>
+            `)}
+            <span>by HA</span>
+          </div>
           <div class="switch-container">
             <ha-switch
               @change="${(e) => this._valueChanged(e, 'use_12hour_format')}"
@@ -1040,24 +1144,8 @@ class WeatherChartCardEditor extends LitElement {
               <option value="probability">Probability</option>
             </select>
           </div>
-         <div class="switch-container" ?hidden=${this._value('forecast.precipitation_type') !== 'rainfall'}>
-             <ha-switch
-               @change="${(e) => this._valueChanged(e, 'forecast.show_probability')}"
-               .checked="${this._flag('forecast.show_probability')}"
-             ></ha-switch>
-             <label class="switch-label">
-               Show precipitation probability
-             </label>
-         </div>
-         <div class="switch-container" ?hidden=${this._value('forecast.precipitation_type') !== 'rainfall'}>
-             <ha-switch
-               @change="${(e) => this._valueChanged(e, 'forecast.show_probability_line')}"
-               .checked="${this._flag('forecast.show_probability_line')}"
-             ></ha-switch>
-             <label class="switch-label">
-               Show precipitation probability as a line
-             </label>
-         </div>
+         ${this._probabilitySwitch('forecast.show_probability', 'Show precipitation probability')}
+         ${this._probabilitySwitch('forecast.show_probability_line', 'Show precipitation probability as a line')}
          <div class="switch-container">
              <ha-switch
                @change="${(e) => this._valueChanged(e, 'forecast.show_precipitation_labels')}"
