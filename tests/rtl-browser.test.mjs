@@ -12,6 +12,41 @@ before(async () => {
 });
 after(async () => { await browser?.close(); });
 
+for (const {name, forecast, expected} of [
+  {name:'defaults', forecast:{}, expected:[[], [5, 5]]},
+  {name:'solid', forecast:{temperature1_line_style:'solid', temperature2_line_style:'solid'}, expected:[[], []]},
+  {name:'dashed', forecast:{temperature1_line_style:'dashed', temperature2_line_style:'dashed'}, expected:[[5, 5], [5, 5]]},
+  {name:'independent', forecast:{temperature1_line_style:'dashed', temperature2_line_style:'solid'}, expected:[[5, 5], []]},
+  {name:'invalid values', forecast:{temperature1_line_style:'unknown', temperature2_line_style:null}, expected:[[], [5, 5]]},
+]) {
+  test('temperature line styles: ' + name, async () => {
+    const page = await browser.newPage();
+    page.on('pageerror', error => console.error(error.message));
+    try {
+      await page.route('**/*', route => route.fulfill({contentType:'text/html', body:'<!doctype html><html></html>'}));
+      await page.goto('http://line-style.test/');
+      await page.addScriptTag({content:bundle});
+      await page.evaluate(forecast => {
+        const card = document.createElement('weather-chart-card-ha');
+        card.setConfig({entity:'weather.home', show_main:false, forecast:{condition_icons:false, show_wind_forecast:false, disable_animation:true, ...forecast}});
+        card.hass = {
+          language:'en', config:{time_zone:'UTC', unit_system:{temperature:'°C'}},
+          states:{'weather.home':{state:'sunny', last_changed:'2026-10-18T11:00:00Z', attributes:{temperature:20, temperature_unit:'°C', supported_features:3}}},
+          connection:{subscribeMessage(callback) {
+            setTimeout(() => callback({forecast:[{datetime:'2026-10-18T12:00:00Z', temperature:20, templow:10, precipitation:0}]}), 0);
+            return Promise.resolve(() => {});
+          }},
+        };
+        document.body.append(card);
+        window.card = card;
+      }, forecast);
+      await page.waitForFunction(() => window.card.forecastChart);
+      const actual = await page.evaluate(() => window.card.forecastChart.data.datasets.slice(0, 2).map(dataset => dataset.borderDash || []));
+      assert.deepEqual(actual, expected);
+    } finally { await page.close(); }
+  });
+}
+
 test('Hebrew covers every existing translation and unit, including Auto', () => {
   for (const key of Object.keys(locale.en)) assert.ok(locale.he[key], key);
   for (const key of Object.keys(locale.en.units)) assert.ok(locale.he.units[key], key);
