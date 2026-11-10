@@ -47,6 +47,48 @@ for (const {name, forecast, expected} of [
   });
 }
 
+for (const {name, forecast, expected} of [
+  {name:'default', forecast:{}, expected:{display:'true', text:'0.4 mm', box:true}},
+  {name:'compact', forecast:{compact_precipitation_labels:true}, expected:{display:'auto', text:'0.4', box:false}},
+  {name:'compact keeps probability %', forecast:{compact_precipitation_labels:true, precipitation_type:'probability'}, expected:{display:'auto', text:'60 %', box:false}},
+]) {
+  test('compact precipitation labels: ' + name, async () => {
+    const page = await browser.newPage();
+    page.on('pageerror', error => console.error(error.message));
+    try {
+      await page.route('**/*', route => route.fulfill({contentType:'text/html', body:'<!doctype html><html></html>'}));
+      await page.goto('http://precip-labels.test/');
+      await page.addScriptTag({content:bundle});
+      await page.evaluate(forecast => {
+        const card = document.createElement('weather-chart-card-ha');
+        card.setConfig({entity:'weather.home', show_main:false, forecast:{condition_icons:false, show_wind_forecast:false, disable_animation:true, ...forecast}});
+        card.hass = {
+          language:'en', config:{time_zone:'UTC', unit_system:{temperature:'°C', length:'km'}},
+          states:{'weather.home':{state:'rainy', last_changed:'2026-10-18T11:00:00Z', attributes:{temperature:10, temperature_unit:'°C', precipitation_unit:'mm', supported_features:3}}},
+          connection:{subscribeMessage(callback) {
+            setTimeout(() => callback({forecast:[{datetime:'2026-10-18T12:00:00Z', temperature:10, templow:5, precipitation:0.4, precipitation_probability:60}]}), 0);
+            return Promise.resolve(() => {});
+          }},
+        };
+        document.body.append(card);
+        window.card = card;
+      }, forecast);
+      await page.waitForFunction(() => window.card.forecastChart);
+      const actual = await page.evaluate(() => {
+        const dataset = window.card.forecastChart.data.datasets[2];
+        const context = {dataset, dataIndex:0};
+        const labels = dataset.datalabels;
+        return {
+          display: labels.display(context),
+          text: labels.formatter(dataset.data[0], context),
+          box: labels.backgroundColor !== 'transparent',
+        };
+      });
+      assert.deepEqual(actual, expected);
+    } finally { await page.close(); }
+  });
+}
+
 test('Hebrew covers every existing translation and unit, including Auto', () => {
   for (const key of Object.keys(locale.en)) assert.ok(locale.he[key], key);
   for (const key of Object.keys(locale.en.units)) assert.ok(locale.he.units[key], key);

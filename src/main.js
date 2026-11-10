@@ -1723,8 +1723,18 @@ drawChart({ config, language, weather, forecastItems } = this) {
           if (config.forecast.show_precipitation_labels === false) {
             return false;
           }
-          return context.dataset.data[context.dataIndex] > 0 ? 'true' : false;
+          if (!(context.dataset.data[context.dataIndex] > 0)) {
+            return false;
+          }
+          // Compact labels: hide the ones that would overlap a neighbour.
+          return config.forecast.compact_precipitation_labels ? 'auto' : 'true';
         },
+        // Compact labels drop the box, so the value fits within a narrow bar.
+        ...(config.forecast.compact_precipitation_labels ? {
+          backgroundColor: 'transparent',
+          borderColor: 'transparent',
+          padding: 0,
+        } : {}),
       formatter: function (value, context) {
         const precipitationType = config.forecast.precipitation_type;
 
@@ -1733,15 +1743,17 @@ drawChart({ config, language, weather, forecastItems } = this) {
         const item = self._chartData.forecast[context.dataIndex];
         const probability = item ? item.precipitation_probability : undefined;
 
+        // Compact labels leave out the rainfall unit (mm/in); a probability keeps its %.
+        const unit = config.forecast.compact_precipitation_labels && precipitationType === 'rainfall' ? '' : ` ${precipUnit}`;
         let formattedValue;
         if (precipitationType === 'rainfall') {
           if (probability !== undefined && probability !== null && config.forecast.show_probability) {
-            formattedValue = `${rainfall > 9 ? Math.round(rainfall) : rainfall.toFixed(1)} ${precipUnit}\n${Math.round(probability)}%`;
+            formattedValue = `${rainfall > 9 ? Math.round(rainfall) : rainfall.toFixed(1)}${unit}\n${Math.round(probability)}%`;
           } else {
-            formattedValue = `${rainfall > 9 ? Math.round(rainfall) : rainfall.toFixed(1)} ${precipUnit}`;
+            formattedValue = `${rainfall > 9 ? Math.round(rainfall) : rainfall.toFixed(1)}${unit}`;
           }
         } else {
-          formattedValue = `${rainfall > 9 ? Math.round(rainfall) : rainfall.toFixed(1)} ${precipUnit}`;
+          formattedValue = `${rainfall > 9 ? Math.round(rainfall) : rainfall.toFixed(1)}${unit}`;
         }
 
         formattedValue = formattedValue.replace('\n', '\n\n');

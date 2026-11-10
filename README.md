@@ -190,6 +190,7 @@ units:
 | precipitation_type             | string  | rainfall                 | Show precipitation in 'rainfall' or 'probability'.                                                 |
 | show_probability               | boolean | false                    | Also show probability value when precipitation_type = rainfall. (Only when available)              |
 | show_precipitation_labels      | boolean | true                     | Show the value printed on each precipitation bar (e.g. `0.1 in` or `35%`). Set to `false` to keep the bars but drop the text. |
+| compact_precipitation_labels   | boolean | false                    | Print precipitation values without the box and the rainfall unit (`0.4` instead of `0.4 mm`), and hide a value that would overlap its neighbour. Useful for many hourly forecasts on a narrow screen. |
 | labels_font_size               | number  | 11                       | Font size for temperature and precipitation labels.                                                |
 | precip_bar_size                | number  | 100                      | Adjusts the thickness of precipitation bars (1-100).                                               |
 | temperature1_color             | string  | rgba(255, 152, 0, 1.0)   | High/day temperature line color (used when use_color_thresholds is false).                         |

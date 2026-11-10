@@ -8,6 +8,7 @@ export const FORECAST_DEFAULTS = {
   precipitation_type: 'rainfall',
   show_probability: false,
   show_precipitation_labels: true,
+  compact_precipitation_labels: false,
   labels_font_size: 11,
   chart_height: 180,
   precip_bar_size: 100,
