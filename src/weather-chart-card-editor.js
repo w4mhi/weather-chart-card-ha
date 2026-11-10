@@ -1067,6 +1067,15 @@ class WeatherChartCardEditor extends LitElement {
                Show precipitation values on the chart
              </label>
          </div>
+         <div class="switch-container" ?hidden=${!this._flag('forecast.show_precipitation_labels')}>
+             <ha-switch
+               @change="${(e) => this._valueChanged(e, 'forecast.compact_precipitation_labels')}"
+               .checked="${this._flag('forecast.compact_precipitation_labels')}"
+             ></ha-switch>
+             <label class="switch-label">
+               Compact precipitation values (no box or unit, overlapping ones hidden)
+             </label>
+         </div>
           <div class="textfield-container">
             <div class="flex-container">
               <ha-textfield
