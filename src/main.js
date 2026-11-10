@@ -143,7 +143,7 @@ set hass(hass) {
     }
 
     this.feels_like = this.readSensorState(hass, this.config.feels_like, attributes.apparent_temperature);
-    this.description = this.readSensorState(hass, this.config.description, attributes.description);
+    this.description = this.readDescription(hass, attributes.description);
   }
 
   // A theme switch changes the CSS variables the chart reads its colors from.
@@ -180,6 +180,28 @@ hasSensorState(hass, entityId) {
 
 readSensorState(hass, entityId, fallback) {
   return this.hasSensorState(hass, entityId) ? hass.states[entityId].state : fallback;
+}
+
+/**
+ * Text for the description line. With `description_attribute` it reads that
+ * attribute from the `description` entity, or from the weather entity when no
+ * description entity is set (summary sensors often keep the text in an
+ * attribute while their state is a timestamp). Without it, the description
+ * entity's state is used. Either way, a missing entity or empty value falls
+ * back to the weather entity's own description.
+ */
+readDescription(hass, fallback) {
+  const attribute = this.config.description_attribute;
+  if (!attribute) {
+    return this.readSensorState(hass, this.config.description, fallback);
+  }
+  const entityId = this.config.description || this.config.entity;
+  const stateObj = entityId ? hass.states[entityId] : null;
+  const value = stateObj && stateObj.attributes ? stateObj.attributes[attribute] : undefined;
+  if (value === undefined || value === null || String(value).trim() === '') {
+    return fallback;
+  }
+  return typeof value === 'object' ? JSON.stringify(value) : String(value);
 }
 
 currentForecastType() {
@@ -1771,7 +1793,8 @@ drawChart({ config, language, weather, forecastItems } = this) {
         textBaseline: 'middle',
         align: 'top',
         anchor: 'start',
-        offset: -10,
+        // Without the box the text would touch the bars' base line: keep a 2px gap.
+        offset: config.forecast.compact_precipitation_labels ? -12 : -10,
       },
     },
   ];
@@ -1904,7 +1927,8 @@ drawChart({ config, language, weather, forecastItems } = this) {
       animation: config.forecast.disable_animation === true ? { duration: 0 } : {},
       layout: {
         padding: {
-          bottom: 10,
+          // 2px more for compact precipitation labels, which sit 2px lower.
+          bottom: config.forecast.compact_precipitation_labels ? 12 : 10,
         },
       },
       scales: {
@@ -2415,6 +2439,13 @@ updateChart({ forecasts, forecastChart } = this) {
           font-size: 13px;
           margin-top: 5px;
           font-weight: 400;
+          /* Summary attributes can be whole sentences: wrap, and stop at three lines. */
+          overflow-wrap: anywhere;
+          display: -webkit-box;
+          -webkit-box-orient: vertical;
+          -webkit-line-clamp: 3;
+          line-clamp: 3;
+          overflow: hidden;
         }
         .card-version {
           position: absolute;
@@ -2772,6 +2803,8 @@ renderAttributes({ config, humidity, pressure, windSpeed, windDirection, sun, la
   const showWindDirection = config.show_wind_direction !== false;
   const showWindSpeed = config.show_wind_speed !== false;
   const showSun = config.show_sun !== false;
+  // A custom location or the home coordinates can give sun times without sun.sun.
+  const showSunTimes = showSun && this.getSunTimes(sun) !== null;
   const showUv = config.show_uv !== false;
   const showDewpoint = config.show_dew_point == true;
   const showWindgustspeed = config.show_wind_gust_speed == true;
@@ -2800,16 +2833,16 @@ return html`
           ` : ''}
         </div>
       ` : ''}
-      ${((showSun && sun !== undefined) || (showUv && uv_index !== undefined)) ? html`
+      ${((showSunTimes) || (showUv && uv_index !== undefined)) ? html`
         <div>
           ${showUv && uv_index !== undefined ? html`
             <div>
               <ha-icon icon="hass:white-balance-sunny"></ha-icon> <span class="uv-index">UV: ${Math.round(uv_index * 10) / 10}</span>
             </div>
           ` : ''}
-          ${showSun && sun !== undefined ? html`
+          ${showSunTimes ? html`
             <div>
-              ${this.renderSun({ sun, language })}
+              ${this.renderSun({ sun })}
             </div>
           ` : ''}
         </div>
@@ -2833,17 +2866,49 @@ return html`
 `;
 }
 
-renderSun({ sun, language } = this) {
-  if (sun == undefined) {
+/**
+ * Next sunrise and sunset for the attributes row. Without a custom card
+ * location this uses `sun.sun`, which Home Assistant computes with astral, so
+ * the card shows the same times as the rest of Home Assistant. The card's own
+ * calculation runs for a custom location, or when `sun.sun` is missing or has
+ * no valid times (unavailable entity, removed integration).
+ * @returns {{ sunrise: Date|null, sunset: Date|null }|null} null when neither
+ *   source can provide times; a null field means polar day or night.
+ */
+getSunTimes(sun = this.sun) {
+  const config = this.config;
+  const hasCustomLocation = config.sun_latitude != null && config.sun_longitude != null;
+  if (!hasCustomLocation && sun && sun.attributes) {
+    const rising = new Date(sun.attributes.next_rising);
+    const setting = new Date(sun.attributes.next_setting);
+    if (!Number.isNaN(rising.getTime()) && !Number.isNaN(setting.getTime())) {
+      return { sunrise: rising, sunset: setting };
+    }
+  }
+
+  const { lat, lon } = this.getSunLocation();
+  if (lat == null || lon == null) {
+    return null;
+  }
+  const now = new Date();
+  const { sunrise: todaySunrise, sunset: todaySunset } = this.calculateSunriseSunset(now, lat, lon);
+  const tomorrow = new Date(now);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const { sunrise: tomorrowSunrise, sunset: tomorrowSunset } = this.calculateSunriseSunset(tomorrow, lat, lon);
+  return {
+    sunrise: todaySunrise > now ? todaySunrise : tomorrowSunrise,
+    sunset: todaySunset > now ? todaySunset : tomorrowSunset,
+  };
+}
+
+renderSun({ sun } = this) {
+  const times = this.getSunTimes(sun);
+  if (!times) {
     return html``;
   }
 
-  const config = this.config;
   const use12HourFormat = this.config.use_12hour_format;
-  const timezone = config.sun_timezone
-    || config.timezone
-    || (this._hass && this._hass.config && this._hass.config.time_zone)
-    || Intl.DateTimeFormat().resolvedOptions().timeZone;
+  const timezone = this.getSunTimezone();
   const locale = this.config.locale || undefined;
 
   const timeOptions = {
@@ -2853,23 +2918,7 @@ renderSun({ sun, language } = this) {
     timeZone: timezone
   };
 
-  const lat = this.config.sun_latitude != null ? this.config.sun_latitude
-    : (this._hass && this._hass.config && this._hass.config.latitude);
-  const lon = this.config.sun_longitude != null ? this.config.sun_longitude
-    : (this._hass && this._hass.config && this._hass.config.longitude);
-  let sunriseDate, sunsetDate;
-  if (lat != null && lon != null) {
-    const now = new Date();
-    const { sunrise: todaySunrise, sunset: todaySunset } = this.calculateSunriseSunset(now, lat, lon);
-    const tomorrow = new Date(now);
-    tomorrow.setDate(tomorrow.getDate() + 1);
-    const { sunrise: tomorrowSunrise, sunset: tomorrowSunset } = this.calculateSunriseSunset(tomorrow, lat, lon);
-    sunriseDate = todaySunrise > now ? todaySunrise : tomorrowSunrise;
-    sunsetDate = todaySunset > now ? todaySunset : tomorrowSunset;
-  } else {
-    sunriseDate = new Date(sun.attributes.next_rising);
-    sunsetDate = new Date(sun.attributes.next_setting);
-  }
+  const { sunrise: sunriseDate, sunset: sunsetDate } = times;
 
   return html`
     <ha-icon icon="mdi:weather-sunset-up"></ha-icon>
@@ -3094,9 +3143,30 @@ renderExtraRows({ config, forecastItems } = this) {
   });
 }
 
+// Which Home Assistant timestamp the "last changed" line shows:
+// 'changed'  - the condition (state) changed, e.g. sunny to cloudy
+// 'updated'  - the state or any attribute changed (temperature, wind...)
+// 'reported' - the integration wrote a value, even an identical one (HA 2024.3+)
+// Falls back to last_changed when the chosen field is missing.
+lastChangedTimestamp() {
+  const field = {
+    updated: 'last_updated',
+    reported: 'last_reported',
+  }[this.config.last_changed_source] || 'last_changed';
+  return this.weather[field] || this.weather.last_changed;
+}
+
 renderLastUpdated() {
-  const lastUpdatedString = this.weather.last_changed;
+  if (this.config.show_last_changed !== true) {
+    return html``;
+  }
+  const lastUpdatedString = this.lastChangedTimestamp();
   const lastUpdatedTimestamp = new Date(lastUpdatedString).getTime();
+  // A missing or unparseable timestamp would make Intl.RelativeTimeFormat throw
+  // and take the whole card down with it.
+  if (!Number.isFinite(lastUpdatedTimestamp)) {
+    return html``;
+  }
   const currentTimestamp = Date.now();
   const timeDifference = currentTimestamp - lastUpdatedTimestamp;
 
@@ -3113,12 +3183,6 @@ renderLastUpdated() {
     formattedLastUpdated = formatter.format(-hoursAgo, 'hour');
   } else {
     formattedLastUpdated = formatter.format(-minutesAgo, 'minute');
-  }
-
-  const showLastUpdated = this.config.show_last_changed == true;
-
-  if (!showLastUpdated) {
-    return html``;
   }
 
   return html`

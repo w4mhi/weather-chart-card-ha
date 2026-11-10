@@ -142,6 +142,7 @@ units:
 | wind_gust_speed       | string  | none                     | An entity_id for a custom wind gust speed sensor.                                                  |
 | visibility            | string  | none                     | An entity_id for a custom visibility sensor.                                                       |
 | description           | string  | none                     | An entity_id for a custom weather description sensor.                                              |
+| description_attribute | string  | none                     | Read the description from this attribute instead of a state, e.g. `content`. Uses the `description` entity, or the weather entity when `description` is not set. |
 | title                 | string  | 'Weather'                | Card title. An empty string hides the header.                                                      |
 | show_main             | boolean | true                     | Show or hide the main section (time, current condition, temperature and attributes). Set to `false` for a forecast-only card. |
 | show_forecast         | boolean | true                     | Show or hide the forecast section (chart, condition icons and wind forecast). Set to `false` for a current-conditions-only card. `show_main` and `show_forecast` cannot both be `false`. |
@@ -165,6 +166,7 @@ units:
 | show_visibility       | boolean | false                    | Show or hide visibility on the card.                                                               |
 | show_description      | boolean | false                    | Show or hide the weather description on the card.                                                  |
 | show_last_changed     | boolean | false                    | Show or hide when last data changed on the card.                                                   |
+| last_changed_source   | string  | 'changed'                | Which timestamp `show_last_changed` shows: 'changed' (the condition changed), 'updated' (the condition or any attribute changed), 'reported' (Home Assistant last received a value, HA 2024.3+). |
 | show_forecast_toggle  | boolean | false                    | Show or hide the Daily/Hourly toggle button in the top-right corner.                               |
 | use_12hour_format     | boolean | false                    | Display time in 12-hour format (AM/PM) instead of 24-hour format.                                  |
 | icons                 | string  | none                     | Path to the location of custom icons in svg format, for example `/local/weather-icons/`. Takes priority over the bundled animated icons. |

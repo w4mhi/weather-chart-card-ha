@@ -591,3 +591,145 @@ test('review: a failed icon import leaves the existing icons alone', async () =>
   importIcons(source, target);
   assert.equal(readdirSync(target).length, Object.keys(AMCHARTS_MAPPING).length);
 });
+
+test('last_changed_source picks the Home Assistant timestamp, falling back to last_changed', () => {
+  const weather = {
+    state: 'sunny',
+    last_changed: '2026-11-10T08:00:00Z',
+    last_updated: '2026-11-10T11:50:00Z',
+    last_reported: '2026-11-10T11:55:00Z',
+    attributes: {},
+  };
+  const stamp = (config, entity = weather) => {
+    const card = makeCard(config);
+    card.weather = entity;
+    return card.lastChangedTimestamp();
+  };
+  assert.equal(stamp({}), weather.last_changed);
+  assert.equal(stamp({ last_changed_source: 'changed' }), weather.last_changed);
+  assert.equal(stamp({ last_changed_source: 'updated' }), weather.last_updated);
+  assert.equal(stamp({ last_changed_source: 'reported' }), weather.last_reported);
+  // Older Home Assistant versions send no last_reported.
+  const older = { ...weather };
+  delete older.last_reported;
+  assert.equal(stamp({ last_changed_source: 'reported' }, older), weather.last_changed);
+  assert.equal(stamp({ last_changed_source: 'bogus' }), weather.last_changed);
+});
+
+test('sun times come from sun.sun unless the card has its own location', () => {
+  const home = { latitude: 52.37, longitude: 4.9, time_zone: 'Europe/Amsterdam', unit_system: { length: 'km', temperature: '°C' } };
+  const sun = { state: 'above_horizon', attributes: {
+    next_rising: '2026-11-11T06:47:13+00:00', next_setting: '2026-11-10T15:58:41+00:00',
+  } };
+  const card = (config, sunEntity) => {
+    const c = makeCard(config, { config: home });
+    c.sun = sunEntity;
+    return c;
+  };
+  const isValidPair = (times) => times
+    && times.sunrise instanceof Date && !Number.isNaN(times.sunrise.getTime())
+    && times.sunset instanceof Date && !Number.isNaN(times.sunset.getTime());
+
+  // No custom location: Home Assistant's own (astral) times, unchanged.
+  const fromHa = card({}, sun).getSunTimes();
+  assert.equal(fromHa.sunrise.toISOString(), '2026-11-11T06:47:13.000Z');
+  assert.equal(fromHa.sunset.toISOString(), '2026-11-10T15:58:41.000Z');
+
+  // A custom location keeps the card's own calculation, even with sun.sun present.
+  const tokyo = { sun_latitude: 35.68, sun_longitude: 139.69, sun_timezone: 'Asia/Tokyo' };
+  const custom = card(tokyo, sun).getSunTimes();
+  assert.ok(isValidPair(custom));
+  assert.notEqual(custom.sunrise.toISOString(), fromHa.sunrise.toISOString());
+
+  // A custom location still renders without a sun.sun entity.
+  assert.ok(isValidPair(card(tokyo, null).getSunTimes()));
+
+  // sun.sun unavailable or missing: fall back to the home coordinates, never "Invalid Date".
+  assert.ok(isValidPair(card({}, { state: 'unavailable', attributes: {} }).getSunTimes()));
+  assert.ok(isValidPair(card({}, { state: 'unavailable' }).getSunTimes()));
+  assert.ok(isValidPair(card({}, null).getSunTimes()));
+
+  // Nothing to compute from: no row at all.
+  const bare = makeCard({}, { config: { time_zone: 'UTC', unit_system: { length: 'km', temperature: '°C' } } });
+  bare.sun = null;
+  assert.equal(bare.getSunTimes(), null);
+});
+
+test('#61 description_attribute reads an attribute, falling back to the weather description', () => {
+  const states = {
+    'weather.home': { state: 'sunny', attributes: { description: 'Weather text', summary: 'Own summary' } },
+    'sensor.owm_summary': { state: '2026-11-10T12:00:00+00:00', attributes: { content: 'Rain from 15:00, clearing tonight.' } },
+    'sensor.plain': { state: 'Plain state text', attributes: {} },
+    'sensor.down': { state: 'unavailable', attributes: { content: '' } },
+  };
+  const read = (config) => {
+    const card = makeCard(config, { states });
+    return card.readDescription(card._hass, states['weather.home'].attributes.description);
+  };
+  // Unchanged: no options, or an entity without an attribute.
+  assert.equal(read({}), 'Weather text');
+  assert.equal(read({ description: 'sensor.plain' }), 'Plain state text');
+  // The attribute of the description entity, even when its state is a timestamp.
+  assert.equal(read({ description: 'sensor.owm_summary', description_attribute: 'content' }), 'Rain from 15:00, clearing tonight.');
+  // No description entity: the attribute comes from the weather entity itself.
+  assert.equal(read({ description_attribute: 'summary' }), 'Own summary');
+  // Missing entity, missing attribute or empty value: the weather description.
+  assert.equal(read({ description: 'sensor.gone', description_attribute: 'content' }), 'Weather text');
+  assert.equal(read({ description: 'sensor.owm_summary', description_attribute: 'nope' }), 'Weather text');
+  assert.equal(read({ description: 'sensor.down', description_attribute: 'content' }), 'Weather text');
+});
+
+test('a missing last_changed timestamp does not break the card', () => {
+  for (const show_last_changed of [false, true]) {
+    const card = makeCard({ show_last_changed });
+    card.weather = { state: 'sunny', attributes: {} };
+    assert.doesNotThrow(() => card.renderLastUpdated());
+  }
+});
+
+test('the editor asks the shown forecast whether it carries precipitation probability', async () => {
+  const Editor = customElements.get('weather-chart-card-ha-editor');
+  const subscriptions = [];
+  const hass = { states: {}, connection: { subscribeMessage(callback, message) {
+    const entry = { callback, message, closed: false };
+    subscriptions.push(entry);
+    return Promise.resolve(() => { entry.closed = true; });
+  } } };
+  const flush = () => new Promise((resolve) => setTimeout(resolve, 0));
+  const editor = new Editor();
+  editor.setConfig({ entity: 'weather.home', forecast: { type: 'hourly', hourly_entity: 'weather.hourly' } });
+  editor.hass = hass;
+
+  editor._probeProbability();
+  assert.equal(subscriptions.length, 1);
+  assert.deepEqual(subscriptions[0].message, { type: 'weather/subscribe_forecast', forecast_type: 'hourly', entity_id: 'weather.hourly' });
+  assert.equal(editor._hasProbability, undefined); // unknown: switches stay usable
+  // An empty first push is not an answer yet.
+  subscriptions[0].callback({ forecast: [] });
+  assert.equal(editor._hasProbability, undefined);
+  subscriptions[0].callback({ forecast: [{ precipitation: 1 }, { precipitation_probability: null }] });
+  assert.equal(editor._hasProbability, false);
+  await flush();
+  assert.ok(subscriptions[0].closed, 'one-shot: the subscription closes after the answer');
+
+  // Same entity and type: no new subscription.
+  editor._probeProbability();
+  assert.equal(subscriptions.length, 1);
+
+  // Another forecast type asks again.
+  editor.setConfig({ entity: 'weather.home', forecast: { type: 'daily' } });
+  editor._probeProbability();
+  assert.equal(subscriptions.length, 2);
+  assert.equal(subscriptions[1].message.entity_id, 'weather.home');
+  subscriptions[1].callback({ forecast: [{ precipitation_probability: 40 }] });
+  assert.equal(editor._hasProbability, true);
+
+  // An entity without that forecast type rejects; the answer stays unknown.
+  const rejecting = { states: {}, connection: { subscribeMessage: () => Promise.reject(new Error('not supported')) } };
+  const other = new Editor();
+  other.setConfig({ entity: 'weather.none' });
+  other.hass = rejecting;
+  other._probeProbability();
+  await flush();
+  assert.equal(other._hasProbability, undefined);
+});
