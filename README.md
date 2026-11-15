@@ -167,6 +167,7 @@ units:
 | show_description      | boolean | false                    | Show or hide the weather description on the card.                                                  |
 | show_last_changed     | boolean | false                    | Show or hide when last data changed on the card.                                                   |
 | last_changed_source   | string  | 'changed'                | Which timestamp `show_last_changed` shows: 'changed' (the condition changed), 'updated' (the condition or any attribute changed), 'reported' (Home Assistant last received a value, HA 2024.3+). |
+| show_version          | boolean | true                     | Show the card version in the bottom corner. |
 | show_forecast_toggle  | boolean | false                    | Show or hide the Daily/Hourly toggle button in the top-right corner.                               |
 | use_12hour_format     | boolean | false                    | Display time in 12-hour format (AM/PM) instead of 24-hour format.                                  |
 | icons                 | string  | none                     | Path to the location of custom icons in svg format, for example `/local/weather-icons/`. Takes priority over the bundled animated icons. |

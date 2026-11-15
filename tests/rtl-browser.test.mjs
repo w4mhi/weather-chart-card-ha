@@ -89,6 +89,41 @@ for (const {name, forecast, expected} of [
   });
 }
 
+for (const {name, config, expected} of [
+  {name:'shown by default, in the flow', config:{}, expected:{shown:true, position:'static'}},
+  {name:'hidden with show_version: false', config:{show_version:false}, expected:{shown:false, position:null}},
+]) {
+  test('card version: ' + name, async () => {
+    const page = await browser.newPage();
+    page.on('pageerror', error => console.error(error.message));
+    try {
+      await page.route('**/*', route => route.fulfill({contentType:'text/html', body:'<!doctype html><html></html>'}));
+      await page.goto('http://card-version.test/');
+      await page.addScriptTag({content:bundle});
+      await page.evaluate(config => {
+        const card = document.createElement('weather-chart-card-ha');
+        card.setConfig({entity:'weather.home', show_main:false, forecast:{condition_icons:false, show_wind_forecast:false, disable_animation:true}, ...config});
+        card.hass = {
+          language:'en', config:{time_zone:'UTC', unit_system:{temperature:'°C'}},
+          states:{'weather.home':{state:'sunny', last_changed:'2026-10-18T11:00:00Z', attributes:{temperature:20, temperature_unit:'°C', supported_features:3}}},
+          connection:{subscribeMessage(callback) {
+            setTimeout(() => callback({forecast:[{datetime:'2026-10-18T12:00:00Z', temperature:20, templow:10, precipitation:0}]}), 0);
+            return Promise.resolve(() => {});
+          }},
+        };
+        document.body.append(card);
+        window.card = card;
+      }, config);
+      await page.waitForFunction(() => window.card.forecastChart);
+      const actual = await page.evaluate(() => {
+        const element = window.card.shadowRoot.querySelector('.card-version');
+        return {shown: !!element, position: element ? getComputedStyle(element).position : null};
+      });
+      assert.deepEqual(actual, expected);
+    } finally { await page.close(); }
+  });
+}
+
 test('Hebrew covers every existing translation and unit, including Auto', () => {
   for (const key of Object.keys(locale.en)) assert.ok(locale.he[key], key);
   for (const key of Object.keys(locale.en.units)) assert.ok(locale.he.units[key], key);

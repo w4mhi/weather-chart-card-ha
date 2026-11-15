@@ -2448,9 +2448,9 @@ updateChart({ forecasts, forecastChart } = this) {
           overflow: hidden;
         }
         .card-version {
-          position: absolute;
-          bottom: 2px;
-          right: 6px; /* physical, not inset-inline-end: bottom-right in RTL too */
+          /* In the flow, not absolute: an overlay covered the last row (wind, icons). */
+          padding: 0 6px 2px;
+          text-align: right; /* physical, not end: bottom-right in RTL too */
           font-size: 9px;
           line-height: 1;
           color: var(--secondary-text-color);
@@ -2550,7 +2550,7 @@ updateChart({ forecasts, forecastChart } = this) {
           ${this.renderExtraRows()}
           ${this.renderLastUpdated()}
         </div>
-        <div class="card-version">v${CARD_VERSION}</div>
+        ${config.show_version === false ? '' : html`<div class="card-version">v${CARD_VERSION}</div>`}
       </ha-card>
     `;
   }
